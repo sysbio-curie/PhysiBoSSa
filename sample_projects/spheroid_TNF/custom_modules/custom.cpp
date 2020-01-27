@@ -107,7 +107,15 @@ void create_cell_types( void )
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 	int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 
-	// initially no necrosis 
+	// set cycle duration, apoptotic duration and rate and initially no necrosis 
+	int ki67n_index = cell_defaults.phenotype.cycle.model().find_phase_index(PhysiCell_constants::Ki67_negative);
+	int ki67pre_index = cell_defaults.phenotype.cycle.model().find_phase_index(PhysiCell_constants::Ki67_positive_premitotic);
+	int ki67post_index = cell_defaults.phenotype.cycle.model().find_phase_index(PhysiCell_constants::Ki67_positive_postmitotic);
+	
+	cell_defaults.phenotype.cycle.data.transition_rate(ki67n_index, ki67pre_index) = parameters.doubles("ki67n_phase_duration");
+	cell_defaults.phenotype.cycle.data.transition_rate(ki67pre_index, ki67post_index) = parameters.doubles("ki67pre_phase_duration");
+	cell_defaults.phenotype.cycle.data.transition_rate(ki67post_index, ki67n_index) = parameters.doubles("ki67post_phase_duration");
+
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
 	// set oxygen uptake / secretion parameters for the default cell type 
