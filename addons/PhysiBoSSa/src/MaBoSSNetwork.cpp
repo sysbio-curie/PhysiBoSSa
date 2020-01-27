@@ -3,22 +3,32 @@
 /* Default constructor */
 MaBoSSNetwork::MaBoSSNetwork( std::string networkFile, std::string configFile )
 {
-	// This is needed for the external functions
-	MaBEstEngine::init();
 	this->network = new Network();
-	this->runConfig = RunConfig::getInstance();
-	this->runConfig->setSeedPseudoRandom( UniformInt() );
-	this->symbTable = SymbolTable::getInstance();
-	this->update_time = 10;
-	this->def_nodes.clear();
-
 	this->network->parse(networkFile.c_str());
-	this->runConfig->parse(this->network, configFile.c_str());
-	
-	// This was missing, for some reason
-	this->network->updateRandomGenerator(RunConfig::getInstance());
 
-	this->initNetworkState();
+	this->config = new RunConfig();
+	this->config->setSeedPseudoRandom( UniformInt() );
+	this->config->parse(this->network, configFile.c_str());
+
+	//This can be modified
+	this->update_time_step = 10;
+
+	IStateGroup::checkAndComplete(network);
+
+	std::vector<Node *> nodes = this->network->getNodes();
+	int i = 0;
+	for (auto node : nodes)
+	{
+		this->node_names[ node->getLabel() ] = i;
+		i++;	
+	}
+
+	StochasticSimulationEngine* engine = new StochasticSimulationEngine(this->network, this->config);
+	int seed = this->config->getSeedPseudoRandom();
+	engine->setSeed(seed);
+
+	(*this->state) = engine->run(NULL, NULL);
+	delete engine;
 }
 
 /* Default destructor */
@@ -26,86 +36,36 @@ MaBoSSNetwork::~MaBoSSNetwork()
 {
 	delete this->network;
 	this->network = NULL;
-}
-
-/* Initialize the state of the network */
-void MaBoSSNetwork::initNetworkState()
-{
-	NetworkState initial_state;
-	this->network->initStates(initial_state);
-	std::vector<Node *> nodes = this->network->getNodes();
-	int i = 0;
-	this->def_nodes.resize( nodes.size() );
-	for (auto node : nodes)
-	{
-		this->node_names[ node->getLabel() ] = i;
-		this->def_nodes[i] = initial_state.getNodeState(node);
-		i++;	
-	}
-}
-
-/* Set values of nodes to default values */
-void MaBoSSNetwork::set_default( std::vector<bool>* nodes )
-{
-	for ( int i = 0; i < (int)this->def_nodes.size(); i++ )
-	{
-		(*nodes)[i] = this->def_nodes[i];
-	}
-}
-
-/* Load previous network states and inputs */
-void MaBoSSNetwork::load( NetworkState* netState, std::vector<bool>* inputs )
-{
-	std::vector<Node*> nodes;
-	nodes = network->getNodes();
-	int ind = 0;
-	for (auto node : nodes)
-	{
-		netState->setNodeState(node, (NodeState) (*inputs)[ind]);
-		ind ++;
-	}
-
-	IStateGroup::setInitialState(network, netState);
+	delete this->config;
+	this->config = NULL;
 }
 
 /* Run the current network */
 void MaBoSSNetwork::run(std::vector<bool>* nodes_val)
 {
-	this->runConfig->setSeedPseudoRandom( UniformInt() ); // pick random number
+	StochasticSimulationEngine* engine = new StochasticSimulationEngine(this->network, this->config);
+	int seed = this->config->getSeedPseudoRandom();
+	engine->setSeed(seed);
 
-	// Load network state and values of current cell in the network instance
-	NetworkState netStates;
-	load( &netStates, nodes_val );
-	MaBEstEngine mabossEngine( this->network, this->runConfig );
-	// No output from MaBoSS run
-	std::ostream* os = NULL; 
-	// And run it
-	mabossEngine.run(os);
-		
-	// save fixed point as initial state for the network for the next time step
-	const STATE_MAP<NetworkState_Impl, double>& states = mabossEngine.getAsymptoticStateDist();
-	if (states.begin() != states.end()) 
-	{
-		netStates = states.begin()->first;
-	}
+	(*this->state) = engine->run(this->state, NULL);
 
 	int i = 0;
 	std::vector<Node*> nodes = this->network->getNodes();
 	for ( auto node: nodes )
 	{
-		(*nodes_val)[i] = netStates.getNodeState( node ) ;
+		(*nodes_val)[i] = ((NetworkState) (*this->state)).getNodeState( node ) ;
 		i++;
 	}
 }
 
 /* Print current state of all the nodes of the network */
-void MaBoSSNetwork::print_nodes(std::vector<bool>* nodes_val)
+void MaBoSSNetwork::print_nodes()
 {
 	int i = 0;
 	std::vector<Node*> nodes = network->getNodes();
 	for ( auto node: nodes )
 	{
-		std::cout << node->getLabel() << "=" << (*nodes_val)[i] << "; ";
+		std::cout << node->getLabel() << "=" << ((NetworkState) (*this->state)).getNodeState( node ) << "; ";
 		i++;
 	}
 	std::cout << std::endl;
