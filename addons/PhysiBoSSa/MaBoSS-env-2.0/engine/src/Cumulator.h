@@ -194,6 +194,7 @@ class Cumulator {
     Iterator iterator() const {return Iterator(*this);}
   };
 #endif
+  RunConfig* runconfig;
   double time_tick;
   unsigned int sample_count;
   unsigned int sample_num;
@@ -290,11 +291,11 @@ class Cumulator {
 #ifdef HD_BUG
   void add(unsigned int where, const HDCumulMap& add_hd_cumul_map);
 #endif
-
+  
 public:
 
-  Cumulator(double time_tick, double max_time, unsigned int sample_count) :
-    time_tick(time_tick), sample_count(sample_count), sample_num(0), last_tm(0.), tick_index(0) {
+  Cumulator(RunConfig* runconfig, double time_tick, double max_time, unsigned int sample_count) :
+    runconfig(runconfig), time_tick(time_tick), sample_count(sample_count), sample_num(0), last_tm(0.), tick_index(0) {
 #ifdef USE_BITSET
     output_mask.set();
 #elif defined(USE_BOOST_BITSET)
@@ -387,12 +388,15 @@ public:
   }
 
   void displayCSV(Network* network, unsigned int refnode_count, std::ostream& os_probtraj = std::cout, std::ostream& os_statdist = std::cout, bool hexfloat = false) const;
+  void displayProbTrajCSV(Network* network, unsigned int refnode_count, std::ostream& os_probtraj = std::cout, bool hexfloat = false) const;
+  void displayStatDistCSV(Network* network, unsigned int refnode_count, std::ostream& os_statdist = std::cout, bool hexfloat = false) const;
   void displayAsymptoticCSV(Network* network, unsigned int refnode_count, std::ostream& os_asymptprob = std::cout, bool hexfloat = false, bool proba = true) const;
 
   const std::map<double, STATE_MAP<NetworkState_Impl, double> > getStateDists() const;
   const STATE_MAP<NetworkState_Impl, double> getNthStateDist(int nn) const;
   const STATE_MAP<NetworkState_Impl, double> getAsymptoticStateDist() const;
-  
+  const double getFinalTime() const;
+
   void computeMaxTickIndex();
   int getMaxTickIndex() const { return max_tick_index;} 
 
@@ -401,7 +405,7 @@ public:
 
   unsigned int getSampleCount() const {return sample_count;}
 
-  static Cumulator* mergeCumulators(std::vector<Cumulator*>& cumulator_v);
+  static Cumulator* mergeCumulators(RunConfig* runconfig, std::vector<Cumulator*>& cumulator_v);
 };
 
 #endif

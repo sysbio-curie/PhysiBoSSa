@@ -31,7 +31,7 @@ endif
 
 CXX = g++
 CXXOPT = -O2
-CXXFLAGS = $(CXXOPT) -Wall -DMAXNODES=$(MAXNODES) $(EXTRA_FLAGS) -fpic
+CXXFLAGS = $(CXXOPT) -Wall -DMAXNODES=$(MAXNODES) $(EXTRA_FLAGS) -fpic -DNDEBUG
 
 MAKEDEPEND = gcc -M $(EXTRA_FLAGS)
 
@@ -41,7 +41,7 @@ BISON = bison
 CHECK_FLEX  = $(FLEX) --version > /dev/null
 CHECK_BISON = $(BISON) --version > /dev/null
 
-LIB_OBJS := MaBEstEngine$(INFIX).o EnsembleEngine$(INFIX).o Cumulator$(INFIX).o ProbaDist$(INFIX).o BooleanNetwork$(INFIX).o BooleanGrammar$(INFIX).o RunConfigGrammar$(INFIX).o Function$(INFIX).o BuiltinFunctions$(INFIX).o RunConfig$(INFIX).o LogicalExprGen$(INFIX).o Utils$(INFIX).o
+LIB_OBJS := FinalStateSimulationEngine$(INFIX).o StochasticSimulationEngine$(INFIX).o MetaEngine$(INFIX).o MaBEstEngine$(INFIX).o EnsembleEngine$(INFIX).o Cumulator$(INFIX).o ProbaDist$(INFIX).o BooleanNetwork$(INFIX).o BooleanGrammar$(INFIX).o RunConfigGrammar$(INFIX).o Function$(INFIX).o BuiltinFunctions$(INFIX).o RunConfig$(INFIX).o LogicalExprGen$(INFIX).o Utils$(INFIX).o
 SERVER_OBJS := Server.o DataStreamer.o RPC.o
 
 # if USE_LIB is set, maboss library will be used for MaBoSS and MaBoSS-server programs => that will oblige the user to set LD_LIBRARY_PATH or DYLD_LIBRARY_PATH environment variable to execute MaBoSS or MaBoSS-server
@@ -53,7 +53,7 @@ else
 MABOSS_OBJS = $(LIB_OBJS)
 endif
 
-all: $(MABOSS_LIB) $(MABOSS) $(MABOSS_SERVER) $(MABOSS_CLIENT)
+all: $(MABOSS_LIB) $(MABOSS) $(MABOSS_SERVER) $(MABOSS_CLIENT) $(FUNC_MODULE)
 
 $(MABOSS_ALIB): $(LIB_OBJS)
 	ar rcs $(MABOSS_ALIB) $+
@@ -85,6 +85,20 @@ endif
 
 $(MABOSS_CLIENT): MaBoSS-client.o Client.o DataStreamer.o RPC.o Utils$(INFIX).o
 	$(CXX) -o $(MABOSS_CLIENT) $+ -lpthread -ldl
+
+OpenMpExample.o: openmp_example.cpp 
+	$(CXX) $(CXXFLAGS) -c openmp_example.cpp -o OpenMpExample.o -fopenmp
+
+OpenMpExample: OpenMpExample.o $(MABOSS_OBJS)
+	$(CXX) -o OpenMpExample $+ -lpthread -ldl -fopenmp
+
+OpenMpExampleMutant.o: openmp_example_mutant.cpp
+	$(CXX) $(CXXFLAGS) -c openmp_example_mutant.cpp -o OpenMpExampleMutant.o -fopenmp
+
+OpenMpExampleMutant: OpenMpExampleMutant.o $(MABOSS_OBJS)
+	$(CXX) -o OpenMpExampleMutant $+ -lpthread -ldl -fopenmp
+
+OpenMpExamples: OpenMpExample OpenMpExampleMutant
 
 init:
 	@CXX=$(CXX) sh init-config.sh
@@ -122,7 +136,7 @@ lex.RC.cc: RunConfigGrammar.l
 	$(FLEX) -t $+ | sed -e 's/yy/RC/g' -e 's/register //g' > lex.RC.cc
 
 clean: cleanobj
-	rm -f Test TestApi KMC $(MABOSS) $(MABOSS_CLIENT) $(MABOSS_SERVER) lex.yy.c lex.CTBNDL.cc BooleanGrammar.tab.h BooleanGrammar.tab.c BooleanGrammar.cc BooleanGrammar.tab.h lex.CTBNDL.cc lex.RC.cc RunConfigGrammar.cc RunConfigGrammar.tab.h RunConfigGrammar.tab.c BooleanGrammar.output RunConfigGrammar.output maboss-config.h
+	rm -f OpenMpExampleMutant OpenMpExample Test TestApi KMC $(MABOSS) $(MABOSS_CLIENT) $(MABOSS_SERVER) lex.yy.c lex.CTBNDL.cc BooleanGrammar.tab.h BooleanGrammar.tab.c BooleanGrammar.cc BooleanGrammar.tab.h lex.CTBNDL.cc lex.RC.cc RunConfigGrammar.cc RunConfigGrammar.tab.h RunConfigGrammar.tab.c BooleanGrammar.output RunConfigGrammar.output maboss-config.h
 
 cleanobj:
 	rm -f *$(INFIX).o *$(INFIX).so *$(INFIX).dylib

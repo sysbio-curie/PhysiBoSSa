@@ -37,46 +37,13 @@
 #include <dlfcn.h>
 #include <iostream>
 
-const std::string EnsembleEngine::VERSION = "1.0";
-// size_t RandomGenerator::generated_number_count = 0;
-static const char* MABOSS_USER_FUNC_INIT = "maboss_user_func_init";
+const std::string EnsembleEngine::VERSION = "1.2.0";
 
-void MetaEngine::init()
-{
-  extern void builtin_functions_init();
-  builtin_functions_init();
-}
-
-void MetaEngine::loadUserFuncs(const char* module)
-{
-  init();
-
-  void* dl = dlopen(module, RTLD_LAZY);
-  if (NULL == dl) {
-    std::cerr << dlerror() << "\n";
-    exit(1);
-  }
-
-  void* sym = dlsym(dl, MABOSS_USER_FUNC_INIT);
-  if (sym == NULL) {
-    std::cerr << "symbol " << MABOSS_USER_FUNC_INIT << "() not found in user func module: " << module << "\n";
-    exit(1);
-  }
-  typedef void (*init_t)(std::map<std::string, Function*>*);
-  init_t init_fun = (init_t)sym;
-  init_fun(Function::getFuncMap());
-}
-
-EnsembleEngine::EnsembleEngine(std::vector<Network*> networks, RunConfig* runconfig, bool save_individual_result, bool random_sampling) :
-  MetaEngine(runconfig), networks(networks), save_individual_result(save_individual_result), random_sampling(random_sampling) {
-
-  tid = NULL;
+EnsembleEngine::EnsembleEngine(std::vector<Network*> networks, RunConfig* runconfig, bool save_individual_result, bool _random_sampling) :
+  MetaEngine(networks[0], runconfig), networks(networks), save_individual_result(save_individual_result), random_sampling(_random_sampling) {
 
   if (thread_count > 1 && !runconfig->getRandomGeneratorFactory()->isThreadSafe()) {
     std::cerr << "Warning: non reentrant random, may not work properly in multi-threaded mode\n";
-  }
-  for (unsigned int i=0; i < networks.size(); i++) {
-    networks[i]->updateRandomGenerator(runconfig);
   }
   
   const std::vector<Node*>& nodes = networks[0]->getNodes();
@@ -109,8 +76,8 @@ EnsembleEngine::EnsembleEngine(std::vector<Network*> networks, RunConfig* runcon
   unsigned int network_index;
   if (random_sampling){
     // Here we need the random generator to compute the list of simulations
-    RandomGeneratorFactory* randgen_factory = RunConfig::getInstance()->getRandomGeneratorFactory();
-    int seed = RunConfig::getInstance()->getSeedPseudoRandom();
+    RandomGeneratorFactory* randgen_factory = runconfig->getRandomGeneratorFactory();
+    int seed = runconfig->getSeedPseudoRandom();
     RandomGenerator* random_generator = randgen_factory->generateRandomGenerator(seed);
     
     for (unsigned int nn = 0; nn < sample_count; nn++) {
@@ -146,7 +113,7 @@ EnsembleEngine::EnsembleEngine(std::vector<Network*> networks, RunConfig* runcon
   unsigned int offset = 0;
   for (unsigned int nn = 0; nn < thread_count; ++nn) {
     unsigned int t_count = (nn == 0 ? firstcount : count);
-    Cumulator* cumulator = new Cumulator(runconfig->getTimeTick(), runconfig->getMaxTime(), t_count);
+    Cumulator* cumulator = new Cumulator(runconfig, runconfig->getTimeTick(), runconfig->getMaxTime(), t_count);
     if (has_internal) {
 #ifdef USE_BITSET
       NetworkState_Impl state2 = ~internal_state.getState();
@@ -249,7 +216,7 @@ EnsembleEngine::EnsembleEngine(std::vector<Network*> networks, RunConfig* runcon
       for (nnn = 0; nnn < count_by_models.size(); nnn++) {
         if (count_by_models[nnn] > 0) {
           Cumulator* t_cumulator = new Cumulator(
-            runconfig->getTimeTick(), runconfig->getMaxTime(), count_by_models[nnn]
+            runconfig, runconfig->getTimeTick(), runconfig->getMaxTime(), count_by_models[nnn]
           );
       
           if (has_internal) {
@@ -408,7 +375,7 @@ void EnsembleEngine::runThread(Cumulator* cumulator, unsigned int start_count_th
       t_models_cumulators[model_ind]->rewind();
     }
     
-    network->initStates(network_state);
+    network->initStates(network_state, random_generator);
     double tm = 0.;
     unsigned int step = 0;
   //   if (NULL != output_traj) {
@@ -521,9 +488,9 @@ void EnsembleEngine::runThread(Cumulator* cumulator, unsigned int start_count_th
 
 void EnsembleEngine::run(std::ostream* output_traj)
 {
-  tid = new pthread_t[thread_count];
-  RandomGeneratorFactory* randgen_factory = RunConfig::getInstance()->getRandomGeneratorFactory();
-  int seed = RunConfig::getInstance()->getSeedPseudoRandom();
+  pthread_t* tid = new pthread_t[thread_count];
+  RandomGeneratorFactory* randgen_factory = runconfig->getRandomGeneratorFactory();
+  int seed = runconfig->getSeedPseudoRandom();
   unsigned int start_sample_count = 0;
   Probe probe;
   for (unsigned int nn = 0; nn < thread_count; ++nn) {
@@ -546,6 +513,7 @@ void EnsembleEngine::run(std::ostream* output_traj)
   probe.stop();
   elapsed_epilogue_runtime = probe.elapsed_msecs();
   user_epilogue_runtime = probe.user_msecs();
+  delete [] tid;
 }  
 
 STATE_MAP<NetworkState_Impl, unsigned int>* MetaEngine::mergeFixpointMaps()
@@ -584,7 +552,7 @@ void EnsembleEngine::mergeEnsembleFixpointMaps()
     if (model_fixpoints.size() > 0) {
       if (1 == model_fixpoints.size()) {
         fixpoints_per_model[i] = new STATE_MAP<NetworkState_Impl, unsigned int>(*model_fixpoints[0]);
-        
+        delete model_fixpoints[0];
       } else {
 
         STATE_MAP<NetworkState_Impl, unsigned int>* fixpoint_map = new STATE_MAP<NetworkState_Impl, unsigned int>();
@@ -619,7 +587,7 @@ void EnsembleEngine::mergeEnsembleFixpointMaps()
 
 void EnsembleEngine::epilogue()
 {
-  merged_cumulator = Cumulator::mergeCumulators(cumulator_v);
+  merged_cumulator = Cumulator::mergeCumulators(runconfig, cumulator_v);
   merged_cumulator->epilogue(networks[0], reference_state);
 
   if (save_individual_result) {
@@ -630,7 +598,7 @@ void EnsembleEngine::epilogue()
       std::vector<Cumulator*> model_cumulator = cumulators_thread_v[i];
       if (model_cumulator.size() > 0) {
         
-        Cumulator* t_cumulator = Cumulator::mergeCumulators(model_cumulator);
+        Cumulator* t_cumulator = Cumulator::mergeCumulators(runconfig, model_cumulator);
         t_cumulator->epilogue(networks[i], reference_state);
         cumulators_per_model[i] = t_cumulator;
         
@@ -656,49 +624,6 @@ void EnsembleEngine::epilogue()
     mergeEnsembleFixpointMaps();
   }
 
-}
-
-void EnsembleEngine::display(std::ostream& output_probtraj, std::ostream& output_statdist, std::ostream& output_fp, bool hexfloat) const
-{
-  Probe probe;
-  merged_cumulator->displayCSV(networks[0], refnode_count, output_probtraj, output_statdist, hexfloat);
-  probe.stop();
-  elapsed_statdist_runtime = probe.elapsed_msecs();
-  user_statdist_runtime = probe.user_msecs();
-
-  unsigned int statdist_traj_count = RunConfig::getInstance()->getStatDistTrajCount();
-  if (statdist_traj_count == 0) {
-    output_statdist << "Trajectory\tState\tProba\n";
-  }
-
-  output_fp << "Fixed Points (" << fixpoints.size() << ")\n";
-  if (0 < fixpoints.size()) {
-
-#ifdef HAS_STD_HEXFLOAT
-    if (hexfloat) {
-      output_fp << std::hexfloat;
-    }
-#endif
-
-    STATE_MAP<NetworkState_Impl, unsigned int>::const_iterator begin = fixpoints.begin();
-    STATE_MAP<NetworkState_Impl, unsigned int>::const_iterator end = fixpoints.end();
-    
-    output_fp << "FP\tProba\tState\t";
-    networks[0]->displayHeader(output_fp);
-    for (unsigned int nn = 0; begin != end; ++nn) {
-      const NetworkState& network_state = (*begin).first;
-      output_fp << "#" << (nn+1) << "\t";
-      if (hexfloat) {
-        output_fp << fmthexdouble((double)(*begin).second / sample_count) <<  "\t";
-      } else {
-        output_fp << ((double)(*begin).second / sample_count) <<  "\t";
-      }
-      network_state.displayOneLine(output_fp, networks[0]);
-      output_fp << '\t';
-      network_state.display(output_fp, networks[0]);
-      ++begin;
-    }
-  }
 }
 
 void EnsembleEngine::displayIndividual(unsigned int model_id, std::ostream& output_probtraj, std::ostream& output_statdist, std::ostream& output_fp, bool hexfloat) const {
@@ -741,32 +666,21 @@ void EnsembleEngine::displayIndividual(unsigned int model_id, std::ostream& outp
 
 EnsembleEngine::~EnsembleEngine()
 {
-  for (std::vector<Cumulator*>::iterator iter = cumulator_v.begin(); iter < cumulator_v.end(); ++iter) {
-    delete *iter;
-  }
+  for (auto t_cumulator: cumulator_v)
+    delete t_cumulator;
 
-  for (std::vector<STATE_MAP<NetworkState_Impl, unsigned int>*>::iterator iter = fixpoint_map_v.begin(); iter < fixpoint_map_v.end(); ++iter) {
-    delete *iter;
-  }
-
-  for (std::vector<EnsembleArgWrapper*>::iterator iter = arg_wrapper_v.begin(); iter < arg_wrapper_v.end(); ++iter) {
-    delete *iter;
-  }
-
+  for (auto t_fixpoint_map: fixpoint_map_v)
+    delete t_fixpoint_map;
+  
+  for (auto t_arg_wrapper: arg_wrapper_v)
+    delete t_arg_wrapper;
+  
   delete merged_cumulator;
 
-  for (unsigned int i=0; i < cumulators_per_model.size(); i++) {
-    if (cumulators_per_model[i] != NULL){
-      delete cumulators_per_model[i];
-    } 
-  }
-  
-  for (unsigned int i=0; i < fixpoints_per_model.size(); i++) {
-    if (fixpoints_per_model[i] != NULL){
-      delete fixpoints_per_model[i];
-    } 
-  }
+  for (auto t_cumulator: cumulators_per_model) 
+    delete t_cumulator;
 
-  delete [] tid;
+  for (auto t_fixpoint: fixpoints_per_model)
+    delete t_fixpoint;
 }
 
