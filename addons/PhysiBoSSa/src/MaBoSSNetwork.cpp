@@ -27,7 +27,7 @@ MaBoSSNetwork::MaBoSSNetwork( std::string networkFile, std::string configFile )
 	int seed = this->config->getSeedPseudoRandom();
 	engine->setSeed(seed);
 
-	(*this->state) = engine->run(NULL, NULL);
+	this->state = engine->run(NULL, NULL);
 	delete engine;
 }
 
@@ -47,13 +47,13 @@ void MaBoSSNetwork::run(std::vector<bool>* nodes_val)
 	int seed = this->config->getSeedPseudoRandom();
 	engine->setSeed(seed);
 
-	(*this->state) = engine->run(this->state, NULL);
+	this->state = engine->run(&(this->state), NULL);
 
 	int i = 0;
 	std::vector<Node*> nodes = this->network->getNodes();
 	for ( auto node: nodes )
 	{
-		(*nodes_val)[i] = ((NetworkState) (*this->state)).getNodeState( node ) ;
+		(*nodes_val)[i] = ((NetworkState) this->state).getNodeState( node ) ;
 		i++;
 	}
 }
@@ -65,7 +65,7 @@ void MaBoSSNetwork::print_nodes()
 	std::vector<Node*> nodes = network->getNodes();
 	for ( auto node: nodes )
 	{
-		std::cout << node->getLabel() << "=" << ((NetworkState) (*this->state)).getNodeState( node ) << "; ";
+		std::cout << node->getLabel() << "=" << ((NetworkState) this->state).getNodeState( node ) << "; ";
 		i++;
 	}
 	std::cout << std::endl;

@@ -24,7 +24,7 @@ class MaBoSSNetwork
 		/** \brief MaBoSS instances: configurations */
 		RunConfig* config;
 		/** \brief MaBoSS instances: state */
-		NetworkState_Impl* state;
+		NetworkState_Impl state;
 
 		/** \brief Time step to update the cycle */
 		double update_time_step;
