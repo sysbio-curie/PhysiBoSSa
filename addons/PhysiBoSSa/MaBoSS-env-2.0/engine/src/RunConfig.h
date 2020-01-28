@@ -35,16 +35,18 @@
 #include "RandomGenerator.h"
 #include "BooleanNetwork.h"
 class MaBEstEngine;
+class FinalStateSimulationEngine;
 
 class RunConfig {
 
-  static RunConfig* instance;
   mutable RandomGeneratorFactory* randgen_factory;
   double time_tick;
   double max_time;
   unsigned int sample_count;
   bool discrete_time;
   bool use_physrandgen;
+  bool use_glibcrandgen;
+  bool use_mtrandgen;
   int seed_pseudorand;
   bool display_traj;
   unsigned int thread_count;
@@ -53,16 +55,10 @@ class RunConfig {
   unsigned int statdist_similarity_cache_max_size;
   void dump_perform(Network* network, std::ostream& os, bool is_template) const;
 
-  RunConfig();
-
  public:
-  static RunConfig* getInstance() {
-    if (NULL == instance) {
-      instance = new RunConfig();
-    }
-    return instance;
-  }
-
+  RunConfig();
+  ~RunConfig();
+  
   int parse(Network* network, const char* file = NULL);
   int parseExpression(Network* network, const char* expr);
   void setParameter(const std::string& param, double value);
@@ -75,6 +71,7 @@ class RunConfig {
   int getSeedPseudoRandom() const {return seed_pseudorand;}
   void setSeedPseudoRandom(int seed) { seed_pseudorand = seed;}
   void display(Network* network, time_t start_time, time_t end_time, MaBEstEngine& mabest, std::ostream& os) const;
+  void display(Network* network, time_t start_time, time_t end_time, FinalStateSimulationEngine& engine, std::ostream& os) const;
   bool displayTrajectories() const {return display_traj;}
   unsigned int getThreadCount() const {return thread_count;}
   unsigned int getStatDistTrajCount() const {return statdist_traj_count <= sample_count ? statdist_traj_count : sample_count;}
@@ -87,7 +84,10 @@ class RunConfig {
 
 extern FILE* RCin;
 extern int RCparse();
+extern void RC_scan_expression(const char *);
+
 extern void runconfig_setNetwork(Network* network);
+extern void runconfig_setConfig(RunConfig* config);
 extern void RC_set_file(const char* file);
 extern void RC_set_expr(const char* expr);
 

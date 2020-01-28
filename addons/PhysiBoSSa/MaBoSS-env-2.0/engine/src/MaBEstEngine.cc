@@ -31,47 +31,18 @@
 
 #include "MaBEstEngine.h"
 #include "Probe.h"
-#include "Utils.h"
 #include <stdlib.h>
 #include <math.h>
 #include <iomanip>
 #include <dlfcn.h>
 #include <iostream>
 
-const std::string MaBEstEngine::VERSION = "2.2.2";
+const std::string MaBEstEngine::VERSION = "2.3.1";
 size_t RandomGenerator::generated_number_count = 0;
-static const char* MABOSS_USER_FUNC_INIT = "maboss_user_func_init";
-
-void MaBEstEngine::init()
-{
-  extern void builtin_functions_init();
-  builtin_functions_init();
-}
-
-void MaBEstEngine::loadUserFuncs(const char* module)
-{
-  init();
-
-  void* dl = dlopen(module, RTLD_LAZY);
-  if (NULL == dl) {
-    std::cerr << dlerror() << "\n";
-    exit(1);
-  }
-
-  void* sym = dlsym(dl, MABOSS_USER_FUNC_INIT);
-  if (sym == NULL) {
-    std::cerr << "symbol " << MABOSS_USER_FUNC_INIT << "() not found in user func module: " << module << "\n";
-    exit(1);
-  }
-  typedef void (*init_t)(std::map<std::string, Function*>*);
-  init_t init_fun = (init_t)sym;
-  init_fun(Function::getFuncMap());
-}
 
 MaBEstEngine::MaBEstEngine(Network* network, RunConfig* runconfig) :
-  network(network), time_tick(runconfig->getTimeTick()), max_time(runconfig->getMaxTime()), sample_count(runconfig->getSampleCount()), discrete_time(runconfig->isDiscreteTime()), thread_count(runconfig->getThreadCount()) {
-
-  tid = NULL;
+  MetaEngine(network, runconfig)
+  {
 
   if (thread_count > sample_count) {
     thread_count = sample_count;
@@ -80,7 +51,6 @@ MaBEstEngine::MaBEstEngine(Network* network, RunConfig* runconfig) :
   if (thread_count > 1 && !runconfig->getRandomGeneratorFactory()->isThreadSafe()) {
     std::cerr << "Warning: non reentrant random, may not work properly in multi-threaded mode\n";
   }
-  network->updateRandomGenerator(runconfig);
 
   const std::vector<Node*>& nodes = network->getNodes();
   std::vector<Node*>::const_iterator begin = nodes.begin();
@@ -107,7 +77,7 @@ MaBEstEngine::MaBEstEngine(Network* network, RunConfig* runconfig) :
   unsigned int count = sample_count / thread_count;
   unsigned int firstcount = count + sample_count - count * thread_count;
   for (unsigned int nn = 0; nn < thread_count; ++nn) {
-    Cumulator* cumulator = new Cumulator(runconfig->getTimeTick(), runconfig->getMaxTime(), (nn == 0 ? firstcount : count));
+    Cumulator* cumulator = new Cumulator(runconfig, runconfig->getTimeTick(), runconfig->getMaxTime(), (nn == 0 ? firstcount : count));
     if (has_internal) {
 #ifdef USE_BITSET
       NetworkState_Impl state2 = ~internal_state.getState();
@@ -213,7 +183,7 @@ void MaBEstEngine::runThread(Cumulator* cumulator, unsigned int start_count_thre
   for (unsigned int nn = 0; nn < sample_count_thread; ++nn) {
     random_generator->setSeed(seed+start_count_thread+nn);
     cumulator->rewind();
-    network->initStates(network_state);
+    network->initStates(network_state, random_generator);
     double tm = 0.;
     unsigned int step = 0;
     if (NULL != output_traj) {
@@ -309,9 +279,9 @@ void MaBEstEngine::runThread(Cumulator* cumulator, unsigned int start_count_thre
 
 void MaBEstEngine::run(std::ostream* output_traj)
 {
-  tid = new pthread_t[thread_count];
-  RandomGeneratorFactory* randgen_factory = RunConfig::getInstance()->getRandomGeneratorFactory();
-  int seed = RunConfig::getInstance()->getSeedPseudoRandom();
+  pthread_t* tid = new pthread_t[thread_count];
+  RandomGeneratorFactory* randgen_factory = runconfig->getRandomGeneratorFactory();
+  int seed = runconfig->getSeedPseudoRandom();
   unsigned int start_sample_count = 0;
   Probe probe;
   for (unsigned int nn = 0; nn < thread_count; ++nn) {
@@ -334,6 +304,7 @@ void MaBEstEngine::run(std::ostream* output_traj)
   probe.stop();
   elapsed_epilogue_runtime = probe.elapsed_msecs();
   user_epilogue_runtime = probe.user_msecs();
+  delete [] tid;
 }  
 
 STATE_MAP<NetworkState_Impl, unsigned int>* MaBEstEngine::mergeFixpointMaps()
@@ -365,7 +336,7 @@ STATE_MAP<NetworkState_Impl, unsigned int>* MaBEstEngine::mergeFixpointMaps()
 
 void MaBEstEngine::epilogue()
 {
-  merged_cumulator = Cumulator::mergeCumulators(cumulator_v);
+  merged_cumulator = Cumulator::mergeCumulators(runconfig, cumulator_v);
   merged_cumulator->epilogue(network, reference_state);
 
   STATE_MAP<NetworkState_Impl, unsigned int>* merged_fixpoint_map = mergeFixpointMaps();
@@ -380,265 +351,17 @@ void MaBEstEngine::epilogue()
   delete merged_fixpoint_map;
 }
 
-void MaBEstEngine::display(std::ostream& output_probtraj, std::ostream& output_statdist, std::ostream& output_fp, bool hexfloat) const
-{
-  Probe probe;
-  merged_cumulator->displayCSV(network, refnode_count, output_probtraj, output_statdist, hexfloat);
-  probe.stop();
-  elapsed_statdist_runtime = probe.elapsed_msecs();
-  user_statdist_runtime = probe.user_msecs();
-
-  unsigned int statdist_traj_count = RunConfig::getInstance()->getStatDistTrajCount();
-  if (statdist_traj_count == 0) {
-    output_statdist << "Trajectory\tState\tProba\n";
-  }
-
-  output_fp << "Fixed Points (" << fixpoints.size() << ")\n";
-  if (0 == fixpoints.size()) {
-    return;
-  }
-
-#ifdef HAS_STD_HEXFLOAT
-  if (hexfloat) {
-    output_fp << std::hexfloat;
-  }
-#endif
-
-  STATE_MAP<NetworkState_Impl, unsigned int>::const_iterator begin = fixpoints.begin();
-  STATE_MAP<NetworkState_Impl, unsigned int>::const_iterator end = fixpoints.end();
-  
-  output_fp << "FP\tProba\tState\t";
-  network->displayHeader(output_fp);
-  for (unsigned int nn = 0; begin != end; ++nn) {
-    const NetworkState& network_state = (*begin).first;
-    output_fp << "#" << (nn+1) << "\t";
-    if (hexfloat) {
-      output_fp << fmthexdouble((double)(*begin).second / sample_count) <<  "\t";
-    } else {
-      output_fp << ((double)(*begin).second / sample_count) <<  "\t";
-    }
-    network_state.displayOneLine(output_fp, network);
-    output_fp << '\t';
-    network_state.display(output_fp, network);
-    ++begin;
-  }
-}
-
-void MaBEstEngine::displayAsymptotic(std::ostream& output_asymptprob, bool hexfloat, bool proba) const
-{
-  merged_cumulator->displayAsymptoticCSV(network, refnode_count, output_asymptprob, hexfloat, proba);
-}
-
-const std::map<double, STATE_MAP<NetworkState_Impl, double> > MaBEstEngine::getStateDists() const {
-  return merged_cumulator->getStateDists();
-}
-
-const STATE_MAP<NetworkState_Impl, double> MaBEstEngine::getNthStateDist(int nn) const {
-  return merged_cumulator->getNthStateDist(nn);
-}
-
-const STATE_MAP<NetworkState_Impl, double> MaBEstEngine::getAsymptoticStateDist() const {
-  return merged_cumulator->getAsymptoticStateDist();
-}
-
-const std::map<double, std::map<Node *, double> > MaBEstEngine::getNodesDists() const {
-
-  std::map<double, std::map<Node *, double> > result;
-
-  const std::map<double, STATE_MAP<NetworkState_Impl, double> > state_dist = merged_cumulator->getStateDists();
-
-  std::map<double, STATE_MAP<NetworkState_Impl, double> >::const_iterator begin = state_dist.begin();
-  std::map<double, STATE_MAP<NetworkState_Impl, double> >::const_iterator end = state_dist.end();
-  
-  const std::vector<Node*>& nodes = network->getNodes();
-
-  while(begin != end) {
-
-    std::map<Node *, double> node_dist;
-    STATE_MAP<NetworkState_Impl, double> present_state_dist = begin->second;
-
-    std::vector<Node *>::const_iterator nodes_begin = nodes.begin();
-    std::vector<Node *>::const_iterator nodes_end = nodes.end();
-
-    while(nodes_begin != nodes_end) {
-
-      double dist = 0;
-
-      STATE_MAP<NetworkState_Impl, double>::const_iterator states_begin = present_state_dist.begin();
-      STATE_MAP<NetworkState_Impl, double>::const_iterator states_end = present_state_dist.end();
-    
-      while(states_begin != states_end) {
-
-        NetworkState state = states_begin->first;
-        dist += states_begin->second * ((double) state.getNodeState(*nodes_begin));
-
-        states_begin++;
-      }
-
-      node_dist[*nodes_begin] = dist;
-
-      nodes_begin++;
-    }
-
-    result[begin->first] = node_dist;
-
-    begin++;
-  }
-
-  return result;
-}
-
-const std::map<Node*, double> MaBEstEngine::getNthNodesDist(int nn) const {
-  std::map<Node *, double> result;
-
-  const STATE_MAP<NetworkState_Impl, double> state_dist = merged_cumulator->getNthStateDist(nn);
-  
-  const std::vector<Node*>& nodes = network->getNodes();
-  std::vector<Node *>::const_iterator nodes_begin = nodes.begin();
-  std::vector<Node *>::const_iterator nodes_end = nodes.end();
-
-  while(nodes_begin != nodes_end) {
-
-    double dist = 0;
-
-    STATE_MAP<NetworkState_Impl, double>::const_iterator states_begin = state_dist.begin();
-    STATE_MAP<NetworkState_Impl, double>::const_iterator states_end = state_dist.end();
-  
-    while(states_begin != states_end) {
-
-      NetworkState state = states_begin->first;
-      dist += states_begin->second * ((double) state.getNodeState(*nodes_begin));
-
-      states_begin++;
-    }
-
-    result[*nodes_begin] = dist;
-
-    nodes_begin++;
-  }
-
-  return result;  
-}
-
-const std::map<Node*, double> MaBEstEngine::getAsymptoticNodesDist() const {
-  std::map<Node *, double> result;
-
-  const STATE_MAP<NetworkState_Impl, double> state_dist = merged_cumulator->getAsymptoticStateDist();
-  
-  const std::vector<Node*>& nodes = network->getNodes();
-  std::vector<Node *>::const_iterator nodes_begin = nodes.begin();
-  std::vector<Node *>::const_iterator nodes_end = nodes.end();
-
-  while(nodes_begin != nodes_end) {
-
-    double dist = 0;
-
-    STATE_MAP<NetworkState_Impl, double>::const_iterator states_begin = state_dist.begin();
-    STATE_MAP<NetworkState_Impl, double>::const_iterator states_end = state_dist.end();
-  
-    while(states_begin != states_end) {
-
-      NetworkState state = states_begin->first;
-      dist += states_begin->second * ((double) state.getNodeState(*nodes_begin));
-
-      states_begin++;
-    }
-
-    result[*nodes_begin] = dist;
-
-    nodes_begin++;
-  }
-
-  return result;  
-}
-
-const std::map<double, double> MaBEstEngine::getNodeDists(Node * node) const {
- 
-  std::map<double, double> result;
-
-  const std::map<double, STATE_MAP<NetworkState_Impl, double> > state_dist = merged_cumulator->getStateDists();
-
-  std::map<double, STATE_MAP<NetworkState_Impl, double> >::const_iterator begin = state_dist.begin();
-  std::map<double, STATE_MAP<NetworkState_Impl, double> >::const_iterator end = state_dist.end();
-
-  while(begin != end) {
-
-    STATE_MAP<NetworkState_Impl, double> present_state_dist = begin->second;
-    double dist = 0;
-
-    STATE_MAP<NetworkState_Impl, double>::const_iterator states_begin = present_state_dist.begin();
-    STATE_MAP<NetworkState_Impl, double>::const_iterator states_end = present_state_dist.end();
-  
-    while(states_begin != states_end) {
-
-      NetworkState state = states_begin->first;
-      dist += states_begin->second * ((double) state.getNodeState(node));
-
-      states_begin++;
-    }
-    result[begin->first] = dist;
-
-    begin++;
-  }
-
-  return result; 
-}
-
-double MaBEstEngine::getNthNodeDist(Node * node, int nn) const {
-
-  double result = 0;
-
-  const STATE_MAP<NetworkState_Impl, double> state_dist = merged_cumulator->getNthStateDist(nn);
-  
-  STATE_MAP<NetworkState_Impl, double>::const_iterator states_begin = state_dist.begin();
-  STATE_MAP<NetworkState_Impl, double>::const_iterator states_end = state_dist.end();
-
-  while(states_begin != states_end) {
-
-    NetworkState state = states_begin->first;
-    result += states_begin->second * ((double) state.getNodeState(node));
-
-    states_begin++;
-  }
-
-  return result;  
-}
-
-double MaBEstEngine::getAsymptoticNodeDist(Node * node) const {
-
-  double result = 0;
-
-  const STATE_MAP<NetworkState_Impl, double> state_dist = merged_cumulator->getAsymptoticStateDist();
-  
-  STATE_MAP<NetworkState_Impl, double>::const_iterator states_begin = state_dist.begin();
-  STATE_MAP<NetworkState_Impl, double>::const_iterator states_end = state_dist.end();
-
-  while(states_begin != states_end) {
-
-    NetworkState state = states_begin->first;
-    result += states_begin->second * ((double) state.getNodeState(node));
-
-    states_begin++;
-  }
-
-  return result;  
-}
-
 MaBEstEngine::~MaBEstEngine()
 {
-  for (std::vector<Cumulator*>::iterator iter = cumulator_v.begin(); iter < cumulator_v.end(); ++iter) {
-    delete *iter;
-  }
+  for (auto t_cumulator: cumulator_v)
+    delete t_cumulator;
 
-  for (std::vector<STATE_MAP<NetworkState_Impl, unsigned int>*>::iterator iter = fixpoint_map_v.begin(); iter < fixpoint_map_v.end(); ++iter) {
-    delete *iter;
-  }
-
-  for (std::vector<ArgWrapper*>::iterator iter = arg_wrapper_v.begin(); iter < arg_wrapper_v.end(); ++iter) {
-    delete *iter;
-  }
+  for (auto t_fixpoint_map: fixpoint_map_v)
+    delete t_fixpoint_map;
+  
+  for (auto t_arg_wrapper: arg_wrapper_v)
+    delete t_arg_wrapper;
 
   delete merged_cumulator;
-  delete [] tid;
 }
 

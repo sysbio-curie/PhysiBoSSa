@@ -31,6 +31,9 @@
 
 #include "MaBEstEngine.h"
 #include "EnsembleEngine.h"
+#include "StochasticSimulationEngine.h"
+#include "FinalStateSimulationEngine.h"
+#include "Function.h"
 #include <fstream>
 #include <stdlib.h>
 #include "Utils.h"
@@ -50,7 +53,7 @@ static int usage(std::ostream& os = std::cerr)
   os << "  " << prog << " [--override]\n";
   os << "  " << prog << " [--augment]\n";
   os << "  " << prog << " [--hexfloat]\n";
-  os << "  " << prog << " [--ensemble [--save-individual] [--random-sampling]]\n";
+  os << "  " << prog << " [--ensemble [--save-individual] [--random-sampling] [--ensemble-istates]]\n";
   os << "  " << prog << " [--export-asymptotic]\n";
   os << "  " << prog << " [--counts]\n";
   return 1;
@@ -78,6 +81,13 @@ static int help()
   std::cout << "  --export-asymptotic                     : create a special file for asymptotic probabilities\n";
   std::cout << "  --counts                                : exports counts instead of probabilities (only works with asymptotic states)\n";
   std::cout << "  -h --help                               : displays this message\n";
+  std::cout << "\nEnsembles:\n";
+  std::cout << "  -- ensemble                             : simulate ensembles\n";
+  std::cout << "  -- random-sampling                      : randomly select which model to simulate\n";
+  std::cout << "  -- save-individual                      : export results of individual models\n";
+  std::cout << "  -- ensemble-istates                     : Each model will have it's own cfg file. Must provide configs via -c, in the same order as the models\n";
+  std::cout << "\nFinal:\n";
+  std::cout << "  -- final                                : Only export final probabilities\n";
   std::cout << "\nNotices:\n";
   std::cout << "\n1. --config and --config-expr options can be used multiple times;\n";
   std::cout << "   multiple --config and/or --config-expr options are managed in the order given at the command line;\n";
@@ -97,10 +107,12 @@ int main(int argc, char* argv[])
   std::vector<ConfigOpt> runconfig_file_or_expr_v;
   std::vector<std::string> runconfig_var_v;
   const char* ctbndl_file = NULL;
+  bool single_simulation = false;
+  bool final_simulation = false;
   bool ensemble = false;
   bool ensemble_save_individual_results = false;
   bool ensemble_random_sampling = false;
-
+  bool ensemble_istates = false;
   std::vector<char *> ctbndl_files;
   bool dump_config = false;
   bool generate_config_template = false;
@@ -134,6 +146,10 @@ int main(int argc, char* argv[])
 	dont_shrink_logical_expressions = true;
       } else if (!strcmp(s, "--ensemble")) {
   ensemble = true;
+      } else if (!strcmp(s, "--single")) {
+  single_simulation = true;
+      } else if (!strcmp(s, "--final")) {
+  final_simulation = true;
       } else if (!strcmp(s, "--save-individual")) {
         if (ensemble) {
           ensemble_save_individual_results = true;
@@ -146,7 +162,14 @@ int main(int argc, char* argv[])
         } else {
           std::cerr << "\n" << prog << ": --random-sampling only usable if --ensemble is used" << std::endl;
         }
-      } else if (!strcmp(s, "--export-asymptotic")) {
+      } else if (!strcmp(s, "--ensemble-istates")) {
+        if (ensemble) {
+          ensemble_istates = true;
+        } else {
+          std::cerr << "\n" << prog << ": --ensemble-istates only usable if --ensemble is used" << std::endl;
+        }
+      }
+       else if (!strcmp(s, "--export-asymptotic")) {
         export_asymptotic = true;
       } else if (!strcmp(s, "--counts")) {
         counts = true;
@@ -253,104 +276,225 @@ int main(int argc, char* argv[])
 
     if (ensemble) {
 
-      std::vector<Network *> networks;
-      RunConfig* runconfig = RunConfig::getInstance();      
+      if (ensemble_istates) {
+        std::vector<Network *> networks;
+        RunConfig* runconfig = new RunConfig();      
 
-      Network* first_network = new Network();
-      first_network->parse(ctbndl_files[0]);
-      networks.push_back(first_network);
+        Network* first_network = new Network();
+        first_network->parse(ctbndl_files[0]);
+        networks.push_back(first_network);
 
-      std::vector<ConfigOpt>::const_iterator begin = runconfig_file_or_expr_v.begin();
-      std::vector<ConfigOpt>::const_iterator end = runconfig_file_or_expr_v.end();
-      while (begin != end) {
-        const ConfigOpt& cfg = *begin;
-        if (cfg.isExpr()) {
-          runconfig->parseExpression(networks[0], (cfg.getExpr() + ";").c_str());
-        } else {
-          runconfig->parse(networks[0], cfg.getFile().c_str());
-        }
-        ++begin;
-      }
+        // std::vector<ConfigOpt>::const_iterator begin = runconfig_file_or_expr_v.begin();
+        // std::vector<ConfigOpt>::const_iterator end = runconfig_file_or_expr_v.end();
+        // while (begin != end) {
+          const ConfigOpt& cfg = runconfig_file_or_expr_v[0];
+          if (cfg.isExpr()) {
+            runconfig->parseExpression(networks[0], (cfg.getExpr() + ";").c_str());
+          } else {
+            runconfig->parse(networks[0], cfg.getFile().c_str());
+          }
+        //   ++begin;
+        // }
 
-      IStateGroup::checkAndComplete(networks[0]);
+        IStateGroup::checkAndComplete(networks[0]);
 
-      std::map<std::string, NodeIndex> nodes_indexes;
-      std::vector<Node*> first_network_nodes = first_network->getNodes();
-      for (unsigned int i=0; i < first_network_nodes.size(); i++) {
-        Node* t_node = first_network_nodes[i];
-        nodes_indexes[t_node->getLabel()] = t_node->getIndex();
-      }
+        // RandomGeneratorFactory* randgen_factory = runconfig->getRandomGeneratorFactory();
+        // RandomGenerator* randgen = randgen_factory->generateRandomGenerator(runconfig->getSeedPseudoRandom());
 
-      for (unsigned int i=1; i < ctbndl_files.size(); i++) {
-        
-        Network* network = new Network();
-        network->parse(ctbndl_files[i], &nodes_indexes);
-        networks.push_back(network);
-
-        const std::vector<Node*> nodes = networks[i]->getNodes();
-        for (unsigned int j=0; j < nodes.size(); j++) {
-            if (!first_network_nodes[j]->istateSetRandomly()) {
-                nodes[j]->setIState(first_network_nodes[j]->getIState(first_network));
-            }
-
-            nodes[j]->isInternal(first_network_nodes[j]->isInternal());
-
-            // if (!first_network_nodes[j]->isReference()) {
-            //   nodes[j]->setReferenceState(first_network_nodes[j]->getReferenceState());
-            // }
+        std::map<std::string, NodeIndex> nodes_indexes;
+        std::vector<Node*> first_network_nodes = first_network->getNodes();
+        for (unsigned int i=0; i < first_network_nodes.size(); i++) {
+          Node* t_node = first_network_nodes[i];
+          nodes_indexes[t_node->getLabel()] = t_node->getIndex();
         }
 
-        IStateGroup::checkAndComplete(networks[i]);
-      }
-      SymbolTable::getInstance()->checkSymbols();
-
-      // output_run = new std::ofstream((std::string(output) + "_run.txt").c_str());
-      output_probtraj = new std::ofstream((std::string(output) + "_probtraj.csv").c_str());
-      output_statdist = new std::ofstream((std::string(output) + "_statdist.csv").c_str());
-      output_fp = new std::ofstream((std::string(output) + "_fp.csv").c_str());
-      
-      time(&start_time);
-      EnsembleEngine engine(networks, runconfig, ensemble_save_individual_results, ensemble_random_sampling);
-      engine.run(NULL);
-      engine.display(*output_probtraj, *output_statdist, *output_fp, hexfloat);
-
-      if (ensemble_save_individual_results) {
-        for (unsigned int i=0; i < networks.size(); i++) {
+        for (unsigned int i=1; i < ctbndl_files.size(); i++) {
           
-          std::ostream* i_output_probtraj = new std::ofstream(
-            (std::string(output) + "_model_" + std::to_string(i) + "_probtraj.csv").c_str()
-          );
-          
-          std::ostream* i_output_fp = new std::ofstream(
-            (std::string(output) + "_model_" + std::to_string(i) + "_fp.csv").c_str()
-          );
-          
-          std::ostream* i_output_statdist = new std::ofstream(
-            (std::string(output) + "_model_" + std::to_string(i) + "_statdist.csv").c_str()
-          );
+          Network* network = new Network();
+          network->parse(ctbndl_files[i], &nodes_indexes);
+          networks.push_back(network);
 
-          engine.displayIndividual(i, *i_output_probtraj, *i_output_statdist, *i_output_fp, hexfloat);
+          const ConfigOpt& cfg = runconfig_file_or_expr_v[i];
+          if (cfg.isExpr()) {
+            runconfig->parseExpression(networks[i], (cfg.getExpr() + ";").c_str());
+          } else {
+            runconfig->parse(networks[i], cfg.getFile().c_str());
+          }
 
-          ((std::ofstream*) i_output_probtraj)->close();
-          ((std::ofstream*) i_output_statdist)->close();
-          ((std::ofstream*) i_output_fp)->close();
 
+          const std::vector<Node*> nodes = networks[i]->getNodes();
+          for (unsigned int j=0; j < nodes.size(); j++) {
+              // if (!first_network_nodes[j]->istateSetRandomly()) {
+              //     nodes[j]->setIState(first_network_nodes[j]->getIState(first_network, randgen));
+              // }
+
+              nodes[j]->isInternal(first_network_nodes[j]->isInternal());
+
+              // if (!first_network_nodes[j]->isReference()) {
+              //   nodes[j]->setReferenceState(first_network_nodes[j]->getReferenceState());
+              // }
+          }
+
+          IStateGroup::checkAndComplete(networks[i]);
+          networks[i]->getSymbolTable()->checkSymbols();
         }
-      }
-      time(&end_time);
 
-      // ((std::ofstream*)output_run)->close();
-      ((std::ofstream*)output_probtraj)->close();
-      ((std::ofstream*)output_statdist)->close();
-      ((std::ofstream*)output_fp)->close();
+        // output_run = new std::ofstream((std::string(output) + "_run.txt").c_str());
+        output_probtraj = new std::ofstream((std::string(output) + "_probtraj.csv").c_str());
+        output_statdist = new std::ofstream((std::string(output) + "_statdist.csv").c_str());
+        output_fp = new std::ofstream((std::string(output) + "_fp.csv").c_str());
         
-    } else {
+        time(&start_time);
+        EnsembleEngine engine(networks, runconfig, ensemble_save_individual_results, ensemble_random_sampling);
+        engine.run(NULL);
+        engine.display(*output_probtraj, *output_statdist, *output_fp, hexfloat);
+
+        if (ensemble_save_individual_results) {
+          for (unsigned int i=0; i < networks.size(); i++) {
+            
+            std::ostream* i_output_probtraj = new std::ofstream(
+              (std::string(output) + "_model_" + std::to_string(i) + "_probtraj.csv").c_str()
+            );
+            
+            std::ostream* i_output_fp = new std::ofstream(
+              (std::string(output) + "_model_" + std::to_string(i) + "_fp.csv").c_str()
+            );
+            
+            std::ostream* i_output_statdist = new std::ofstream(
+              (std::string(output) + "_model_" + std::to_string(i) + "_statdist.csv").c_str()
+            );
+
+            engine.displayIndividual(i, *i_output_probtraj, *i_output_statdist, *i_output_fp, hexfloat);
+
+            ((std::ofstream*) i_output_probtraj)->close();
+            ((std::ofstream*) i_output_statdist)->close();
+            ((std::ofstream*) i_output_fp)->close();
+
+          }
+        }
+        time(&end_time);
+
+        // ((std::ofstream*)output_run)->close();
+        ((std::ofstream*)output_probtraj)->close();
+        ((std::ofstream*)output_statdist)->close();
+        ((std::ofstream*)output_fp)->close();
+      } else {
+
+        std::vector<Network *> networks;
+        RunConfig* runconfig = new RunConfig();      
+
+        Network* first_network = new Network();
+        first_network->parse(ctbndl_files[0]);
+        networks.push_back(first_network);
+
+        std::vector<ConfigOpt>::const_iterator begin = runconfig_file_or_expr_v.begin();
+        std::vector<ConfigOpt>::const_iterator end = runconfig_file_or_expr_v.end();
+        while (begin != end) {
+          const ConfigOpt& cfg = *begin;
+          if (cfg.isExpr()) {
+            runconfig->parseExpression(networks[0], (cfg.getExpr() + ";").c_str());
+          } else {
+            runconfig->parse(networks[0], cfg.getFile().c_str());
+          }
+          ++begin;
+        }
+
+        IStateGroup::checkAndComplete(networks[0]);
+
+        RandomGeneratorFactory* randgen_factory = runconfig->getRandomGeneratorFactory();
+        RandomGenerator* randgen = randgen_factory->generateRandomGenerator(runconfig->getSeedPseudoRandom());
+
+        std::map<std::string, NodeIndex> nodes_indexes;
+        std::vector<Node*> first_network_nodes = first_network->getNodes();
+        for (unsigned int i=0; i < first_network_nodes.size(); i++) {
+          Node* t_node = first_network_nodes[i];
+          nodes_indexes[t_node->getLabel()] = t_node->getIndex();
+        }
+
+        for (unsigned int i=1; i < ctbndl_files.size(); i++) {
+          
+          Network* network = new Network();
+          network->parse(ctbndl_files[i], &nodes_indexes);
+          networks.push_back(network);
+
+          const std::vector<Node*> nodes = networks[i]->getNodes();
+          for (unsigned int j=0; j < nodes.size(); j++) {
+              if (!first_network_nodes[j]->istateSetRandomly()) {
+                  nodes[j]->setIState(first_network_nodes[j]->getIState(first_network, randgen));
+              }
+
+              nodes[j]->isInternal(first_network_nodes[j]->isInternal());
+
+              // if (!first_network_nodes[j]->isReference()) {
+              //   nodes[j]->setReferenceState(first_network_nodes[j]->getReferenceState());
+              // }
+          }
+
+          IStateGroup::checkAndComplete(networks[i]);
+          networks[i]->getSymbolTable()->checkSymbols();
+        }
+
+        // output_run = new std::ofstream((std::string(output) + "_run.txt").c_str());
+        output_probtraj = new std::ofstream((std::string(output) + "_probtraj.csv").c_str());
+        output_statdist = new std::ofstream((std::string(output) + "_statdist.csv").c_str());
+        output_fp = new std::ofstream((std::string(output) + "_fp.csv").c_str());
         
+        time(&start_time);
+        EnsembleEngine engine(networks, runconfig, ensemble_save_individual_results, ensemble_random_sampling);
+        engine.run(NULL);
+        engine.display(*output_probtraj, *output_statdist, *output_fp, hexfloat);
+
+        if (ensemble_save_individual_results) {
+          for (unsigned int i=0; i < networks.size(); i++) {
+            
+            std::ostream* i_output_probtraj = new std::ofstream(
+              (std::string(output) + "_model_" + std::to_string(i) + "_probtraj.csv").c_str()
+            );
+            
+            std::ostream* i_output_fp = new std::ofstream(
+              (std::string(output) + "_model_" + std::to_string(i) + "_fp.csv").c_str()
+            );
+            
+            std::ostream* i_output_statdist = new std::ofstream(
+              (std::string(output) + "_model_" + std::to_string(i) + "_statdist.csv").c_str()
+            );
+
+            engine.displayIndividual(i, *i_output_probtraj, *i_output_statdist, *i_output_fp, hexfloat);
+
+            ((std::ofstream*) i_output_probtraj)->close();
+            delete i_output_probtraj;
+            ((std::ofstream*) i_output_statdist)->close();
+            delete i_output_statdist;
+            ((std::ofstream*) i_output_fp)->close();
+            delete i_output_fp;
+
+          }
+        }
+        time(&end_time);
+
+        // ((std::ofstream*)output_run)->close();
+        ((std::ofstream*)output_probtraj)->close();
+        delete output_probtraj;
+        ((std::ofstream*)output_statdist)->close();
+        delete output_statdist;
+        ((std::ofstream*)output_fp)->close();
+        delete output_fp;
+
+        delete runconfig;
+        for (std::vector<Network*>::iterator it = networks.begin(); it != networks.end(); ++it)
+          delete *it;
+
+        Function::destroyFuncMap();  
+
+      }
+        
+    } else if (single_simulation) {
+
       Network* network = new Network();
 
       network->parse(ctbndl_file);
 
-      RunConfig* runconfig = RunConfig::getInstance();
+      RunConfig* runconfig = new RunConfig();
 
       if (generate_config_template) {
         IStateGroup::checkAndComplete(network);
@@ -358,7 +502,55 @@ int main(int argc, char* argv[])
         return 0;
       }
 
-      if (setConfigVariables(prog, runconfig_var_v)) {
+      if (setConfigVariables(network, prog, runconfig_var_v)) {
+        return 1;
+      }      
+
+      std::vector<ConfigOpt>::const_iterator begin = runconfig_file_or_expr_v.begin();
+      std::vector<ConfigOpt>::const_iterator end = runconfig_file_or_expr_v.end();
+      while (begin != end) {
+        const ConfigOpt& cfg = *begin;
+        if (cfg.isExpr()) {
+          runconfig->parseExpression(network, (cfg.getExpr() + ";").c_str());
+        } else {
+          runconfig->parse(network, cfg.getFile().c_str());
+        }
+        ++begin;
+      }
+
+      IStateGroup::checkAndComplete(network);
+
+      network->getSymbolTable()->checkSymbols();
+
+      output_run = new std::ofstream((std::string(output) + "_run.txt").c_str());
+      
+      StochasticSimulationEngine single_simulation(network, runconfig);
+      [[maybe_unused]] NetworkState_Impl final_state = single_simulation.run(NULL, output_run);
+
+      ((std::ofstream*)output_run)->close();
+      delete output_run;
+
+
+      delete runconfig;
+      delete network;
+
+      Function::destroyFuncMap();  
+      
+    } else {
+        
+      Network* network = new Network();
+
+      network->parse(ctbndl_file);
+
+      RunConfig* runconfig = new RunConfig();
+
+      if (generate_config_template) {
+        IStateGroup::checkAndComplete(network);
+        runconfig->generateTemplate(network, std::cout);
+        return 0;
+      }
+
+      if (setConfigVariables(network, prog, runconfig_var_v)) {
         return 1;
       }      
 
@@ -376,7 +568,7 @@ int main(int argc, char* argv[])
 
       IStateGroup::checkAndComplete(network);
 
-      SymbolTable::getInstance()->checkSymbols();
+      network->getSymbolTable()->checkSymbols();
 
       if (check) {
         return 0;
@@ -400,34 +592,56 @@ int main(int argc, char* argv[])
         }
       }
 
-      output_run = new std::ofstream((std::string(output) + "_run.txt").c_str());
-      output_probtraj = new std::ofstream((std::string(output) + "_probtraj.csv").c_str());
-      output_statdist = new std::ofstream((std::string(output) + "_statdist.csv").c_str());
-      output_fp = new std::ofstream((std::string(output) + "_fp.csv").c_str());
+      if (final_simulation) {
+          std::ostream* output_final = new std::ofstream((std::string(output) + "_finalprob.csv").c_str());
+          FinalStateSimulationEngine engine(network, runconfig);
+          engine.run(NULL);
+          engine.displayFinal(*output_final, hexfloat);
+          ((std::ofstream*)output_final)->close();
+          delete output_final;
+        
 
-      if (export_asymptotic) {
-        output_asymptprob = new std::ofstream((std::string(output) + "_asymptprob.csv").c_str());
+      } else {
+
+        output_run = new std::ofstream((std::string(output) + "_run.txt").c_str());
+        output_probtraj = new std::ofstream((std::string(output) + "_probtraj.csv").c_str());
+        output_statdist = new std::ofstream((std::string(output) + "_statdist.csv").c_str());
+        output_fp = new std::ofstream((std::string(output) + "_fp.csv").c_str());
+
+        if (export_asymptotic) {
+          output_asymptprob = new std::ofstream((std::string(output) + "_finalprob.csv").c_str());
+        }
+
+        time(&start_time);
+        MaBEstEngine mabest(network, runconfig);
+        mabest.run(output_traj);
+        mabest.display(*output_probtraj, *output_statdist, *output_fp, hexfloat);
+        time(&end_time);
+
+        runconfig->display(network, start_time, end_time, mabest, *output_run);
+
+        if (export_asymptotic) {
+          mabest.displayAsymptotic(*output_asymptprob, hexfloat, !counts);
+          ((std::ofstream*)output_asymptprob)->close();
+          delete output_asymptprob;
+        }
+        ((std::ofstream*)output_run)->close();
+        delete output_run;
+        if (NULL != output_traj) {
+          ((std::ofstream*)output_traj)->close();
+          delete output_traj;
+        }
+        ((std::ofstream*)output_probtraj)->close();
+        delete output_probtraj;
+        ((std::ofstream*)output_statdist)->close();
+        delete output_statdist;
+        ((std::ofstream*)output_fp)->close();
+        delete output_fp;
       }
+      delete runconfig;
+      delete network;
 
-      time(&start_time);
-      MaBEstEngine mabest(network, runconfig);
-      mabest.run(output_traj);
-      mabest.display(*output_probtraj, *output_statdist, *output_fp, hexfloat);
-      time(&end_time);
-
-      runconfig->display(network, start_time, end_time, mabest, *output_run);
-
-      if (export_asymptotic) {
-        mabest.displayAsymptotic(*output_asymptprob, hexfloat, !counts);
-        ((std::ofstream*)output_asymptprob)->close();
-      }
-      ((std::ofstream*)output_run)->close();
-      if (NULL != output_traj) {
-        ((std::ofstream*)output_traj)->close();
-      }
-      ((std::ofstream*)output_probtraj)->close();
-      ((std::ofstream*)output_statdist)->close();
-      ((std::ofstream*)output_fp)->close();
+      Function::destroyFuncMap();  
     }
   } catch(const BNException& e) {
     std::cerr << '\n' << prog << ": " << e;

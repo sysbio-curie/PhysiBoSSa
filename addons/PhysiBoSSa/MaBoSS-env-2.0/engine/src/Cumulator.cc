@@ -174,10 +174,9 @@ void Cumulator::epilogue(Network* network, const NetworkState& reference_state)
   }
 #endif
 }
-
-void Cumulator::displayCSV(Network* network, unsigned int refnode_count, std::ostream& os_probtraj, std::ostream& os_statdist, bool hexfloat) const
+void Cumulator::displayProbTrajCSV(Network* network, unsigned int refnode_count, std::ostream& os_probtraj, bool hexfloat) const
 {
-  std::vector<Node*>::const_iterator begin_network;
+ std::vector<Node*>::const_iterator begin_network;
 
   os_probtraj << "Time\tTH" << (COMPUTE_ERRORS ? "\tErrorTH" : "") << "\tH";
 
@@ -294,11 +293,13 @@ void Cumulator::displayCSV(Network* network, unsigned int refnode_count, std::os
     }
     os_probtraj << '\n';
   }
-
+}
+void Cumulator::displayStatDistCSV(Network* network, unsigned int refnode_count, std::ostream& os_statdist, bool hexfloat) const
+{
   // should not be in cumulator, but somehwere in ProbaDist*
 
   // Probability distribution
-  unsigned int statdist_traj_count = RunConfig::getInstance()->getStatDistTrajCount();
+  unsigned int statdist_traj_count = runconfig->getStatDistTrajCount();
   if (statdist_traj_count == 0) {
     return;
   }
@@ -356,18 +357,21 @@ void Cumulator::displayCSV(Network* network, unsigned int refnode_count, std::os
 
   // should not be called from here, but from MaBestEngine
   ProbaDistClusterFactory* clusterFactory = new ProbaDistClusterFactory(proba_dist_v, statdist_traj_count);
-  clusterFactory->makeClusters(RunConfig::getInstance()->getStatdistClusterThreshold());
+  clusterFactory->makeClusters(runconfig);
   clusterFactory->display(network, os_statdist, hexfloat);
   clusterFactory->computeStationaryDistribution();
   clusterFactory->displayStationaryDistribution(network, os_statdist, hexfloat);
+  delete clusterFactory;
+}
+
+void Cumulator::displayCSV(Network* network, unsigned int refnode_count, std::ostream& os_probtraj, std::ostream& os_statdist, bool hexfloat) const
+{
+  displayProbTrajCSV(network, refnode_count, os_probtraj, hexfloat);
+  displayStatDistCSV(network, refnode_count, os_statdist, hexfloat);
 }
 
 void Cumulator::displayAsymptoticCSV(Network *network, unsigned int refnode_count, std::ostream &os_asymptprob, bool hexfloat, bool proba) const
 {
-
-  std::vector<Node *>::const_iterator begin_network;
-
-  os_asymptprob << "Time";
 
   double ratio;
   if (proba)
@@ -393,49 +397,37 @@ void Cumulator::displayAsymptoticCSV(Network *network, unsigned int refnode_coun
   CumulMap::Iterator iter = mp.iterator();
 
 
-    while (iter.hasNext())
-  {
-    NetworkState_Impl state;
-    TickValue tick_value;
-    iter.next(state, tick_value);
-
-    os_asymptprob << '\t';
-    NetworkState network_state(state);
-    network_state.displayOneLine(os_asymptprob, network);
-  }
-
-  os_asymptprob << '\n';
-  iter.rewind();
-  os_asymptprob << std::setprecision(4) << std::fixed << (nn * time_tick);
-
-  
-  std::string zero_hexfloat = fmthexdouble(0.0);
-  
-  // Proba, ErrorProba
   while (iter.hasNext())
   {
     NetworkState_Impl state;
     TickValue tick_value;
     iter.next(state, tick_value);
+
     double proba = tick_value.tm_slice / ratio;
     if (proba)
     {
       if (hexfloat)
       {
-        os_asymptprob << '\t' << std::setprecision(6) << fmthexdouble(proba);
+        os_asymptprob << std::setprecision(6) << fmthexdouble(proba);
       }
       else
       {
-        os_asymptprob << '\t' << std::setprecision(6) << proba;
+        os_asymptprob << std::setprecision(6) << proba;
       }
     }
     else
     {
       int t_proba = static_cast<int>(round(proba));
-      os_asymptprob << '\t' << std::fixed << t_proba;
+      os_asymptprob << std::fixed << t_proba;
     }
+
+    os_asymptprob << '\t';
+    NetworkState network_state(state);
+    network_state.displayOneLine(os_asymptprob, network);
+
+    os_asymptprob << '\n';
+
   }
-  os_asymptprob << '\n';
 }
 
 const std::map<double, STATE_MAP<NetworkState_Impl, double> > Cumulator::getStateDists() const
@@ -488,6 +480,9 @@ const STATE_MAP<NetworkState_Impl, double> Cumulator::getNthStateDist(int nn) co
 const STATE_MAP<NetworkState_Impl, double> Cumulator::getAsymptoticStateDist() const 
 { return getNthStateDist(getMaxTickIndex()-1); }
 
+const double Cumulator::getFinalTime() const {
+  return time_tick*(getMaxTickIndex()-1);
+}
 void Cumulator::add(unsigned int where, const CumulMap& add_cumul_map)
 {
   CumulMap& to_cumul_map = get_map(where);
@@ -516,7 +511,7 @@ void Cumulator::add(unsigned int where, const HDCumulMap& add_hd_cumul_map)
 }
 #endif
 
-Cumulator* Cumulator::mergeCumulators(std::vector<Cumulator*>& cumulator_v)
+Cumulator* Cumulator::mergeCumulators(RunConfig* runconfig, std::vector<Cumulator*>& cumulator_v)
 {
   size_t size = cumulator_v.size();
   if (1 == size) {
@@ -524,14 +519,12 @@ Cumulator* Cumulator::mergeCumulators(std::vector<Cumulator*>& cumulator_v)
     return new Cumulator(*cumulator);
   }
 
-  RunConfig* runconfig = RunConfig::getInstance();
-
   unsigned int t_cumulator_size = 0;
   for (auto& cum: cumulator_v) {
     t_cumulator_size += cum->sample_count;
   }
 
-  Cumulator* ret_cumul = new Cumulator(runconfig->getTimeTick(), runconfig->getMaxTime(), t_cumulator_size);
+  Cumulator* ret_cumul = new Cumulator(runconfig, runconfig->getTimeTick(), runconfig->getMaxTime(), t_cumulator_size);
   size_t min_cumul_size = ~0ULL;
   size_t min_tick_index_size = ~0ULL;
   std::vector<Cumulator*>::iterator begin = cumulator_v.begin();

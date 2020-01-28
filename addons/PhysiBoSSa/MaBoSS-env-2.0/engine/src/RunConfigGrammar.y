@@ -39,6 +39,7 @@ extern int yylex();
 
 static void yyerror(const char *s);
 static Network* network;
+static RunConfig* config;
 
 extern std::string yy_error_head();
 %}
@@ -52,6 +53,8 @@ extern std::string yy_error_head();
   std::vector<Expression*>* expr_list;
   IStateGroup::ProbaIState* istate_expr;
   std::vector<IStateGroup::ProbaIState*>* istate_expr_list;
+  ArgumentList* arg_list;
+
 }
 
 %type<expr> primary_expression 
@@ -71,6 +74,7 @@ extern std::string yy_error_head();
 %type<expr_list> expression_list
 %type<istate_expr> istate_expression
 %type<istate_expr_list> istate_expression_list
+%type<arg_list> argument_expression_list
 
 %token<str> VARIABLE
 %token<str> SYMBOL
@@ -99,7 +103,9 @@ runconfig_decl: SYMBOL '=' expression ';'
 {
   NetworkState network_state;
   double value = $3->eval(NULL, network_state);
-  RunConfig::getInstance()->setParameter($1, value);
+  config->setParameter($1, value);
+  free($1);
+  delete $3;
 }
 ;
 
@@ -113,9 +119,9 @@ node_attr_decl: SYMBOL '.' SYMBOL '=' expression ';'
       node->setIState((bool)value);
     } else {
       if (value < 0) {
-	new IStateGroup(node);
+	new IStateGroup(network, node);
       } else {
-	new IStateGroup(node, $5);
+	new IStateGroup(network, node, $5);
       }
     }
   } else if (!strcasecmp($3, "is_internal")) {
@@ -129,6 +135,10 @@ node_attr_decl: SYMBOL '.' SYMBOL '=' expression ';'
   } else {
     throw BNException(std::string(yy_error_head() + "invalid node attribute: ") + $3 + ", valid attributes are: istate or is_internal");
   }
+
+  free($1);
+  free($3);
+  delete $5;
 }
 | symbol_istate_list '.' SYMBOL '=' istate_expression_list ';'
 {
@@ -136,10 +146,12 @@ node_attr_decl: SYMBOL '.' SYMBOL '=' expression ';'
     throw BNException(std::string(yy_error_head() + "invalid node group attribute: ") + $3 + ", valid attribute is istate");
   }
   std::string error_msg;
-  new IStateGroup($1, $5, error_msg);
+  new IStateGroup(network, $1, $5, error_msg);
   if (error_msg.length() > 0) {
     throw BNException(std::string(yy_error_head() + error_msg));
   }
+  
+  free($3);
 }
 ;
 
@@ -153,6 +165,7 @@ symbol_list: SYMBOL
 {
   $$ = new std::vector<const Node*>();
   $$->push_back(network->getNode($1));
+  free($1);
 }
 | symbol_list ',' SYMBOL
 {
@@ -176,6 +189,11 @@ istate_expression_list: istate_expression
 istate_expression: primary_expression '[' expression_list ']'
 {
   $$ = new IStateGroup::ProbaIState($1, $3);
+  delete $1;
+  for (std::vector<Expression*>::iterator it = $3->begin(); it != $3->end(); ++it) {
+    delete *it;
+  }
+  delete $3;
 }
 ;
 
@@ -193,10 +211,11 @@ expression_list: primary_expression
 
 var_decl: VARIABLE '=' expression ';'
 {
-  SymbolTable* symtab = SymbolTable::getInstance();
-  const Symbol* symbol = symtab->getOrMakeSymbol($1);
+  const Symbol* symbol = network->getSymbolTable()->getOrMakeSymbol($1);
+  free($1);
   NetworkState dummy_state;
-  symtab->setSymbolValue(symbol, $3->eval(NULL, dummy_state));
+  network->getSymbolTable()->setSymbolValue(symbol, $3->eval(NULL, dummy_state));
+  delete $3;
 }
 ;
 
@@ -210,7 +229,8 @@ primary_expression: INTEGER
 }
 | VARIABLE
 {
-  $$ = new SymbolExpression(SymbolTable::getInstance()->getOrMakeSymbol($1));
+  $$ = new SymbolExpression(network->getSymbolTable(), network->getSymbolTable()->getOrMakeSymbol($1));
+  free($1);
 }
 | '(' expression ')'
 {
@@ -218,11 +238,35 @@ primary_expression: INTEGER
 }
 ;
 
+argument_expression_list: expression
+{
+  $$ = new ArgumentList();
+  $$->push_back($1);
+}
+| argument_expression_list ',' expression
+{
+  $$ = $1;
+  $$->push_back($3);
+}
+;
+
+
 postfix_expression: primary_expression
 {
   $$ = $1;
 }
+| SYMBOL '(' argument_expression_list ')'
+{
+  $$ = new FuncCallExpression($1, $3);
+  free($1);
+}
+| SYMBOL '(' ')'
+{
+  $$ = new FuncCallExpression($1, NULL);
+  free($1);
+}
 ;
+
 
 unary_expression: postfix_expression
 {
@@ -367,4 +411,14 @@ void runconfig_setNetwork(Network* _network)
   network = _network;
 }
 
+void runconfig_setConfig(RunConfig* _config)
+{
+  config = _config;
+}
+
 #include "lex.RC.cc"
+
+void yy_scan_expression(const char* str)
+{
+    yy_switch_to_buffer(yy_scan_string(str));
+}
