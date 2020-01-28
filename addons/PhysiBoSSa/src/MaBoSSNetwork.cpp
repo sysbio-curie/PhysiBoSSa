@@ -65,7 +65,7 @@ void MaBoSSNetwork::run()
 	StochasticSimulationEngine* engine = new StochasticSimulationEngine(this->network, this->config);
 	int seed = this->config->getSeedPseudoRandom();
 	engine->setSeed(seed);
-	NetworkState_Impl next_state = engine->run(this->state, NULL);
+	this->next_state = engine->run(this->state, NULL);
 	this->state = &next_state;
 	delete engine;
 }
@@ -82,7 +82,7 @@ void MaBoSSNetwork::run(std::vector<bool>* node_values)
 void MaBoSSNetwork::print_nodes()
 {
 	int i = 0;
-	std::vector<Node*> nodes = network->getNodes();
+	std::vector<Node*> nodes = this->network->getNodes();
 	for ( auto node: nodes )
 	{
 		std::cout << node->getLabel() << "=" << ((NetworkState) *(this->state)).getNodeState( node ) << "; ";

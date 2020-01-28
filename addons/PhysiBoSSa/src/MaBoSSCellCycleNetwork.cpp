@@ -2,8 +2,12 @@
 
 CellCycleNetwork::CellCycleNetwork(std::string bnd_file, std::string cfg_file)
 {
-	MaBoSSNetwork* maboss = new MaBoSSNetwork(bnd_file, cfg_file); 
-	this->set_maboss(maboss);
+	this->maboss = new MaBoSSNetwork(bnd_file, cfg_file);
+
+	// initialize all nodes to 0
+	this->nodes.resize( maboss->nodes_lenght() );
+	this->maboss->recover_state(&(this->nodes));
+
 	this->set_time_to_update();
 }
 
@@ -11,17 +15,6 @@ CellCycleNetwork::~CellCycleNetwork()
 {
 	delete this->maboss;
 	this->maboss = NULL;
-}
-
-/* Initialization: set network */
-void CellCycleNetwork::set_maboss( MaBoSSNetwork* maboss )
-{
-	this->maboss = maboss;
-	this->set_time_to_update();
-
-	// initialize all nodes to 0
-	this->nodes.resize( maboss->nodes_lenght() );
-	this->maboss->recover_state(&(this->nodes));
 }
 
 /* random update time, to asynchronize it between all cells */

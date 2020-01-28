@@ -27,11 +27,6 @@ class CellCycleNetwork
 
 		/** \brief time left before to update it again */
 		double time_to_update;
-
-		/** \brief Initialization: set network 
-		 *
-		 * @param mboss reference to the common object handling MaBoSS runs */
-		void set_maboss( MaBoSSNetwork* maboss );
 	
 		/** \brief choose a random update time, to asynchronize it between all cells 
 		 *
