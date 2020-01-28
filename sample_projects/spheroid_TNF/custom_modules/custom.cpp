@@ -192,9 +192,7 @@ void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
 	{
 		set_input_nodes(pCell);
 
-		#pragma omp critical
 		pCell->maboss_cycle_network->run_maboss();
-		
 		double next_run_in = pCell->maboss_cycle_network->get_time_to_update();
 		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
 		

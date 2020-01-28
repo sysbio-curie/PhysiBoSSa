@@ -32,8 +32,9 @@
 #include "RunConfig.h"
 #include "BooleanNetwork.h"
 #include "MaBEstEngine.h"
+#include "FinalStateSimulationEngine.h"
 
-RunConfig* RunConfig::instance;
+extern void RClex_destroy();
 
 RunConfig::RunConfig()
 {
@@ -43,6 +44,8 @@ RunConfig::RunConfig()
   discrete_time = false;
   //  use_physrandgen = true;
   use_physrandgen = false;
+  use_glibcrandgen = false;
+  use_mtrandgen = false;
   seed_pseudorand = 0;
   randgen_factory = NULL;
   display_traj = false;
@@ -50,6 +53,11 @@ RunConfig::RunConfig()
   statdist_traj_count = 0;
   statdist_cluster_threshold = 1.0;
   statdist_similarity_cache_max_size = 20000;
+}
+
+RunConfig::~RunConfig()
+{
+  delete randgen_factory;
 }
 
 void RunConfig::setParameter(const std::string& param, double value)
@@ -65,6 +73,10 @@ void RunConfig::setParameter(const std::string& param, double value)
     discrete_time = (bool)value;
   } else if (!strcasecmp(str, "use_physrandgen")) {
     use_physrandgen = (bool)value;
+  } else if (!strcasecmp(str, "use_glibcrandgen")) {
+    use_glibcrandgen = (bool)value;
+  } else if (!strcasecmp(str, "use_mtrandgen")) {
+    use_mtrandgen = (bool)value;
   } else if (!strcasecmp(str, "seed_pseudorandom")) {
     seed_pseudorand = (int)value;
   } else if (!strcasecmp(str, "display_traj")) {
@@ -88,8 +100,12 @@ RandomGeneratorFactory* RunConfig::getRandomGeneratorFactory() const
   if (NULL == randgen_factory) {
     if (use_physrandgen) {
       randgen_factory = new RandomGeneratorFactory(RandomGeneratorFactory::PHYSICAL);
+    } else if (use_mtrandgen) {
+      randgen_factory = new RandomGeneratorFactory(RandomGeneratorFactory::MERSENNE_TWISTER);
+    } else if (use_glibcrandgen) {
+      randgen_factory = new RandomGeneratorFactory(RandomGeneratorFactory::GLIBC);
     } else {
-      randgen_factory = new RandomGeneratorFactory(RandomGeneratorFactory::STANDARD);
+      randgen_factory = new RandomGeneratorFactory(RandomGeneratorFactory::DEFAULT);
     }
   }
   return randgen_factory;
@@ -139,7 +155,48 @@ void RunConfig::display(Network* network, time_t start_time, time_t end_time, Ma
 
   sprintf(bufstr, sepfmt, " Variables ");
   os << bufstr;
-  SymbolTable::getInstance()->display(os);
+  network->getSymbolTable()->display(os);
+  sprintf(bufstr, sepfmt, "-----------");
+  os << bufstr << '\n';
+}
+
+void RunConfig::display(Network* network, time_t start_time, time_t end_time, FinalStateSimulationEngine& mabest, std::ostream& os) const
+{
+  const char sepfmt[] = "-----------------------------------------------%s-----------------------------------------------\n";
+  char bufstr[1024];
+
+  os << '\n';
+  sprintf(bufstr, sepfmt, "--- Run ---");
+  os << bufstr;
+
+  os << "MaBoSS version: " << FinalStateSimulationEngine::VERSION << " [networks up to " << MAXNODES << " nodes]\n";
+  os << "\nRun start time: " << ctime(&start_time);
+  os << "Run end time: " << ctime(&end_time);
+
+  os << "Time Tick: " << getTimeTick() << '\n';
+  os << "Max Time: " <<getMaxTime() << '\n';
+  os << "Sample Count: " << getSampleCount() << '\n';
+  os << "StatDist Trajectory Count: " << getStatDistTrajCount() << '\n';
+  os << "StatDist Similarity Cache Maximum Size: " << getStatDistSimilarityCacheMaxSize() << '\n';
+  os << "Discrete Time: " << (isDiscreteTime() ? "TRUE" : "FALSE") << '\n';
+  os << "Random Generator: " << getRandomGeneratorFactory()->getName() << '\n';
+  if (getRandomGeneratorFactory()->isPseudoRandom()) {
+    os << "Seed Pseudo Random: " << getSeedPseudoRandom() << '\n';
+  }
+  os << "Generated Number Count: " << RandomGenerator::getGeneratedNumberCount() << "\n\n";
+
+  sprintf(bufstr, sepfmt, "-----------");
+  os << bufstr << '\n';
+
+  sprintf(bufstr, sepfmt, "- Network -");
+  os << bufstr;
+  network->display(os);
+  sprintf(bufstr, sepfmt, "-----------");
+  os << bufstr << '\n';
+
+  sprintf(bufstr, sepfmt, " Variables ");
+  os << bufstr;
+  network->getSymbolTable()->display(os);
   sprintf(bufstr, sepfmt, "-----------");
   os << bufstr << '\n';
 }
@@ -147,35 +204,38 @@ void RunConfig::display(Network* network, time_t start_time, time_t end_time, Ma
 int RunConfig::parse(Network* network, const char* file)
 {
   runconfig_setNetwork(network);
+  runconfig_setConfig(this);
   if (NULL != file) {
     RCin = fopen(file, "r");
     if (RCin == NULL) {
       throw BNException("variable parsing: cannot open file:" + std::string(file) + " for reading");
     }
   }
-
   RC_set_file(file);
   int res = RCparse();
+  runconfig_setNetwork(NULL);
+  runconfig_setConfig(NULL);
+
   if (NULL != file)
     fclose(RCin);
-    
+  RClex_destroy();
+
   return res;
 }
 
 int RunConfig::parseExpression(Network* network, const char* expr)
 {
   runconfig_setNetwork(network);
+  runconfig_setConfig(this);
+  RC_scan_expression(expr);
 
-  char tmpfile[] = "/tmp/maboss_XXXXXX";
-  int fd = mkstemp(tmpfile);
-  ssize_t ret = write(fd, expr, strlen(expr));
-  assert(ret > 0);
-  close(fd);
-
-  RCin = fopen(tmpfile, "r");
-  RC_set_expr(expr);
-  unlink(tmpfile);
-  return RCparse();
+  int res = RCparse();
+  runconfig_setNetwork(NULL);
+  runconfig_setConfig(NULL);
+  
+  RClex_destroy();
+  
+  return res;
 }
 
 void RunConfig::generateTemplate(Network* network, std::ostream& os) const
@@ -204,6 +264,8 @@ void RunConfig::dump_perform(Network* network, std::ostream& os, bool is_templat
   os << "sample_count = " << sample_count << ";\n";
   os << "discrete_time = " << discrete_time << ";\n";
   os << "use_physrandgen = " << use_physrandgen << ";\n";
+  os << "use_glibcrandgen = " << use_glibcrandgen << ";\n";
+  os << "use_mtrandgen = " << use_mtrandgen << ";\n";
   os << "seed_pseudorandom = " << seed_pseudorand << ";\n";
   os << "display_traj = " << display_traj << ";\n";
   os << "statdist_traj_count = " << statdist_traj_count << ";\n";
@@ -212,11 +274,11 @@ void RunConfig::dump_perform(Network* network, std::ostream& os, bool is_templat
   os << "statdist_similarity_cache_max_size = " << statdist_similarity_cache_max_size << ";\n";
 
   os << '\n';
-  if (SymbolTable::getInstance()->getSymbolCount() != 0) {
+  if (network->getSymbolTable()->getSymbolCount() != 0) {
     if (is_template) {
       os << "// variables to be set in the configuration file or by using the --config-vars option\n";
     }
-    SymbolTable::getInstance()->display(os, false);
+    network->getSymbolTable()->display(os, false);
     os << '\n';
   }
 

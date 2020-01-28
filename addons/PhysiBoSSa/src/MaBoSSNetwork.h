@@ -11,7 +11,9 @@
  * G. Letort, Institute Curie
  */
 
-#include "MaBEstEngine.h"
+#include "StochasticSimulationEngine.h"
+#include "BooleanNetwork.h"
+#include "RunConfig.h"
 #include "utils.h"
 
 class MaBoSSNetwork
@@ -20,41 +22,25 @@ class MaBoSSNetwork
 		/** \brief MaBoSS instances: network */
 		Network* network;
 		/** \brief MaBoSS instances: configurations */
-		RunConfig* runConfig;
-		/** \brief MaBoSS instances: symbols list */
-		SymbolTable* symbTable;
+		RunConfig* config;
+		/** \brief MaBoSS instances: state */
+		NetworkState_Impl state;
 
 		/** \brief Time step to update the cycle */
-		double update_time;
+		double update_time_step;
 
 		/** \brief Names and indices of network nodes */
 		std::map< std::string, int > node_names;
-
-		/** \brief Keep default value of nodes from CFG file */
-		std::vector<bool> def_nodes;
-
-		/** \brief Read and load nodes initial states */
-		void initNetworkState();
-		
-		/** \brief Load previous network states and inputs */
-		void load( NetworkState* netState, std::vector<bool>* inputs );
 
 	public:
 		/** \brief Constructor */
 		MaBoSSNetwork( std::string networkFile, std::string configFile );
 		/** \brief Destructor */
 		~MaBoSSNetwork();
-
-		/** \brief return number of nodes */
-		inline int number_of_nodes()
-		{ return node_names.size(); };
 		
+		inline int nodes_lenght() { return node_names.size(); }
 		/** \brief Return update time value */
-		inline double update_time_step()
-		{ return update_time; };
-
-		/** \brief Set values of nodes to default values */
-		void set_default( std::vector<bool>* nodes );
+		inline double get_update_time_step(){ return update_time_step; }
 
 		/** \brief Run the current network
 		 *
@@ -64,7 +50,7 @@ class MaBoSSNetwork
 		void run(std::vector<bool>* nodes_val);
 		
 		/** \brief Print current state of all the nodes of the network */
-		void print_nodes(std::vector<bool>* nodes_val);
+		void print_nodes();
 
 		/** \brief Return node of given name current value
 		 *

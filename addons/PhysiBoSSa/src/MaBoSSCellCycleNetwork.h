@@ -1,7 +1,6 @@
 #ifndef __CELL_CYCLE_NETWORK_H
 #define __CELL_CYCLE_NETWORK_H
 
-#include "MaBEstEngine.h"
 #include "MaBoSSNetwork.h"
 
 /**
@@ -48,7 +47,7 @@ class CellCycleNetwork
 		inline std::vector<bool>* get_nodes() {return &nodes;}
 		inline double get_time_to_update() {return time_to_update;}
 		inline int get_maboss_node_index( std::string name ) {return maboss->get_node_index(name);}
-		inline void print_nodes() {maboss->print_nodes(&nodes);}
+		inline void print_nodes() {maboss->print_nodes();}
 
 		/** \brief Update MaboSS network states */
 		void run_maboss();

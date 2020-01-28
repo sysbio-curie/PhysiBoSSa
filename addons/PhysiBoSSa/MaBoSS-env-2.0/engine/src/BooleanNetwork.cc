@@ -36,12 +36,10 @@
 #include "Utils.h"
 #include <iostream>
 
-// Network* Network::instance;
-SymbolTable* SymbolTable::instance;
 extern FILE* CTBNDLin;
+extern void CTBNDL_scan_expression(const char *);
 extern int CTBNDLparse();
-
-std::vector<IStateGroup*>* IStateGroup::istate_group_list = new std::vector<IStateGroup*>();
+extern void CTBNDLlex_destroy();
 const bool backward_istate = getenv("MABOSS_BACKWARD_ISTATE") != NULL;
 
 bool Node::override = false;
@@ -89,9 +87,29 @@ bool Node::isInputNode() const
   return getLogicalInputExpression() == NULL && getRateUpExpression() == NULL && getRateDownExpression() == NULL;
 }
 
-Network::Network() : last_index(0U), random_generator(NULL)
+Network::Network() : last_index(0U)
 {
+  istate_group_list = new std::vector<IStateGroup*>();
+  symbol_table = new SymbolTable();
 }
+
+int Network::parseExpression(const char* content, std::map<std::string, NodeIndex>* nodes_indexes){
+  
+  set_current_network(this);
+  
+  CTBNDL_scan_expression(content);
+  int r = CTBNDLparse();
+  
+  set_current_network(NULL);
+
+  if (r) {
+    return 1;
+  }
+  compile(nodes_indexes);
+  CTBNDLlex_destroy();
+  return 0;
+}
+
 
 int Network::parse(const char* file, std::map<std::string, NodeIndex>* nodes_indexes)
 {
@@ -115,7 +133,8 @@ int Network::parse(const char* file, std::map<std::string, NodeIndex>* nodes_ind
 
   if (NULL != file)
     fclose(CTBNDLin);
-    
+  CTBNDLlex_destroy();
+
   return 0;
 }
 
@@ -150,12 +169,6 @@ void SymbolTable::checkSymbols() const
   if (str.length() != 0) {
     throw BNException(str);
   }
-}
-
-void Network::updateRandomGenerator(RunConfig* runconfig)
-{
-  delete random_generator;
-  random_generator = runconfig->getRandomGeneratorFactory()->generateRandomGenerator(runconfig->getSeedPseudoRandom());
 }
 
 void Network::compile(std::map<std::string, NodeIndex>* nodes_indexes)
@@ -225,7 +238,7 @@ Node* Network::getNode(const std::string& label)
   return node_map[label];
 }
 
-void Network::initStates(NetworkState& initial_state)
+void Network::initStates(NetworkState& initial_state, RandomGenerator * randgen)
 {
   if (backward_istate) {
     std::vector<Node*>::const_iterator begin = nodes.begin();
@@ -233,11 +246,11 @@ void Network::initStates(NetworkState& initial_state)
   
     while (begin != end) {
       Node* node = *begin;
-      initial_state.setNodeState(node, node->getIState(this));
+      initial_state.setNodeState(node, node->getIState(this, randgen));
       ++begin;
     }
   } else {
-    IStateGroup::initStates(this, initial_state);
+    IStateGroup::initStates(this, initial_state, randgen);
   }
 }
 
@@ -295,14 +308,14 @@ bool Node::computeNodeState(NetworkState& network_state, NodeState& node_state) 
   return network_state.computeNodeState(this, node_state);
 }
 
-NodeState Node::getIState(const Network* network) const
+NodeState Node::getIState(const Network* network, RandomGenerator* rangen) const
 {
   if (!istate_set) {
 #if 1
-    double rand = network->getRandomGenerator()->generate();
+    double rand = rangen->generate();
     istate = rand > 0.5; // >= 0.5 ?
 #else
-    istate = (network->getRandomGenerator()->generateUInt32() % 2) == 0;
+    istate = (rangen->generateUInt32() % 2) == 0;
 #endif
   }
   return istate;
@@ -428,20 +441,18 @@ void NetworkState::display(std::ostream& os, Network* network) const
   os << '\n';
 }
 
-void NetworkState::displayOneLine(std::ostream& os, Network* network, const std::string& sep) const
-{
-#if defined(USE_BITSET) || defined(USE_BOOST_BITSET)
+std::string NetworkState::getName(Network* network, const std::string& sep) const {
+   #if defined(USE_BITSET) || defined(USE_BOOST_BITSET)
   if (state.none()) {
-    os << "<nil>";
-    return;
+    return "<nil>";
   }
 #else
   if (!state) {
-    os << "<nil>";
-    return;
+    return "<nil>";
   }
 #endif
 
+  std::string result = "";
   const std::vector<Node*>& nodes = network->getNodes();
   std::vector<Node*>::const_iterator begin = nodes.begin();
   std::vector<Node*>::const_iterator end = nodes.end();
@@ -451,14 +462,21 @@ void NetworkState::displayOneLine(std::ostream& os, Network* network, const std:
     Node* node = *begin;
     if (getNodeState(node)) {
       if (displayed) {
-	os << sep;
+	    result += sep;
       } else {
 	displayed = true;
       }
-      os << node->getLabel();
+      result += node->getLabel();
     }
     ++begin;
   }
+  return result;
+  }
+
+
+void NetworkState::displayOneLine(std::ostream& os, Network* network, const std::string& sep) const
+{
+  os << getName(network, sep);
 }
 
 std::ostream& operator<<(std::ostream& os, const BNException& e)
@@ -470,8 +488,10 @@ std::ostream& operator<<(std::ostream& os, const BNException& e)
 void IStateGroup::checkAndComplete(Network* network)
 {
   std::map<std::string, bool> node_label_map;
-  std::vector<IStateGroup*>::iterator begin = istate_group_list->begin();
-  std::vector<IStateGroup*>::iterator end = istate_group_list->end();
+  std::vector<IStateGroup*>::iterator begin = network->getIStateGroup()->begin();
+  std::vector<IStateGroup*>::iterator end = network->getIStateGroup()->end();
+  
+  
   while (begin != end) {
     IStateGroup* istate_group = *begin;
     std::vector<const Node*>* nodes = istate_group->getNodes();
@@ -496,7 +516,7 @@ void IStateGroup::checkAndComplete(Network* network)
   while (bb != ee) {
     const Node* node = *bb;
     if (node_label_map.find(node->getLabel()) == node_label_map.end()) {
-      new IStateGroup(node);
+      new IStateGroup(network, node);
     }
     ++bb;
   }
@@ -504,10 +524,11 @@ void IStateGroup::checkAndComplete(Network* network)
   // now complete missing nodes
 }
 
-void IStateGroup::initStates(Network* network, NetworkState& initial_state)
+void IStateGroup::initStates(Network* network, NetworkState& initial_state, RandomGenerator* randgen)
 {
-  std::vector<IStateGroup*>::iterator istate_group_iter = istate_group_list->begin();
-  std::vector<IStateGroup*>::iterator istate_group_end = istate_group_list->end();
+  std::vector<IStateGroup*>::iterator istate_group_iter = network->getIStateGroup()->begin();
+  std::vector<IStateGroup*>::iterator istate_group_end = network->getIStateGroup()->end();
+  
   while (istate_group_iter != istate_group_end) {
     IStateGroup* istate_group = *istate_group_iter;
     std::vector<const Node*>* nodes = istate_group->getNodes();
@@ -527,7 +548,8 @@ void IStateGroup::initStates(Network* network, NetworkState& initial_state)
 	++state_value_iter;
       }
     } else {
-      double rand = network->getRandomGenerator()->generate();
+      // double rand = network->getRandomGenerator()->generate();
+      double rand = randgen->generate();
       assert(rand >= 0. && rand <= 1.);
       std::vector<ProbaIState*>::iterator proba_istate_iter = proba_istates->begin();
       std::vector<ProbaIState*>::iterator proba_istate_end = proba_istates->end();
@@ -559,8 +581,9 @@ void IStateGroup::initStates(Network* network, NetworkState& initial_state)
 
 void IStateGroup::display(Network* network, std::ostream& os)
 {
-  std::vector<IStateGroup*>::iterator begin = istate_group_list->begin();
-  std::vector<IStateGroup*>::iterator end = istate_group_list->end();
+  std::vector<IStateGroup*>::iterator begin = network->getIStateGroup()->begin();
+  std::vector<IStateGroup*>::iterator end = network->getIStateGroup()->end();
+  
   while (begin != end) {
     IStateGroup* istate_group = *begin;
     std::vector<const Node*>* nodes = istate_group->getNodes();
@@ -609,8 +632,8 @@ void IStateGroup::display(Network* network, std::ostream& os)
   }
 }
 
-void IStateGroup::reset() {
-  istate_group_list->clear();
+void IStateGroup::reset(Network * network) {
+  network->getIStateGroup()->clear();
 }
 
 Node::~Node()
@@ -622,36 +645,40 @@ Node::~Node()
   MAP<std::string, const Expression*>::const_iterator attr_expr_begin = attr_expr_map.begin();
   MAP<std::string, const Expression*>::const_iterator attr_expr_end = attr_expr_map.end();
   while (attr_expr_begin != attr_expr_end) {
-    //delete (*attr_expr_begin).second;
+    delete (*attr_expr_begin).second;
+    attr_expr_begin++;
   }
 }
 
 Network::Network(const Network& network)
 {
-  random_generator = NULL;
   *this = network;
 }
 
 Network& Network::operator=(const Network& network)
 {
-  delete random_generator;
-  random_generator = NULL;
   node_map = network.node_map;
   last_index = network.last_index;
   input_nodes = network.input_nodes;
   non_input_nodes = network.non_input_nodes;
   nodes = network.nodes;
+  symbol_table = network.symbol_table;
   return *this;
 }
 
 Network::~Network()
 {
-  delete random_generator;
-  /*
+  delete symbol_table;
+  
+  for (std::vector<IStateGroup*>::iterator iter = istate_group_list->begin(); iter != istate_group_list->end(); ++iter) {
+    delete *iter;
+  }
+  delete istate_group_list;
+  
   for (MAP<std::string, Node*>::iterator iter = node_map.begin(); iter != node_map.end(); ++iter) {
     delete (*iter).second;
   }
-  */
+  
 }
 
 void SymbolTable::reset()
@@ -663,9 +690,9 @@ void SymbolTable::reset()
   last_symb_idx = 0;
 }
 
-int setConfigVariables(const std::string& prog, std::vector<std::string>& runvar_v)
+int setConfigVariables(Network* network, const std::string& prog, std::vector<std::string>& runvar_v)
 {
-  SymbolTable* symtab = SymbolTable::getInstance();
+  SymbolTable* symtab = network->getSymbolTable();
   std::vector<std::string>::const_iterator begin = runvar_v.begin();
   std::vector<std::string>::const_iterator end = runvar_v.end();
 
@@ -707,11 +734,11 @@ int setConfigVariables(const std::string& prog, std::vector<std::string>& runvar
   return 0;
 }
 
-int setConfigVariables(const std::string& prog, const std::string& runvar)
+int setConfigVariables(Network* network, const std::string& prog, const std::string& runvar)
 {
   std::vector<std::string> runvar_v;
   runvar_v.push_back(runvar);
-  return setConfigVariables(prog, runvar_v);
+  return setConfigVariables(network, prog, runvar_v);
 }
 
 void SymbolTable::unsetSymbolExpressions() {
