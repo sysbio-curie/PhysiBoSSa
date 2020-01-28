@@ -21,6 +21,7 @@ void CellCycleNetwork::set_maboss( MaBoSSNetwork* maboss )
 
 	// initialize all nodes to 0
 	this->nodes.resize( maboss->nodes_lenght() );
+	this->maboss->recover_state(&(this->nodes));
 }
 
 /* random update time, to asynchronize it between all cells */

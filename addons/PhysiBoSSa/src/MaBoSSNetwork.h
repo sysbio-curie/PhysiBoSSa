@@ -24,7 +24,7 @@ class MaBoSSNetwork
 		/** \brief MaBoSS instances: configurations */
 		RunConfig* config;
 		/** \brief MaBoSS instances: state */
-		NetworkState_Impl state;
+		NetworkState_Impl* state;
 
 		/** \brief Time step to update the cycle */
 		double update_time_step;
@@ -42,12 +42,13 @@ class MaBoSSNetwork
 		/** \brief Return update time value */
 		inline double get_update_time_step(){ return update_time_step; }
 
-		/** \brief Run the current network
-		 *
-		 * Otherwise put new network states in input netStates
-		 * cellline: index of current cell_line for specific properties (rates) 
-		 * */
-		void run(std::vector<bool>* nodes_val);
+		void load_state(std::vector<bool>* input);
+		void recover_state(std::vector<bool>* output);
+
+		/** \brief Run the current network*/
+		void run();
+
+		void run(std::vector<bool>* node_values);
 		
 		/** \brief Print current state of all the nodes of the network */
 		void print_nodes();
