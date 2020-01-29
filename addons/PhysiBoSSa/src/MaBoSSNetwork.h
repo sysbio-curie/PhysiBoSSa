@@ -25,7 +25,7 @@ class MaBoSSNetwork
 		RunConfig* config;
 		/** \brief MaBoSS instances: state */
 		NetworkState_Impl* state;
-		NetworkState_Impl next_state;
+		NetworkState_Impl state_object;
 
 		/** \brief Time step to update the cycle */
 		double update_time_step;

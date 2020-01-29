@@ -41,20 +41,23 @@ void MaBoSSNetwork::load_state(std::vector<bool>* input)
 {
 	int i = 0;
 	std::vector<Node*> nodes = network->getNodes();
+	NetworkState state_to_load = (NetworkState) this->state_object;
 	for (auto node : nodes)
 	{
-		((NetworkState) *(this->state)).setNodeState(node, (NodeState) (*input)[i]);
+		state_to_load.setNodeState(node, (NodeState) (*input)[i]);
 		i ++;
 	}
+	this->state_object = state_to_load.getState();
 }
 
 void MaBoSSNetwork::recover_state(std::vector<bool>* output)
 {
 	int i = 0;
 	std::vector<Node*> nodes = this->network->getNodes();
+	NetworkState state_to_retrieve = (NetworkState) this->state_object;
 	for ( auto node: nodes )
 	{
-		(*output)[i] = ((NetworkState) *(this->state)).getNodeState( node ) ;
+		(*output)[i] = state_to_retrieve.getNodeState( node ) ;
 		i++;
 	}
 }
@@ -65,8 +68,8 @@ void MaBoSSNetwork::run()
 	StochasticSimulationEngine* engine = new StochasticSimulationEngine(this->network, this->config);
 	int seed = this->config->getSeedPseudoRandom();
 	engine->setSeed(seed);
-	this->next_state = engine->run(this->state, NULL);
-	this->state = &next_state;
+	this->state_object = engine->run(this->state, NULL);
+	this->state = &state_object;
 	delete engine;
 }
 
@@ -83,9 +86,10 @@ void MaBoSSNetwork::print_nodes()
 {
 	int i = 0;
 	std::vector<Node*> nodes = this->network->getNodes();
+	NetworkState state_to_print = (NetworkState) this->state_object;
 	for ( auto node: nodes )
 	{
-		std::cout << node->getLabel() << "=" << ((NetworkState) *(this->state)).getNodeState( node ) << "; ";
+		std::cout << node->getLabel() << "=" << state_to_print.getNodeState( node ) << "; ";
 		i++;
 	}
 	std::cout << std::endl;
