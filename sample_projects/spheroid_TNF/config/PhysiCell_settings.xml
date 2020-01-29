@@ -167,14 +167,14 @@
 		<cfg_file type="string" units="">./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg</cfg_file>
 
 		<tnf_uptake_rate type="double" units="">0.0025</tnf_uptake_rate>
-		<tnf_secretion_rate type="double" units="">0.1</tnf_secretion_rate> <!-- 0.1 -->
+		<tnf_secretion_rate type="double" units="fg/cell/min">0.1</tnf_secretion_rate> <!-- 0.1 -->
 
 		<duration_add_tnf type="int" units="min">10</duration_add_tnf> <!-- 10 -->
 		<time_remove_tnf type="int" units="min">8000</time_remove_tnf> <!-- 8000 -->
 		<time_add_tnf type="int" units="min">150</time_add_tnf> <!-- 150 -->
 
 		<tnf_threshold type="double" units="dimensionless">2.8e-05</tnf_threshold> <!-- 2.8e-05 -->
-		<concentration_tnf type="double" units=""> 0.5 </concentration_tnf> <!-- 0.5 -->
+		<concentration_tnf type="double" units="ng/mL"> 0.5 </concentration_tnf> <!-- 0.5 -->
 		<membrane_length type="int" units=""> 470 </membrane_length>
 	</user_parameters>
 	
