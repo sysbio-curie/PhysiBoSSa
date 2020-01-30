@@ -185,6 +185,8 @@ reset:
 	touch ALL_CITATIONS.txt 
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
+	rm -f ./config/init.txt
+	rm -rf ./config/boolean_network/	
 	rm -rf ./scripts
 
 MaBoSS-clean:

@@ -146,7 +146,7 @@ spheroid-TNF:
 	cp Makefile Makefile-backup
 	cp ./sample_projects/spheroid_TNF/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/spheroid_TNF/config/* ./config/
+	cp -r ./sample_projects/spheroid_TNF/config/* ./config/
 	mkdir ./scripts/
 	cp ./sample_projects/spheroid_TNF/scripts/* ./scripts/
 
@@ -157,7 +157,7 @@ drug-AGS:
 	cp Makefile Makefile-backup
 	cp ./sample_projects/drug_AGS/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp ./sample_projects/drug_AGS/config/* ./config/
+	cp -r ./sample_projects/drug_AGS/config/* ./config/
 	mkdir ./scripts/
 	cp ./sample_projects/drug_AGS/scripts/* ./scripts/
 	

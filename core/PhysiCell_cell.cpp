@@ -453,9 +453,7 @@ Cell* Cell::divide( )
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
 
-	std::string bnd_file = "./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd";
-	std::string cfg_file = "./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg";
-	child->maboss_cycle_network = new CellCycleNetwork(bnd_file, cfg_file);
+	child->maboss_cycle_network = this->maboss_cycle_network;
 	
 	return child;
 }

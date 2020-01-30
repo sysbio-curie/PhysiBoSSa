@@ -161,10 +161,10 @@
 		<ki67post_phase_duration type="double" units="1/min">0.00617283950617</ki67post_phase_duration> <!-- 2.7*60 min -->
 
 		<!-- init file --> 
-		<init_cells_filename type="string" units="">./custom_modules/init.txt</init_cells_filename>
+		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
 
-		<bnd_file type="string" units="">./addons/PhysiBoSSa/BN/TNF/TNF_nodes.bnd</bnd_file>
-		<cfg_file type="string" units="">./addons/PhysiBoSSa/BN/TNF/TNF_conf.cfg</cfg_file>
+		<bnd_file type="string" units="">./config/boolean_network/TNF_nodes.bnd</bnd_file>
+		<cfg_file type="string" units="">./config/boolean_network/TNF_conf.cfg</cfg_file>
 
 		<tnf_uptake_rate type="double" units="">0.0025</tnf_uptake_rate>
 		<tnf_secretion_rate type="double" units="fg/cell/min">0.1</tnf_secretion_rate> <!-- 0.1 -->
@@ -173,7 +173,7 @@
 		<time_remove_tnf type="int" units="min">8000</time_remove_tnf> <!-- 8000 -->
 		<time_add_tnf type="int" units="min">150</time_add_tnf> <!-- 150 -->
 
-		<tnf_threshold type="double" units="dimensionless">2.8e-05</tnf_threshold> <!-- 2.8e-05 -->
+		<tnf_threshold type="double" units="dimensionless">2.025e-05</tnf_threshold> <!-- 2.8e-05 -->
 		<concentration_tnf type="double" units="ng/mL"> 0.5 </concentration_tnf> <!-- 0.5 -->
 		<membrane_length type="int" units=""> 470 </membrane_length>
 	</user_parameters>

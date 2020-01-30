@@ -142,18 +142,23 @@ void setup_tissue( void )
 	MaBoSSNetwork* maboss;
 	std::string bnd_file = parameters.strings("bnd_file");
 	std::string cfg_file = parameters.strings("cfg_file");
+	CellCycleNetwork ags_network;
+	ags_network.initialize_boolean_network(bnd_file, cfg_file);
 
 	pC = create_cell(); 
 	pC->assign_position( 0.0, 0.0, 0.0 );
-	pC->maboss_cycle_network = new CellCycleNetwork(bnd_file, cfg_file);
+	pC->maboss_cycle_network = ags_network;
+	pC->maboss_cycle_network.restart_nodes();
 
 	pC = create_cell(); 
 	pC->assign_position( -100.0, 0.0, 1.0 );
-	pC->maboss_cycle_network = new CellCycleNetwork(bnd_file, cfg_file);
-	
+	pC->maboss_cycle_network = ags_network;
+	pC->maboss_cycle_network.restart_nodes();	
+
 	pC = create_cell(); 
 	pC->assign_position( 0, 100.0, -7.0 );
-	pC->maboss_cycle_network = new CellCycleNetwork(bnd_file, cfg_file);
+	pC->maboss_cycle_network = ags_network;
+	pC->maboss_cycle_network.restart_nodes();
 
 	return; 
 }
@@ -173,14 +178,13 @@ void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
         return;
     }
 	
-	if (pCell->maboss_cycle_network != NULL) {
-		std::vector<bool> * nodes = pCell->maboss_cycle_network->get_nodes();
+		std::vector<bool> * nodes = pCell->maboss_cycle_network.get_nodes();
 		set_input_nodes(pCell, nodes);
 
-		pCell->maboss_cycle_network->run_maboss();
+		pCell->maboss_cycle_network.run_maboss();
 
 		from_nodes_to_cell(pCell, phenotype, dt);
-	}
+	
 }
 
 void set_input_nodes(Cell* pCell, std::vector<bool> * nodes) {

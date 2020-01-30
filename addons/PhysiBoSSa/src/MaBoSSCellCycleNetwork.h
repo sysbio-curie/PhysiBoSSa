@@ -31,21 +31,29 @@ class CellCycleNetwork
 		/** \brief choose a random update time, to asynchronize it between all cells 
 		 *
 		 * Set the next time at which to update the current cell's network. The time in between two udpates is chosen randomly in order to not update all cells together. */
-		void set_time_to_update();
+		inline void set_time_to_update(){this->time_to_update = (1 + 0.5*UniformRandom11()) * this->maboss->get_update_time_step();}
 
 	public:
-		/** \brief Constructor with given network instance */
-		CellCycleNetwork(std::string bnd_file, std::string cfg_file);
-		/** \brief Class destructor */
-		~CellCycleNetwork();
-
-		inline std::vector<bool>* get_nodes() {return &nodes;}
-		inline double get_time_to_update() {return time_to_update;}
-		inline int get_maboss_node_index( std::string name ) {return maboss->get_node_index(name);}
-		inline void print_nodes() {maboss->print_nodes();}
+		/** \brief Initialize a maboos network */
+		inline void initialize_boolean_network(std::string bnd_file, std::string cfg_file) { this->maboss = new MaBoSSNetwork(bnd_file, cfg_file);}
+		
+		/** \brief Reset nodes and time to update */
+		void restart_nodes();
 
 		/** \brief Update MaboSS network states */
 		void run_maboss();
+		
+		/** \brief Get nodes */
+		inline std::vector<bool>* get_nodes() {return &this->nodes;}
+		
+		/** \brief Get time to update*/
+		inline double get_time_to_update() {return this->time_to_update;}
+		
+		/** \brief Get index of a node by name*/
+		inline int get_maboss_node_index( std::string name ) {return this->maboss->get_node_index(name);}
+		
+		/** \brief Print name and values from the network */
+		inline void print_nodes() {this->maboss->print_nodes(&this->nodes);}
 };
 
 #endif

@@ -147,8 +147,6 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 
 	if( phenotype.death.dead == true )
 	{
-		delete pCell->maboss_cycle_network;
-		pCell->maboss_cycle_network = NULL;
 		pCell->functions.update_phenotype = NULL;
 		return;
 	}
@@ -157,9 +155,9 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 	{
 		set_input_nodes(pCell);
 
-		pCell->maboss_cycle_network->run_maboss();
+		pCell->maboss_cycle_network.run_maboss();
 		// Get noisy step size
-		double next_run_in = pCell->maboss_cycle_network->get_time_to_update();
+		double next_run_in = pCell->maboss_cycle_network.get_time_to_update();
 		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
 
 		from_nodes_to_cell(pCell, phenotype, dt);
@@ -190,6 +188,9 @@ void setup_tissue( void )
 	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
 	std::string bnd_file = parameters.strings("bnd_file");
 	std::string cfg_file = parameters.strings("cfg_file");
+	CellCycleNetwork tnf_network;
+	tnf_network.initialize_boolean_network(bnd_file, cfg_file);
+
 	for (int i = 0; i < cells.size(); i++)
 	{
 		float x = cells[i].x;
@@ -206,8 +207,9 @@ void setup_tissue( void )
 		// pC->phenotype.cycle.data.current_phase_index = phase;
 		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
 		
-		pC->maboss_cycle_network = new CellCycleNetwork(bnd_file, cfg_file);
-		pC->custom_data["next_physibossa_run"] = pC->maboss_cycle_network->get_time_to_update();
+		pC->maboss_cycle_network = tnf_network;
+		pC->maboss_cycle_network.restart_nodes();
+		pC->custom_data["next_physibossa_run"] = pC->maboss_cycle_network.get_time_to_update();
 	}
 
 	return; 
@@ -218,15 +220,15 @@ void setup_tissue( void )
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 	// start with ki67 coloring 
-	std::vector<std::string> output = false_cell_coloring_Ki67(pCell); 
+	std::vector<std::string> output = false_cell_coloring_live_dead(pCell); 
 	return output; 
 }
 
 
 void set_input_nodes(Cell* pCell) {
-	std::vector<bool> * nodes = pCell->maboss_cycle_network->get_nodes();
+	std::vector<bool> * nodes = pCell->maboss_cycle_network.get_nodes();
 	
-	int tnf_maboss_index = pCell->maboss_cycle_network->get_maboss_node_index("TNF");
+	int tnf_maboss_index = pCell->maboss_cycle_network.get_maboss_node_index("TNF");
 	static int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 	static double tnf_threshold = parameters.doubles("tnf_threshold");
 
@@ -236,10 +238,10 @@ void set_input_nodes(Cell* pCell) {
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {
-	std::vector<bool>* nodes = pCell->maboss_cycle_network->get_nodes();
+	std::vector<bool>* nodes = pCell->maboss_cycle_network.get_nodes();
 	int bn_index;
 
-	bn_index = pCell->maboss_cycle_network->get_maboss_node_index( "Apoptosis" );
+	bn_index = pCell->maboss_cycle_network.get_maboss_node_index( "Apoptosis" );
 	if ( bn_index != -1 && (*nodes)[bn_index] )
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
@@ -247,7 +249,7 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 		return;
 	}
 
-	bn_index = pCell->maboss_cycle_network->get_maboss_node_index( "NonACD" );
+	bn_index = pCell->maboss_cycle_network.get_maboss_node_index( "NonACD" );
 	if ( bn_index != -1 && (*nodes)[bn_index] )
 	{
 		int necrosis_model_index = phenotype.death.find_death_model_index( "Necrosis" );
@@ -255,7 +257,7 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 		return;
 	}
 
-	bn_index = pCell->maboss_cycle_network->get_maboss_node_index( "Survival" );
+	bn_index = pCell->maboss_cycle_network.get_maboss_node_index( "Survival" );
 	if ( bn_index != -1 && (*nodes)[bn_index])
 	{
 		do_proliferation( pCell, phenotype, dt );
@@ -263,7 +265,7 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 
 
 	// For model with TNF production
-	bn_index = pCell->maboss_cycle_network->get_maboss_node_index( "NFkB" );
+	bn_index = pCell->maboss_cycle_network.get_maboss_node_index( "NFkB" );
 	if ( bn_index != -1 )
 	{
 		int tnf_substrate_index = microenvironment.find_density_index( "tnf" );
