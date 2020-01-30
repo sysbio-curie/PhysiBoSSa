@@ -12,9 +12,6 @@ MaBoSSNetwork::MaBoSSNetwork( std::string networkFile, std::string configFile )
 
 	this->state = NULL;
 
-	//This can be modified
-	this->update_time_step = 10;
-
 	IStateGroup::checkAndComplete(network);
 
 	int i = 0;

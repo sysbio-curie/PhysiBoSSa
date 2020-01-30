@@ -28,7 +28,7 @@ class MaBoSSNetwork
 		NetworkState_Impl state_object;
 
 		/** \brief Time step to update the cycle */
-		double update_time_step;
+		double update_time_step = 12;
 
 		/** \brief Names and indices of network nodes */
 		std::map< std::string, int > node_names;
