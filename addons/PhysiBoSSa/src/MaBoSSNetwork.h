@@ -20,9 +20,9 @@ class MaBoSSNetwork
 {
 	private:
 		/** \brief MaBoSS instances: network */
-		Network network;
+		Network* network;
 		/** \brief MaBoSS instances: configurations */
-		RunConfig config;
+		RunConfig* config;
 
 		/** \brief Time step to update the cycle */
 		double update_time_step = 12;
@@ -37,8 +37,11 @@ class MaBoSSNetwork
 		void recover_state(NetworkState_Impl state, std::vector<bool>* output);
 
 	public:
-		/** \brief Constructor */
-		MaBoSSNetwork( std::string networkFile, std::string configFile);
+		/** \brief Initialize network */
+		void init_maboss( std::string networkFile, std::string configFile);
+
+		/** \brief Destructor */
+		void delete_maboss();
 
 		/** \brief Restart a vector of bools, to the init values of the network */
 		void restart_node_values(std::vector<bool>* node_values);
