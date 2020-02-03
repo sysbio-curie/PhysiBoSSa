@@ -81,7 +81,7 @@ void MaBoSSNetwork::run_simulation(std::vector<bool>* node_values)
 
 	StochasticSimulationEngine* engine = new StochasticSimulationEngine(this->network, this->config);
 	engine->setSeed(UniformInt());
-	NetworkState_Impl state_result = engine->run(&state, NULL);
+	state = engine->run(&state, NULL);
 	delete engine;
 
 	this->recover_state(state, node_values);
