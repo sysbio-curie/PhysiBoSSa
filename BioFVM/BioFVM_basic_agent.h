@@ -80,9 +80,6 @@ class Basic_Agent
 	std::vector<double> * secretion_rates; 
 	std::vector<double> * saturation_densities; 
 	std::vector<double> * uptake_rates;  
-	/** \brief amount of density bounded to the cell*/
-	std::vector<double> * bounded;
-
 	double get_total_volume();
 	void set_total_volume(double);
 	void update_voxel_index();

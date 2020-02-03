@@ -114,6 +114,8 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.uptake_rates[tnf_substrate_index] = parameters.doubles("tnf_uptake_rate"); 
 	cell_defaults.phenotype.secretion.saturation_densities[tnf_substrate_index] = 1; 
 	
+	cell_defaults.phenotype.molecular.fraction_released_at_death[tnf_substrate_index] = 0.0;
+
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
 
@@ -216,7 +218,7 @@ void set_input_nodes(Cell* pCell) {
 	static double tnf_threshold = parameters.doubles("tnf_threshold");
 
 	if (tnf_maboss_index != -1 && tnf_substrate_index != -1)
-		(*nodes)[tnf_maboss_index] = (*pCell->bounded)[tnf_substrate_index] > tnf_threshold;
+		(*nodes)[tnf_maboss_index] = pCell->phenotype.molecular.internalized_total_substrates[tnf_substrate_index] > tnf_threshold;
 }
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)

@@ -72,7 +72,6 @@ Basic_Agent::Basic_Agent()
 	secretion_rates= new std::vector<double>(0);
 	uptake_rates= new std::vector<double>(0);
 	saturation_densities= new std::vector<double>(0);
-	bounded= new std::vector<double>(0);
 	// extern Microenvironment* default_microenvironment;
 	// register_microenvironment( default_microenvironment ); 
 
@@ -166,7 +165,6 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	secretion_rates->resize( microenvironment->density_vector(0).size() , 0.0 );
 	saturation_densities->resize( microenvironment->density_vector(0).size() , 0.0 );
 	uptake_rates->resize( microenvironment->density_vector(0).size() , 0.0 );	
-	bounded->resize( microenvironment->density_vector(0).size() , 0.0 );	
 
 	// some solver temporary variables 
 	cell_source_sink_solver_temp1.resize( microenvironment->density_vector(0).size() , 0.0 );
@@ -299,13 +297,6 @@ void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt
 		volume_is_changed = false;
 	}
 	
-	// decrease 1 percent per min
-	double fact = dt * volume / ( (microenvironment->voxels(current_voxel_index)).volume ) ; 
-	(*bounded) -= 0.01 * dt * (*bounded);
-	for ( int i = 0; i < (*bounded).size(); i++ )
-		(*bounded)[i] = (*bounded)[i] > 0 ? (*bounded)[i] : 0;
-	(*bounded) += fact * (*uptake_rates) * nearest_density_vector();   
-
 	if( default_microenvironment_options.track_internalized_substrates_in_each_agent == true )
 	{
 		total_extracellular_substrate_change.assign( total_extracellular_substrate_change.size() , 1.0 ); // 1
