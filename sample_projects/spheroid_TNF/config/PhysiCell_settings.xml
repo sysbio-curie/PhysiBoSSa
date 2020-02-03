@@ -156,9 +156,7 @@
 		<!-- example parameters from the template --> 
 		
 		<!-- cell cycle custom duration -->
-		<ki67n_phase_duration type="double" units="1/min">10</ki67n_phase_duration> <!-- 0.1 min -->
-		<ki67pre_phase_duration type="double" units="1/min">0.00119047619048</ki67pre_phase_duration> <!-- 14*60 min -->
-		<ki67post_phase_duration type="double" units="1/min">0.00617283950617</ki67post_phase_duration> <!-- 2.7*60 min -->
+		<live_phase_duration type="double" units="1/min">0.0075</live_phase_duration> <!-- 300 min -->
 
 		<!-- init file --> 
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>

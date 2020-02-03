@@ -86,16 +86,12 @@ void create_cell_types( void )
 	// Name the default cell type 
 	cell_defaults.name = "tumor cell";
 	cell_defaults.type = 0; 
-
 	
 	// set default cell cycle model
-
+	cell_defaults.phenotype.cycle.sync_to_cycle_model( live );
 
 	// set default_cell_functions; 
-
-	
-	// make sure the defaults are self-consistent. 
-	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
+	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling;
 
 	// set the rate terms in the default phenotype 
 	// first find index for a few key variables. 
@@ -103,21 +99,9 @@ void create_cell_types( void )
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 	int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
 
-	cell_defaults.phenotype.cycle.sync_to_cycle_model( live );
-
 	// set cycle duration, apoptotic duration and rate and initially no necrosis 
-
-	/*
-
-        cell_defaults.phenotype.cycle.sync_to_cycle_model( Ki67_advanced );
-	int ki67n_index = cell_defaults.phenotype.cycle.model().find_phase_index(PhysiCell_constants::Ki67_negative);
-	int ki67pre_index = cell_defaults.phenotype.cycle.model().find_phase_index(PhysiCell_constants::Ki67_positive_premitotic);
-	int ki67post_index = cell_defaults.phenotype.cycle.model().find_phase_index(PhysiCell_constants::Ki67_positive_postmitotic);
-	
-	cell_defaults.phenotype.cycle.data.transition_rate(ki67n_index, ki67pre_index) = parameters.doubles("ki67n_phase_duration");
-	cell_defaults.phenotype.cycle.data.transition_rate(ki67pre_index, ki67post_index) = parameters.doubles("ki67pre_phase_duration");
-	cell_defaults.phenotype.cycle.data.transition_rate(ki67post_index, ki67n_index) = parameters.doubles("ki67post_phase_duration");
-	*/
+	int live_index = cell_defaults.phenotype.cycle.model().find_phase_index(PhysiCell_constants::live);
+	cell_defaults.phenotype.cycle.data.transition_rate(live_index, live_index) = parameters.doubles("live_phase_duration");
 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
@@ -132,7 +116,6 @@ void create_cell_types( void )
 	
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
-	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling;
 
 	return; 
 }
