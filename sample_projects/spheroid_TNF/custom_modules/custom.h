@@ -95,7 +95,6 @@ void setup_microenvironment( void );
 std::vector<std::string> my_coloring_function( Cell* );
 
 // custom cell phenotype functions could go here 
-void boolean_network_rule( Cell* pCell, Phenotype& phenotype, double dt );
 void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt );
 
 void update_custom_variables( Cell* pCell );

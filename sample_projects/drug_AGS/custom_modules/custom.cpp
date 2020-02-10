@@ -94,12 +94,11 @@ void create_cell_types( void )
 	
 	// set default_cell_functions; 
 	
-	cell_defaults.functions.update_phenotype = update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; 
 	
 	// make sure the defaults are self-consistent. 
 	
 	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
-	cell_defaults.phenotype.sync_to_functions( cell_defaults.functions ); 
 
 	// set the rate terms in the default phenotype 
 	// first find index for a few key variables. 
@@ -114,9 +113,9 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
 	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
-	
-	// add custom data here, if any 
-	cell_defaults.functions.custom_cell_rule = boolean_network_rule;
+
+	// add custom data here, if any
+	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
 
 	return; 
 }
@@ -170,28 +169,62 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	return output; 
 }
 
-void boolean_network_rule(Cell* pCell, Phenotype& phenotype, double dt )
+void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
 {
-    if( phenotype.death.dead == true )
-    {
-        pCell->functions.update_phenotype = NULL;
-        return;
-    }
-	
-		std::vector<bool> * nodes = pCell->maboss_cycle_network.get_nodes();
-		set_input_nodes(pCell, nodes);
+	static int o2_index = microenvironment.find_density_index( "oxygen" );
+	double o2 = pCell->nearest_density_vector()[o2_index];
+
+	update_cell_and_death_parameters_O2_based(pCell, phenotype, dt);
+
+	if( phenotype.death.dead == true )
+	{
+		pCell->functions.update_phenotype = NULL;
+		return;
+	}
+
+	if (PhysiCell_globals.current_time >= pCell->custom_data["next_physibossa_run"])
+	{
+		set_input_nodes(pCell);
 
 		pCell->maboss_cycle_network.run_maboss();
-
+		// Get noisy step size
+		double next_run_in = pCell->maboss_cycle_network.get_time_to_update();
+		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
+		
 		from_nodes_to_cell(pCell, phenotype, dt);
-	
+	}
 }
 
-void set_input_nodes(Cell* pCell, std::vector<bool> * nodes) {
-	//set up input nodes
+void set_input_nodes(Cell* pCell) {
+	std::vector<bool> * nodes = pCell->maboss_cycle_network.get_nodes();
+	
+	int x_maboss_index = pCell->maboss_cycle_network.get_maboss_node_index("X");
+	static int x_index = microenvironment.find_density_index( "x" ); 
+	static double x_threshold = parameters.doubles("x_threshold");
+
+	
+	if (x_maboss_index != -1 && x_index != -1)
+	{
+		double tnf_cell_concentration = pCell->phenotype.molecular.internalized_total_substrates[x_index];
+		if (tnf_cell_concentration >= x_threshold)
+		{
+			(*nodes)[x_maboss_index] = 1;
+		}
+	}
+	/// example
 }
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {
-	//get result from output nodes
+	std::vector<bool>* nodes = pCell->maboss_cycle_network.get_nodes();
+	int bn_index;
+
+	bn_index = pCell->maboss_cycle_network.get_maboss_node_index( "Apoptosis" );
+	if ( bn_index != -1 && (*nodes)[bn_index] )
+	{
+		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
+		pCell->start_death(apoptosis_model_index);
+		return;
+	}
+	/// example
 }
