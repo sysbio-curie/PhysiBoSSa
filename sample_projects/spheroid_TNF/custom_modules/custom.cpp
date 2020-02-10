@@ -118,6 +118,9 @@ void create_cell_types( void )
 
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
+	cell_defaults.custom_data.add_variable("tnf_concentration", "dimensionless", 0);
+	cell_defaults.custom_data.add_variable("tnf_node", "dimensionless", 0);
+	cell_defaults.custom_data.add_variable("fadd_node", "dimensionless", 0);
 
 	return; 
 }
@@ -144,6 +147,8 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 		// Get noisy step size
 		double next_run_in = pCell->maboss_cycle_network.get_time_to_update();
 		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
+		
+		update_custom_variables(pCell);
 
 		from_nodes_to_cell(pCell, phenotype, dt);
 	}
@@ -164,6 +169,20 @@ void setup_microenvironment( void )
 	initialize_microenvironment(); 	
 	
 	return; 
+}
+
+void update_custom_variables( Cell* pCell )
+{
+	std::vector<bool> * nodes = pCell->maboss_cycle_network.get_nodes();
+
+	int tnf_maboss_index = pCell->maboss_cycle_network.get_maboss_node_index("TNF");
+	int fadd_maboss_index = pCell->maboss_cycle_network.get_maboss_node_index("FADD");
+	static int tnf_index = microenvironment.find_density_index( "tnf" ); 
+	static double tnf_threshold = parameters.doubles("tnf_threshold");
+
+	pCell->custom_data["tnf_concentration"] = pCell->phenotype.molecular.internalized_total_substrates[tnf_index];
+	pCell->custom_data["tnf_node"] = (*nodes)[tnf_maboss_index];
+	pCell->custom_data["fadd_node"] = (*nodes)[fadd_maboss_index];
 }
 
 void setup_tissue( void )
@@ -195,6 +214,7 @@ void setup_tissue( void )
 		pC->maboss_cycle_network = tnf_network;
 		pC->maboss_cycle_network.restart_nodes();
 		pC->custom_data["next_physibossa_run"] = pC->maboss_cycle_network.get_time_to_update();
+		update_custom_variables(pC);
 	}
 
 	return; 
@@ -214,12 +234,22 @@ void set_input_nodes(Cell* pCell) {
 	std::vector<bool> * nodes = pCell->maboss_cycle_network.get_nodes();
 	
 	int tnf_maboss_index = pCell->maboss_cycle_network.get_maboss_node_index("TNF");
-	static int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
+	static int tnf_index = microenvironment.find_density_index( "tnf" ); 
 	static double tnf_threshold = parameters.doubles("tnf_threshold");
 
-	if (tnf_maboss_index != -1 && tnf_substrate_index != -1)
-		(*nodes)[tnf_maboss_index] = pCell->phenotype.molecular.internalized_total_substrates[tnf_substrate_index] > tnf_threshold;
-}
+	
+	if (tnf_maboss_index != -1 && tnf_index != -1)
+	{
+		double tnf_cell_concentration = pCell->phenotype.molecular.internalized_total_substrates[tnf_index];
+		if (tnf_cell_concentration >= tnf_threshold)
+			(*nodes)[tnf_maboss_index] = 1;
+		else
+		{
+			double rate = (tnf_threshold - tnf_cell_concentration) / tnf_threshold;
+			(*nodes)[tnf_maboss_index] = uniform_random() > rate; 
+		}
+		
+	}}
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {

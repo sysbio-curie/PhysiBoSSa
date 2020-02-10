@@ -98,6 +98,8 @@ std::vector<std::string> my_coloring_function( Cell* );
 void boolean_network_rule( Cell* pCell, Phenotype& phenotype, double dt );
 void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt );
 
+void update_custom_variables( Cell* pCell );
+
 void set_input_nodes(Cell* pCell); 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt);
 void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt );
