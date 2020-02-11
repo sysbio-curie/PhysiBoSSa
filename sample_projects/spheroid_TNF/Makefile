@@ -12,16 +12,16 @@ ifdef PHYSICELL_CPP
 endif
 
 ### MaBoSS configuration 
-# MaBoSS directory
-MABOSS_DIR = addons/PhysiBoSSa/MaBoSS-env-2.0/engine
-CUR_DIR = $(shell pwd)
-LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS -ldl
-INC := -I$(CUR_DIR)/$(MABOSS_DIR)/include 
-
 # MaBoSS max nodes
 ifndef MABOSS_MAX_NODES
 MABOSS_MAX_NODES = 64
 endif
+
+# MaBoSS directory
+MABOSS_DIR = addons/PhysiBoSSa/MaBoSS-env-2.0/engine
+CUR_DIR = $(shell pwd)
+LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS -ldl
+INC := -I$(CUR_DIR)/$(MABOSS_DIR)/include -DMAXNODES=$(MABOSS_MAX_NODES)
 
 # If max nodes > 64, change lib path 
 ifeq ($(shell expr $(MABOSS_MAX_NODES) '>' 64), 1)
