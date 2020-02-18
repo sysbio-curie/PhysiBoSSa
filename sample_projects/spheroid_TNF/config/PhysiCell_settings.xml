@@ -163,6 +163,7 @@
 
 		<bnd_file type="string" units="">./config/boolean_network/TNF_nodes.bnd</bnd_file>
 		<cfg_file type="string" units="">./config/boolean_network/TNF_conf.cfg</cfg_file>
+		<maboss_time_step type="double" units="dimensionless">12.</maboss_time_step>
 
 		<tnf_uptake_rate type="double" units="">0.0025</tnf_uptake_rate>
 		<tnf_secretion_rate type="double" units="fg/cell/min">0.1</tnf_secretion_rate> <!-- 0.1 -->

@@ -141,23 +141,23 @@ void setup_tissue( void )
 	MaBoSSNetwork* maboss;
 	std::string bnd_file = parameters.strings("bnd_file");
 	std::string cfg_file = parameters.strings("cfg_file");
-	CellCycleNetwork ags_network;
-	ags_network.initialize_boolean_network(bnd_file, cfg_file);
+	BooleanNetwork ags_network;
+	ags_network.initialize_boolean_network(bnd_file, cfg_file, 12);
 
 	pC = create_cell(); 
 	pC->assign_position( 0.0, 0.0, 0.0 );
-	pC->maboss_cycle_network = ags_network;
-	pC->maboss_cycle_network.restart_nodes();
+	pC->boolean_network = ags_network;
+	pC->boolean_network.restart_nodes();
 
 	pC = create_cell(); 
 	pC->assign_position( -100.0, 0.0, 1.0 );
-	pC->maboss_cycle_network = ags_network;
-	pC->maboss_cycle_network.restart_nodes();	
+	pC->boolean_network = ags_network;
+	pC->boolean_network.restart_nodes();	
 
 	pC = create_cell(); 
 	pC->assign_position( 0, 100.0, -7.0 );
-	pC->maboss_cycle_network = ags_network;
-	pC->maboss_cycle_network.restart_nodes();
+	pC->boolean_network = ags_network;
+	pC->boolean_network.restart_nodes();
 
 	return; 
 }
@@ -186,9 +186,9 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 	{
 		set_input_nodes(pCell);
 
-		pCell->maboss_cycle_network.run_maboss();
+		pCell->boolean_network.run_maboss();
 		// Get noisy step size
-		double next_run_in = pCell->maboss_cycle_network.get_time_to_update();
+		double next_run_in = pCell->boolean_network.get_time_to_update();
 		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
 		
 		from_nodes_to_cell(pCell, phenotype, dt);
@@ -196,9 +196,9 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 }
 
 void set_input_nodes(Cell* pCell) {
-	std::vector<bool> * nodes = pCell->maboss_cycle_network.get_nodes();
+	std::vector<bool> * nodes = pCell->boolean_network.get_nodes();
 	
-	int x_maboss_index = pCell->maboss_cycle_network.get_maboss_node_index("X");
+	int x_maboss_index = pCell->boolean_network.get_node_index("X");
 	static int x_index = microenvironment.find_density_index( "x" ); 
 	static double x_threshold = parameters.doubles("x_threshold");
 
@@ -216,10 +216,10 @@ void set_input_nodes(Cell* pCell) {
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {
-	std::vector<bool>* nodes = pCell->maboss_cycle_network.get_nodes();
+	std::vector<bool>* nodes = pCell->boolean_network.get_nodes();
 	int bn_index;
 
-	bn_index = pCell->maboss_cycle_network.get_maboss_node_index( "Apoptosis" );
+	bn_index = pCell->boolean_network.get_node_index( "Apoptosis" );
 	if ( bn_index != -1 && (*nodes)[bn_index] )
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );

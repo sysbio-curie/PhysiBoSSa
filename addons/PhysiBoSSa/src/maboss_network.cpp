@@ -1,4 +1,4 @@
-#include "MaBoSSNetwork.h"
+#include "maboss_network.h"
 
 /* Default constructor */
 void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile)
@@ -88,7 +88,7 @@ void MaBoSSNetwork::run_simulation(std::vector<bool>* node_values)
 }
 
 /* Return the index of node based on node's name */
-int MaBoSSNetwork::get_node_index( std::string name )
+int MaBoSSNetwork::get_maboss_node_index( std::string name )
 {
 	auto res = this->node_names.find(name);
 	if ( res != this->node_names.end() )

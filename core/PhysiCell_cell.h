@@ -75,7 +75,7 @@
 #include "./PhysiCell_cell_container.h"
 #include "./PhysiCell_constants.h"
 
-#include "../addons/PhysiBoSSa/src/MaBoSSCellCycleNetwork.h"
+#include "../addons/PhysiBoSSa/src/boolean_network.h"
 
 using namespace BioFVM; 
 
@@ -161,7 +161,7 @@ class Cell : public Basic_Agent
 	Cell_State state; 
 	Phenotype phenotype; 
 	
-	CellCycleNetwork maboss_cycle_network;
+	BooleanNetwork boolean_network;
 
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 

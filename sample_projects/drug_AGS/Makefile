@@ -62,7 +62,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiBoSSa_OBJECTS := utils.o MaBoSSNetwork.o MaBoSSCellCycleNetwork.o
+PhysiBoSSa_OBJECTS := utils.o maboss_network.o boolean_network.o
 
 PhysiCell_custom_module_OBJECTS := custom.o
 
@@ -160,14 +160,14 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 MaBoSS:
 	cd $(MABOSS_DIR)/src && make MAXNODES=$(MABOSS_MAX_NODES) install_alib
 
-MaBoSSNetwork.o: ./addons/PhysiBoSSa/src/MaBoSSNetwork.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/MaBoSSNetwork.cpp
+maboss_network.o: ./addons/PhysiBoSSa/src/maboss_network.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/maboss_network.cpp
 
 utils.o: ./addons/PhysiBoSSa/src/utils.cpp
 	$(COMPILE_COMMAND) -c ./addons/PhysiBoSSa/src/utils.cpp
 
-MaBoSSCellCycleNetwork.o: ./addons/PhysiBoSSa/src/MaBoSSCellCycleNetwork.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/MaBoSSCellCycleNetwork.cpp
+boolean_network.o: ./addons/PhysiBoSSa/src/boolean_network.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/boolean_network.cpp
 
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom.cpp

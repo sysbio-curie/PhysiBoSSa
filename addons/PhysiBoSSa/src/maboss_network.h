@@ -43,6 +43,9 @@ class MaBoSSNetwork
 		/** \brief Destructor */
 		void delete_maboss();
 
+		/** \brief Setter update time */
+		inline void set_update_time_step(double time_step) { this->update_time_step = time_step;}
+
 		/** \brief Restart a vector of bools, to the init values of the network */
 		void restart_node_values(std::vector<bool>* node_values);
 
@@ -54,10 +57,10 @@ class MaBoSSNetwork
 		 * Return -1 if node doesn't exit \n
 		 * Return 0 if node is 0 \n
 		 * Return 1 if node is 1 */
-		int get_node_index( std::string name );
+		int get_maboss_node_index( std::string name );
 
 		/** \brief Return update time value */
-		inline double get_update_time_step(){ return update_time_step; }
+		inline double get_update_time_step(){ return this->update_time_step; }
 		
 		/** \brief Print current state of all the nodes of the network */
 		void print_nodes(std::vector<bool>* node_values);

@@ -453,7 +453,7 @@ Cell* Cell::divide( )
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
 
-	child->maboss_cycle_network = this->maboss_cycle_network;
+	child->boolean_network = this->boolean_network;
 	
 	return child;
 }
