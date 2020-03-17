@@ -17,3 +17,42 @@ void BooleanNetwork::run_maboss()
 	this->maboss.run_simulation(&this->nodes);
 	this->set_time_to_update();
 }
+
+int BooleanNetwork::get_node_value( std::string name )
+{
+	try
+	{
+		int bn_index = this->get_node_index( name );
+		return this->nodes[bn_index];
+	}
+	catch(const std::exception& e)
+	{
+		throw;
+	}
+}
+
+void BooleanNetwork::set_node_value( std::string name, bool value )
+{
+	try
+	{
+		int bn_index = this->get_node_index( name );
+		this->nodes[bn_index] = value;
+	}
+	catch(const std::exception& e)
+	{
+		throw;
+	}
+}
+
+int BooleanNetwork::get_node_index( std::string name ) 
+{
+	try 
+	{
+		return this->maboss.get_maboss_node_index(name);
+	}
+	catch (const std::exception& e) 
+	{
+		throw;
+	}
+}
+

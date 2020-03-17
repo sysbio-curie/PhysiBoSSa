@@ -93,7 +93,9 @@ int MaBoSSNetwork::get_maboss_node_index( std::string name )
 	auto res = this->node_names.find(name);
 	if ( res != this->node_names.end() )
 		return res->second;
-	return -1;	
+		
+	std::string err_msg = "A node with name " + name + " does not exist in the network.";
+	throw std::invalid_argument(err_msg);
 }
 
 /* Print current state of all the nodes of the network */

@@ -46,8 +46,14 @@ class BooleanNetwork
 		/** \brief Get time to update*/
 		inline double get_time_to_update() {return this->time_to_update;}
 		
+		/** \brief Get value of a node by name*/
+		int get_node_value( std::string name );
+
+		/** \brief Set value of a node by name*/
+		void set_node_value( std::string name, bool value );
+
 		/** \brief Get index of a node by name*/
-		inline int get_node_index( std::string name ) {return this->maboss.get_maboss_node_index(name);}
+		int get_node_index( std::string name );
 		
 		/** \brief Print name and values from the network */
 		inline void print_nodes() {this->maboss.print_nodes(&this->nodes);}
