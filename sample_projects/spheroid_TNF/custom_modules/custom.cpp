@@ -232,71 +232,56 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 
 
 void set_input_nodes(Cell* pCell) {
-	std::vector<bool> * nodes = pCell->boolean_network.get_nodes();
-	
-	int tnf_maboss_index = pCell->boolean_network.get_node_index("TNF");
 	static int tnf_index = microenvironment.find_density_index( "tnf" ); 
 	static double tnf_threshold = parameters.doubles("tnf_threshold");
 
-	
-	if (tnf_maboss_index != -1 && tnf_index != -1)
+	if (tnf_index != -1)
 	{
 		double tnf_cell_concentration = pCell->phenotype.molecular.internalized_total_substrates[tnf_index];
 		if (tnf_cell_concentration >= tnf_threshold)
-			(*nodes)[tnf_maboss_index] = 1;
+			pCell->boolean_network.set_node_value("TNF", 1);
 		else
 		{
 			double rate = (tnf_threshold - tnf_cell_concentration) / tnf_threshold;
-			(*nodes)[tnf_maboss_index] = uniform_random() > rate; 
+			pCell->boolean_network.set_node_value("TNF", uniform_random() > rate);
 		}
 		
 	}}
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {
-	std::vector<bool>* nodes = pCell->boolean_network.get_nodes();
-	int bn_index;
 
-	bn_index = pCell->boolean_network.get_node_index( "Apoptosis" );
-	if ( bn_index != -1 && (*nodes)[bn_index] )
+	if ( pCell->boolean_network.get_node_value( "Apoptosis" ) )
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
 		return;
 	}
 
-	bn_index = pCell->boolean_network.get_node_index( "NonACD" );
-	if ( bn_index != -1 && (*nodes)[bn_index] )
+	if ( pCell->boolean_network.get_node_value( "NonACD" ) )
 	{
 		int necrosis_model_index = phenotype.death.find_death_model_index( "Necrosis" );
 		pCell->start_death(necrosis_model_index);
 		return;
 	}
 
-	bn_index = pCell->boolean_network.get_node_index( "Survival" );
-	if ( bn_index != -1 && (*nodes)[bn_index])
+	if ( pCell->boolean_network.get_node_value( "Survival" ) )
 	{
 		do_proliferation( pCell, phenotype, dt );
 	}
 
+	int tnf_substrate_index = microenvironment.find_density_index( "tnf" );
+	static double tnf_secretion = parameters.doubles("tnf_secretion_rate");
 
-	// For model with TNF production
-	bn_index = pCell->boolean_network.get_node_index( "NFkB" );
-	if ( bn_index != -1 )
+	double tnf_secretion_rate = 0;
+	// produce some TNF
+	if ( pCell->boolean_network.get_node_value( "NFkB" ) )
 	{
-		int tnf_substrate_index = microenvironment.find_density_index( "tnf" );
-		static double tnf_secretion = parameters.doubles("tnf_secretion_rate");
+		tnf_secretion_rate = (tnf_secretion / microenvironment.voxels(pCell->get_current_voxel_index()).volume);
 
-		double tnf_secretion_rate = 0;
-		// produce some TNF
-		if ( (*nodes)[bn_index] )
-		{
-			tnf_secretion_rate = (tnf_secretion / microenvironment.voxels(pCell->get_current_voxel_index()).volume);
-
-		}
-		pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = tnf_secretion_rate;
-		pCell->set_internal_uptake_constants(dt);
 	}
+	pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = tnf_secretion_rate;
+	pCell->set_internal_uptake_constants(dt);
 }
 
 /* Go to proliferative if needed */

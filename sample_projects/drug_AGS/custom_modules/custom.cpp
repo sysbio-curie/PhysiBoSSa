@@ -196,19 +196,15 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 }
 
 void set_input_nodes(Cell* pCell) {
-	std::vector<bool> * nodes = pCell->boolean_network.get_nodes();
-	
-	int x_maboss_index = pCell->boolean_network.get_node_index("X");
 	static int x_index = microenvironment.find_density_index( "x" ); 
 	static double x_threshold = parameters.doubles("x_threshold");
 
-	
-	if (x_maboss_index != -1 && x_index != -1)
+	if (x_index != -1)
 	{
 		double tnf_cell_concentration = pCell->phenotype.molecular.internalized_total_substrates[x_index];
 		if (tnf_cell_concentration >= x_threshold)
 		{
-			(*nodes)[x_maboss_index] = 1;
+			pCell->boolean_network.set_node_value("X", 1);
 		}
 	}
 	/// example
@@ -216,11 +212,7 @@ void set_input_nodes(Cell* pCell) {
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {
-	std::vector<bool>* nodes = pCell->boolean_network.get_nodes();
-	int bn_index;
-
-	bn_index = pCell->boolean_network.get_node_index( "Apoptosis" );
-	if ( bn_index != -1 && (*nodes)[bn_index] )
+	if ( pCell->boolean_network.get_node_value( "Apoptosis" ) )
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
