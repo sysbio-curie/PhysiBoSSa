@@ -11,6 +11,10 @@ ifdef PHYSICELL_CPP
 	CC := $(PHYSICELL_CPP)
 endif
 
+# AGS model have more than 64 nodes, so we have 
+# to set up this var to the number of nodes
+MABOSS_MAX_NODES = 90
+
 ### MaBoSS configuration 
 # MaBoSS max nodes
 ifndef MABOSS_MAX_NODES
