@@ -67,8 +67,12 @@
 
 #include "./custom.h"
 #include "../BioFVM/BioFVM.h"  
+#include "../core/base/vector3d.h"
+#include "../core/base/writeSVG.h"
+#include "../core/base/readXML.h"
 
 using namespace BioFVM;
+
 // declare cell definitions here 
 
 void create_cell_types( void )

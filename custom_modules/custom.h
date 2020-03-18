@@ -67,9 +67,8 @@
 
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
-
-#include "../addons/PhysiBoSSa/src/base/utilities.h"
-#include "../addons/PhysiBoSSa/src/base/readXML.h"
+#include "../core/PhysiCell_utilities.h"
+#include "../core/base/readXML.h"
 
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
 
