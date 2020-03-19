@@ -47,7 +47,7 @@ class BooleanNetwork
 		inline double get_time_to_update() {return this->time_to_update;}
 		
 		/** \brief Get value of a node by name*/
-		int get_node_value( std::string name );
+		bool get_node_value( std::string name );
 
 		/** \brief Set value of a node by name*/
 		void set_node_value( std::string name, bool value );

@@ -18,7 +18,7 @@ void BooleanNetwork::run_maboss()
 	this->set_time_to_update();
 }
 
-int BooleanNetwork::get_node_value( std::string name )
+bool BooleanNetwork::get_node_value( std::string name )
 {
 	try
 	{
