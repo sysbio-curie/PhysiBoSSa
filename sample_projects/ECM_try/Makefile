@@ -62,6 +62,10 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
+PhysiBoSS_module_OBJECTS := readXML.o vector3d.o writeSVG.o 
+
+tinyxml_OBJECTS := tinyxml2.o
+
 PhysiBoSSa_OBJECTS := utils.o maboss_network.o boolean_network.o
 
 PhysiCell_custom_module_OBJECTS := custom.o
@@ -69,7 +73,7 @@ PhysiCell_custom_module_OBJECTS := custom.o
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSSa_OBJECTS)
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSSa_OBJECTS) $(PhysiBoSS_module_OBJECTS) $(tinyxml_OBJECTS)
 
 # compile the project 
 
@@ -171,6 +175,21 @@ boolean_network.o: ./addons/PhysiBoSSa/src/boolean_network.cpp
 
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom.cpp
+
+# PhysiBoSS modules from Gaelle's code:
+
+readXML.o: ./core/base/readXML.cpp
+	$(COMPILE_COMMAND) -c ./core/base/readXML.cpp
+
+vector3d.o: ./core/base/vector3d.cpp
+	$(COMPILE_COMMAND) -c ./core/base/vector3d.cpp
+
+writeSVG.o: ./core/base/writeSVG.cpp
+	$(COMPILE_COMMAND) -c ./core/base/writeSVG.cpp
+
+tinyxml2.o: ./core/tinyxml/tinyxml2.cpp
+	$(COMPILE_COMMAND) -c ./core/tinyxml/tinyxml2.cpp
+
 
 # cleanup
 

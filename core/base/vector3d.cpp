@@ -66,8 +66,8 @@ Vector3d & Vector3d::operator/=( const double factor )
 {
 	double f = factor;
 	// not to divide by 0
-	if ( fabs(factor) < EPSILON )
-		f = sign(factor) * EPSILON * 10;
+	if ( fabs(factor) < PhysiCell::EPSILON )
+		f = PhysiCell::sign(factor) * PhysiCell::EPSILON * 10;
 	for ( int i = 0; i < 3; i++ )
 		data[i] /= f;
 	return (*this);
@@ -76,7 +76,7 @@ Vector3d & Vector3d::operator/=( const double factor )
 std::string Vector3d::str() const
 {
 	std::ostringstream convert;
-	convert << data[0] << delim << data[1] << delim << data[2];
+	convert << data[0] << PhysiCell::delim << data[1] << PhysiCell::delim << data[2];
 	return convert.str();
 }
 
@@ -89,8 +89,8 @@ std::ostream & operator << ( std::ostream & os, const Vector3d& v)
 /** Assign random values to current vector, with norm 1 */
 void Vector3d::randomize_normed()
 {
-	double temp_angle = 2 * M_PI * UniformRandom();
-	double temp_phi = M_PI * UniformRandom();
+	double temp_angle = 2 * M_PI * PhysiCell::UniformRandom();
+	double temp_phi = M_PI * PhysiCell::UniformRandom();
 	data[0] = cos( temp_angle ) * sin( temp_phi );
 	data[1] = sin( temp_angle ) * sin( temp_phi );
 	data[2] = cos( temp_phi );
