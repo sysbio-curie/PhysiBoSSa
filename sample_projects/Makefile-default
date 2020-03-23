@@ -43,6 +43,10 @@ PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o
 
+PhysiBoSS_module_OBJECTS := readXML.o vector3d.o writeSVG.o 
+
+tinyxml_OBJECTS := tinyxml2.o
+
 # put your custom objects here (they should be in the custom_modules directory)
 
 PhysiCell_custom_module_OBJECTS := .o
@@ -50,7 +54,7 @@ PhysiCell_custom_module_OBJECTS := .o
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSS_module_OBJECTS) $(tinyxml_OBJECTS)
 
 EXAMPLES := ./examples/PhysiCell_test_mechanics_1.cpp ./examples/PhysiCell_test_mechanics_2.cpp \
  ./examples/PhysiCell_test_DCIS.cpp ./examples/PhysiCell_test_HDS.cpp \
@@ -280,6 +284,20 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
 	
 # user-defined PhysiCell modules
+# PhysiBoSS modules from Gaelle's code:
+
+readXML.o: ./core/base/readXML.cpp
+	$(COMPILE_COMMAND) -c ./core/base/readXML.cpp
+
+vector3d.o: ./core/base/vector3d.cpp
+	$(COMPILE_COMMAND) -c ./core/base/vector3d.cpp
+
+writeSVG.o: ./core/base/writeSVG.cpp
+	$(COMPILE_COMMAND) -c ./core/base/writeSVG.cpp
+
+tinyxml2.o: ./core/tinyxml/tinyxml2.cpp
+	$(COMPILE_COMMAND) -c ./core/tinyxml/tinyxml2.cpp
+
 
 # cleanup
 

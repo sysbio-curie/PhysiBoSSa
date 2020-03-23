@@ -67,9 +67,7 @@
 
 #include "./custom.h"
 #include "../BioFVM/BioFVM.h"  
-#include "../core/base/vector3d.h"
-#include "../core/base/writeSVG.h"
-#include "../core/base/readXML.h"
+
 
 using namespace BioFVM;
 
@@ -109,7 +107,6 @@ void create_cell_types( void )
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
 	microenvironment.add_density("ecm", "dimensionless");
-	ecm_file = "";
 	reader.getStringValue("user_parameters", "ecm_file", &ecm_file );
 	load_ecm_file();
 
