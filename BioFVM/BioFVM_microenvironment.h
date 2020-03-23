@@ -52,6 +52,7 @@
 #include "BioFVM_mesh.h"
 #include "BioFVM_agent_container.h"
 #include "BioFVM_MultiCellDS.h"
+#include "../core/base/vector3d.h"
 
 namespace BioFVM{
 
@@ -187,7 +188,8 @@ class Microenvironment
 	int voxel_index( int i, int j, int k ); 
 	std::vector<unsigned int> cartesian_indices( int n ); 
 	
-	int nearest_voxel_index( std::vector<double>& position ); 
+	int nearest_voxel_index( std::vector<double>& position );
+	int nearest_voxel_index( Vector3d& position );
 	std::vector<unsigned int> nearest_cartesian_indices( std::vector<double>& position ); 
 	Voxel& nearest_voxel( std::vector<double>& position ); 
 	Voxel& voxels( int voxel_index );

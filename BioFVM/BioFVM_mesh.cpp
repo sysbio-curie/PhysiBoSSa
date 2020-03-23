@@ -897,6 +897,27 @@ int Cartesian_Mesh::nearest_voxel_index( std::vector<double>& position )
 	return ( k*y_coordinates.size() + j )*x_coordinates.size() + i; 
 }
 
+int Cartesian_Mesh::nearest_voxel_index( Vector3d& position )
+{
+	unsigned int i = (unsigned int) floor( (position[0]-bounding_box[0])/dx ); 
+	unsigned int j = (unsigned int) floor( (position[1]-bounding_box[1])/dy ); 
+	unsigned int k = (unsigned int) floor( (position[2]-bounding_box[2])/dz ); 
+
+	//  add some bounds checking -- truncate to inside the computational domain   
+
+	if( i >= (int) x_coordinates.size() ){ i = (int) x_coordinates.size()-1; }
+	if( i < 0 ){ i = 0; }
+
+	if( j >= (int) y_coordinates.size() ){ j = (int) y_coordinates.size()-1; }
+	if( j < 0 ){ j = 0; }
+
+	if( k >= (int) z_coordinates.size() ){ k = (int) z_coordinates.size()-1; }
+	if( k < 0 ){ k = 0; }
+
+	return ( k*(int) y_coordinates.size() + j )*(int) x_coordinates.size() + i; 
+}
+
+
 std::vector<unsigned int> Cartesian_Mesh::nearest_cartesian_indices( std::vector<double>& position )
 {
 	std::vector<unsigned int> out; 
