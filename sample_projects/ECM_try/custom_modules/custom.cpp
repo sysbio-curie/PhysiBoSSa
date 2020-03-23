@@ -273,6 +273,6 @@ void load_ecm_file()
 		microenvironment.density_vector(voxel_index)[microenvironment.find_density_index("ecm")] += amount; 	
 	}
 	infile.close();
-	std::cout << "File loaded " << std::endl;
+	std::cout << "File loaded !" << std::endl;
 
 }
