@@ -2,7 +2,7 @@
 
 ReadXML::ReadXML(): doc()
 {
-	fileName = "parameters.xml";
+	fileName = "PhysiCell_Settings.xml";
 	pSimu = NULL;
 	pCells = NULL;
 	pInit = NULL;
