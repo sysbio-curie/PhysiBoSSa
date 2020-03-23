@@ -73,6 +73,9 @@ using namespace BioFVM;
 
 // declare cell definitions here 
 
+std::string ecm_file;
+ReadXML reader;
+
 void create_cell_types( void )
 {
 	// use the same random seed so that future experiments have the 
