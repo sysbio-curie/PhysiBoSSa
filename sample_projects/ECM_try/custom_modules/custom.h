@@ -77,8 +77,8 @@
 using namespace BioFVM; 
 using namespace PhysiCell;
 
-std::string ecm_file;
-ReadXML  reader;
+///std::string ecm_file;
+///ReadXML  reader;
 // setup functions to help us along 
 void create_cell_types( void );
 void setup_tissue( void ); 
