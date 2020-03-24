@@ -154,7 +154,7 @@
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 
-		
+		<ecm_file type="string" units="">ecm.txt</ecm_file>
 		<bnd_file type="string" units="">./config/boolean_network/ECM_mod.bnd</bnd_file>
 		<cfg_file type="string" units="">./config/boolean_network/ECM_mod.bnd.cfg</cfg_file>
 
