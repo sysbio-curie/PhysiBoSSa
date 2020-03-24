@@ -77,6 +77,16 @@
 using namespace BioFVM; 
 using namespace PhysiCell;
 
+struct init_record
+{
+	float x;
+	float y;
+	float z;
+	float radius;
+	int phase;
+	double elapsed_time;
+};
+
 ///std::string ecm_file;
 ///ReadXML  reader;
 // setup functions to help us along 
@@ -94,5 +104,5 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 
 void set_input_nodes(Cell* pCell); 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt);
-
+std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header);
 void load_ecm_file();

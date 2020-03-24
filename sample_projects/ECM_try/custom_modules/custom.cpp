@@ -151,26 +151,33 @@ void setup_microenvironment( void )
 void setup_tissue( void )
 {
 	Cell* pC;
+	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
 	MaBoSSNetwork* maboss;
 	std::string bnd_file = parameters.strings("bnd_file");
 	std::string cfg_file = parameters.strings("cfg_file");
-	BooleanNetwork ags_network;
-	ags_network.initialize_boolean_network(bnd_file, cfg_file, 12);
+	BooleanNetwork ecm_network;
+	ecm_network.initialize_boolean_network(bnd_file, cfg_file, 12);
 
-	pC = create_cell(); 
-	pC->assign_position( 0.0, 0.0, 0.0 );
-	pC->boolean_network = ags_network;
-	pC->boolean_network.restart_nodes();
+	for (int i = 0; i < cells.size(); i++)
+	{
+		float x = cells[i].x;
+		float y = cells[i].y;
+		float z = cells[i].z;
+		float radius = cells[i].radius;
+		int phase = cells[i].phase;
+		double elapsed_time = cells[i].elapsed_time;
 
-	pC = create_cell(); 
-	pC->assign_position( -100.0, 0.0, 1.0 );
-	pC->boolean_network = ags_network;
-	pC->boolean_network.restart_nodes();	
-
-	pC = create_cell(); 
-	pC->assign_position( 0, 100.0, -7.0 );
-	pC->boolean_network = ags_network;
-	pC->boolean_network.restart_nodes();
+		pC = create_cell(); 
+		pC->assign_position( x, y, z );
+		// pC->set_total_volume(sphere_volume_from_radius(radius));
+		
+		// pC->phenotype.cycle.data.current_phase_index = phase;
+		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
+		pC->boolean_network = ecm_network;
+		pC->boolean_network.restart_nodes();
+		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
+		
+	}
 
 	std::cout << "tissue created" << std::endl;
 
@@ -277,4 +284,56 @@ void load_ecm_file()
 	infile.close();
 	std::cout << "File loaded !" << std::endl;
 
+}
+
+
+std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header) 
+{ 
+	// File pointer 
+	std::fstream fin; 
+	std::vector<init_record> result;
+
+	// Open an existing file 
+	fin.open(filename, std::ios::in); 
+
+	// Read the Data from the file 
+	// as String Vector 
+	std::vector<std::string> row; 
+	std::string line, word;
+
+	if(header)
+		getline(fin, line);
+
+	do 
+	{
+		row.clear(); 
+
+		// read an entire row and 
+		// store it in a string variable 'line' 
+		getline(fin, line);
+
+		// used for breaking words 
+		std::stringstream s(line); 
+
+		// read every column data of a row and 
+		// store it in a string variable, 'word' 
+		while (getline(s, word, delimiter)) { 
+
+			// add all the column data 
+			// of a row to a vector 
+			row.push_back(word); 
+		}
+
+		init_record record;
+		record.x = std::stof(row[2]);
+		record.y = std::stof(row[3]);
+		record.z = std::stof(row[4]);
+		record.radius = std::stof(row[5]);
+		record.phase = std::stoi(row[13]);
+		record.elapsed_time = std::stod(row[14]);
+
+		result.push_back(record);
+	} while (!fin.eof());
+	
+	return result;
 }
