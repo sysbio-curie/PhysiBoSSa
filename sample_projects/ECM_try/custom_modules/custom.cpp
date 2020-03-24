@@ -73,8 +73,8 @@ using namespace BioFVM;
 
 // declare cell definitions here 
 
-std::string ecm_file;
-ReadXML reader;
+// std::string ecm_file;
+///ReadXML reader;
 
 void create_cell_types( void )
 {
@@ -110,7 +110,7 @@ void create_cell_types( void )
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
 	microenvironment.add_density("ecm", "dimensionless");
-	reader.getStringValue("user_parameters", "ecm_file", &ecm_file );
+	///reader.getStringValue("user_parameters", "ecm_file", &ecm_file );
 	load_ecm_file();
 
 	// set the rate terms in the default phenotype 
@@ -171,6 +171,8 @@ void setup_tissue( void )
 	pC->assign_position( 0, 100.0, -7.0 );
 	pC->boolean_network = ags_network;
 	pC->boolean_network.restart_nodes();
+
+	std::cout << "tissue created" << std::endl;
 
 	return; 
 }
@@ -246,10 +248,10 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 /* Load ecm density values from given file */
 void load_ecm_file()
 {
-	strip( &ecm_file );
-	std::cout << "Loading ECM file " << ecm_file << std::endl;
+	// strip( &ecm_file );
+	std::cout << "Loading ECM file " << parameters.strings("ecm_file") << std::endl;
 	std::ifstream infile;
-	infile.open( ecm_file );
+	infile.open( parameters.strings("ecm_file") );
 	std::string array[4];
 	int i = 0;
 	std::string line;

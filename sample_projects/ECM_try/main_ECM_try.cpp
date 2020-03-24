@@ -131,10 +131,17 @@ int main( int argc, char* argv[] )
 	
 	// save a simulation snapshot 
 	
+	//mkdir("../output");
+
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
+
+	std::cout << "fin qui tutto bene" << std::endl;
+
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
+	std::cout << "fin qui tutto bene" << std::endl;
+
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
 
@@ -149,6 +156,8 @@ int main( int argc, char* argv[] )
 	
 	display_citations(); 
 	
+	std::cout << "fin qui tutto bene";
+
 	// set the performance timers 
 
 	BioFVM::RUNTIME_TIC();
