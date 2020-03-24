@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">1440</max_time>
+		<max_time units="min">3300</max_time>
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 
@@ -155,9 +155,9 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 
 		<ecm_file type="string" units="">ecm.txt</ecm_file>
-		<bnd_file type="string" units="">./config/boolean_network/ECM_mod.bnd</bnd_file>
-		<cfg_file type="string" units="">./config/boolean_network/ECM_mod.bnd.cfg</cfg_file>
-
+		<bnd_file type="string" units="">./config/boolean_network/bn_nodes.bnd</bnd_file>
+		<cfg_file type="string" units="">./config/boolean_network/bn_conf.cfg</cfg_file>
+		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
 		<x_threshold type="double" units="dimensionless">1.</x_threshold>
 	</user_parameters>
 	

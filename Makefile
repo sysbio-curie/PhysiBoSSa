@@ -163,6 +163,7 @@ ecm-try:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp -r ./sample_projects/ECM_try/config/* ./config/
 	mkdir ./scripts/
+	mkdir ./output/
 	cp ./sample_projects/ECM_try/scripts/* ./scripts/
 
 
