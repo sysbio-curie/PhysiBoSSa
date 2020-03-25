@@ -211,15 +211,19 @@ int main( int argc, char* argv[] )
 				}
 			}
 
+			/*
+			  Custom add-ons could potentially go here. 
+			*/
+			int e = microenvironment.find_density_index("ecm");
+			writeDensity(e, PhysiCell_globals.current_time);
+
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
-			/*
-			  Custom add-ons could potentially go here. 
-			*/
+
 			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}

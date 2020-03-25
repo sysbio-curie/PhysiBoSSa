@@ -92,7 +92,7 @@ struct init_record
 // setup functions to help us along 
 void create_cell_types( void );
 void setup_tissue( void ); 
-
+std::vector<std::string> conc_names;
 // set up the BioFVM microenvironment 
 void setup_microenvironment( void ); 
 
@@ -101,7 +101,8 @@ std::vector<std::string> my_coloring_function( Cell* );
 
 // custom cell phenotype functions could go here 
 void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt );
-
+/** \brief Write Density values to output file */
+void writeDensity( int index, double t );
 void set_input_nodes(Cell* pCell); 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt);
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header);
