@@ -112,7 +112,9 @@ void create_cell_types( void )
 	microenvironment.add_density("ecm", "dimensionless");
 	///reader.getStringValue("user_parameters", "ecm_file", &ecm_file );
 	load_ecm_file();
-
+	conc_names.resize(2);
+	conc_names[0] = "oxygen";
+	conc_names[1] = "ecm"
 	// set the rate terms in the default phenotype 
 	// first find index for a few key variables. 
 	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
@@ -336,4 +338,15 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 	} while (!fin.eof());
 	
 	return result;
+}
+
+void writeDensity( int index, double t )
+{
+	std::string ecmname; 
+	ecmname.resize( 1024 );
+	sprintf( (char*) ecmname.c_str() , "_t%05d.txt", (int)round(t) );
+	ecmname = "microutput//"+conc_names[index]+ecmname;
+	std::ofstream outecm_file( ecmname );
+	microenvironment.write_density( outecm_file, index );
+	outecm_file.close();
 }

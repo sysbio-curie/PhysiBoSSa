@@ -72,7 +72,8 @@ class Microenvironment
 	std::vector< std::vector<double> > temporary_density_vectors1; 
 	/*! For internal use and accelerations in solvers */ 
 	std::vector< std::vector<double> > temporary_density_vectors2; 
-	
+	/** \brief Small value to consider empty or not */
+	static constexpr double small_value = 1e-40;
 	/*! for internal use in bulk source/sink solvers */
 	std::vector< std::vector<double> > bulk_source_sink_solver_temp1; 
 	std::vector< std::vector<double> > bulk_source_sink_solver_temp2; 
@@ -120,7 +121,8 @@ class Microenvironment
 	bool diffusion_solver_setup_done; 
 	
 	// on "resize density" type operations, need to extend all of these 
-	
+	/** \brief List of voxels indexes to write to output files */
+	std::vector<int> toWrite;
 	/*
 	std::vector<int> dirichlet_indices; 
 	std::vector< std::vector<double> > dirichlet_value_vectors; 
@@ -195,7 +197,9 @@ class Microenvironment
 	Voxel& voxels( int voxel_index );
 	std::vector<double>& nearest_density_vector( std::vector<double>& position );  
 	std::vector<double>& nearest_density_vector( int voxel_index );  
-
+	/** \brief Return center coordinates of i-th voxel */
+	inline Vector3d voxel_center( int i )
+	{ return Vector3d( voxels(i).center[0], voxels(i).center[1], voxels(i).center[2] ); };
 	/*! access the density vector at  [ X(i),Y(j),Z(k) ] */
 	std::vector<double>& operator()( int i, int j, int k ); 
 	/*! access the density vector at  [ X(i),Y(j),0 ]  -- helpful for 2-D problems */
@@ -230,7 +234,8 @@ class Microenvironment
 	void simulate_cell_sources_and_sinks( std::vector<Basic_Agent*>& basic_agent_list , double dt ); 
 	// use the global list of cells 
 	void simulate_cell_sources_and_sinks( double dt ); 
-	
+	/** \brief Write microenvironment given density values of voxels in the indixes toWrite list if it's not (nearly) empty */
+	void write_density( std::ostream& os, int dens );
 	void display_information( std::ostream& os ); 
 	
 	void add_dirichlet_node( int voxel_index, std::vector<double>& value ); 

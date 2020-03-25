@@ -608,6 +608,23 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	return; 
 }
 
+/* Write microenvironment given density values of the voxels in the toWrite list */
+void Microenvironment::write_density( std::ostream& os, int dens )
+{
+	for ( int i : toWrite )
+	{
+		double fill = nearest_density_vector(i)[dens];
+		if ( fill > small_value )
+		{
+			os << voxel_center(i)[0] << ";";
+			os << voxel_center(i)[1] << ";";
+			os << voxel_center(i)[2] << ";";
+			os << nearest_density_vector(i)[dens] << std::endl;
+		}
+	}
+}
+
+
 int Microenvironment::find_density_index( std::string name )
 {
 	for( unsigned int i=0; i < density_names.size() ; i++ )
