@@ -75,7 +75,7 @@
 
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
-
+#include "./custom_modules/custom_main.h"
 // put custom code modules here! 
 
 #include "./custom_modules/custom.h" 
@@ -119,6 +119,7 @@ int main( int argc, char* argv[] )
 	create_cell_types();
 	
 	setup_tissue();
+
 
 	/* Users typically stop modifying here. END USERMODS */ 
 	
