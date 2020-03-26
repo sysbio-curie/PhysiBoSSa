@@ -68,7 +68,7 @@ tinyxml_OBJECTS := tinyxml2.o
 
 PhysiBoSSa_OBJECTS := utils.o maboss_network.o boolean_network.o
 
-PhysiCell_custom_module_OBJECTS := custom.o
+PhysiCell_custom_module_OBJECTS := custom.o custom_main.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -175,6 +175,10 @@ boolean_network.o: ./addons/PhysiBoSSa/src/boolean_network.cpp
 
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom.cpp
+
+custom_main.o: ./custom_modules/custom_main.cpp 
+	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom_main.cpp
+
 
 # PhysiBoSS modules from Gaelle's code:
 
