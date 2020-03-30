@@ -74,9 +74,9 @@
 #include "./PhysiCell_phenotype.h"
 #include "./PhysiCell_cell_container.h"
 #include "./PhysiCell_constants.h"
-
+#include "../core/base/vector3d.h"
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
-
+#include <math.h>
 using namespace BioFVM; 
 
 namespace PhysiCell{
@@ -150,30 +150,37 @@ class Cell : public Basic_Agent
 	Cell_Container * container;
 	int current_mechanics_voxel_index;
 	int updated_current_mechanics_voxel_index; // keeps the updated voxel index for later adjusting of current voxel index
-		
+	int freezed;	
  public:
 	std::string type_name; 
  
 	Custom_Cell_Data custom_data;
 	Cell_Parameters parameters;
 	Cell_Functions functions; 
-
+	inline bool passive() { return type == PhysiCell_constants::PASSIVE_TYPE; };
 	Cell_State state; 
 	Phenotype phenotype; 
 	
 	BooleanNetwork boolean_network;
-
+	Vector3d previous_velocity;
+	Vector3d position;  
+	Vector3d velocity; 
+	Vector3d displacement;
+	double nucleus_deform;
+	double ecm_contact;
+	/** \brief Amount of contact with other cells */
+	double cell_contact;
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 
-	
+	void set_motility(double );
 	void add_potentials(Cell*);       // Add repulsive and adhesive forces.
 	void set_previous_velocity(double xV, double yV, double zV);
 	int get_current_mechanics_voxel_index();
 	void turn_off_reactions(double); 		  // Turn off all the reactions of the cell
-	
+	void freezer( int frozen );
 	bool is_out_of_domain;
 	bool is_movable;
-	
+	double get_adhesion();
 	void flag_for_division( void ); // done 
 	void flag_for_removal( void ); // done 
 	
@@ -188,12 +195,15 @@ class Cell : public Basic_Agent
 	bool assign_position(std::vector<double> new_position);
 	bool assign_position(double, double, double);
 	void set_total_volume(double);
-	
+	bool necrotic_oxygen();
+	bool has_neighbor(int);
+	double adhesion(Cell* other_cell);
+	double local_density(std::string field);
 	double& get_total_volume(void); // NEW
-	
+	inline Vector3d get_position() const { return position; };
 	// mechanics 
 	void update_position( double dt ); //
-	std::vector<double> displacement; // this should be moved to state, or made private  
+	//std::vector<double> displacement; // this should be moved to state, or made private  
 
 	
 	void assign_orientation();  // if set_orientaion is defined, uses it to assign the orientation
@@ -205,16 +215,39 @@ class Cell : public Basic_Agent
 	void copy_data(Cell *);
 	
 	void ingest_cell( Cell* pCell_to_eat ); // for use in predation, e.g., immune cells 
-
+	/** \brief Return amount of contact with other cells */
+	inline double contact_cell()
+	{ return cell_contact / phenotype.geometry.radius ; };
+	/** \brief Return value of adhesion strength with ECM according to integrin level */
+	double integrinStrength();
+	int feel_enough(std::string field);
 	// I want to eventually deprecate this, by ensuring that 
 	// critical BioFVM and PhysiCell data elements are synced when they are needed 
 	
+	virtual void add_cell_basement_membrane_interactions(double t, double dist);
 	void set_phenotype( Phenotype& phenotype ); // no longer needed?
 	void update_radius();
 	Cell_Container * get_container();
-	
+	/** \brief Calculate agent distance to BM if defined */
+	double distance_to_membrane( double l, std::string shape);
+	/** \brief Distance of agent to BA for duct geometry */
+	double distance_to_membrane_duct( double l);
+	/** \brief Distance of agent to BA for sphere geometry */
+	double distance_to_membrane_sphere( double l);
+	/** \brief Distance to membrane Sheet
+	 * Basement membrane is a sheet of height 2*BM_radius 
+	 * Z value is in between -BM_radius and +BM_radius
+	 */
+	double distance_to_membrane_sheet(double length);
+	void update_cell_motion( double dt, double l, std::string shape );
+	void update_velocity( double dt, double l, std::string shape );
 	std::vector<Cell*>& cells_in_my_container( void ); 
-	
+			/** \brief Calculate repulsion and adhesion between agent and ecm at given voxel index
+	 *
+	 * @param index_ecm index of the ECM density in the microenv vector of densities
+	 * @param index_voxel index of the current ECM voxel  */
+	void add_ecm_interaction( int index_ecm, int index_voxel );
+
 	void convert_to_cell_definition( Cell_Definition& cd ); 
 };
 

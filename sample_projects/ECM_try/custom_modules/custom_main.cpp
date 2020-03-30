@@ -1,7 +1,8 @@
 #include "custom_main.h"
 
-std::string conc_names[2] = {"oxygen", "ecm"};
+using namespace PhysiCell;
 
+std::string conc_names[2] = {"oxygen", "ecm"};
 
 void writeDensity( int index, double t )
 {

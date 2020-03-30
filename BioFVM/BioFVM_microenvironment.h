@@ -196,7 +196,11 @@ class Microenvironment
 	Voxel& nearest_voxel( std::vector<double>& position ); 
 	Voxel& voxels( int voxel_index );
 	std::vector<double>& nearest_density_vector( std::vector<double>& position );  
-	std::vector<double>& nearest_density_vector( int voxel_index );  
+	std::vector<double>& nearest_density_vector( int voxel_index ); 
+	/** \brief Return the current voxel size */
+	inline double voxel_rad(int i)
+	{ return voxels(i).halfdiag; };
+	 
 	/** \brief Return center coordinates of i-th voxel */
 	inline Vector3d voxel_center( int i )
 	{ return Vector3d( voxels(i).center[0], voxels(i).center[1], voxels(i).center[2] ); };

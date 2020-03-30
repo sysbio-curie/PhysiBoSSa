@@ -95,7 +95,7 @@ void setup_tissue( void );
 //std::vector<std::string> conc_names;
 // set up the BioFVM microenvironment 
 void setup_microenvironment( void ); 
-
+std::vector<bool> nodes;
 // custom pathology coloring function 
 std::vector<std::string> my_coloring_function( Cell* );
 

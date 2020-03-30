@@ -67,7 +67,7 @@
 
 #include "./custom.h"
 #include "../BioFVM/BioFVM.h"  
-
+#include "../addons/PhysiBoSSa/src/boolean_network.h"
 
 using namespace BioFVM;
 
@@ -218,21 +218,57 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 }
 
 void set_input_nodes(Cell* pCell) {
-	std::vector<bool> * nodes = pCell->boolean_network.get_nodes();
-	
-	int x_maboss_index = pCell->boolean_network.get_node_index("X");
-	static int x_index = microenvironment.find_density_index( "x" ); 
-	static double x_threshold = parameters.doubles("x_threshold");
+int ind;
 
+	// Oxygen input node O2; Oxygen or Oxy
+	ind = pCell->boolean_network.get_node_index( "Oxygen" );
+	if ( ind < 0 )
+		ind = pCell->boolean_network.get_node_index( "Oxy" );
+	if ( ind < 0 )
+		ind = pCell->boolean_network.get_node_index( "O2" );
+	if ( ind >= 0 )
+		nodes[ind] = ( !pCell->necrotic_oxygen() );
 	
-	if (x_maboss_index != -1 && x_index != -1)
-	{
-		double tnf_cell_concentration = pCell->phenotype.molecular.internalized_total_substrates[x_index];
-		if (tnf_cell_concentration >= x_threshold)
-		{
-			(*nodes)[x_maboss_index] = 1;
-		}
-	}
+
+	ind = pCell->boolean_network.get_node_index( "Neighbours" );
+	if ( ind >= 0 )
+		nodes[ind] = ( pCell->has_neighbor(0) );
+	
+	ind = pCell->boolean_network.get_node_index( "Nei2" );
+	if ( ind >= 0 )
+		nodes[ind] = ( pCell->has_neighbor(1) );
+
+	enough_to_node( "Glucose", "glucose" );
+	enough_to_node( "EGF", "egf" );
+	enough_to_node( "IGF", "igf" );
+	enough_to_node( "TNF", "tnf" );
+	enough_to_node( "GF", "gf" );
+	enough_to_node( "TGFBR", "tgfb" );
+	enough_to_node( "IL2R_b1", "il2" );
+	enough_to_node( "IL2R_b2", "il2" );
+	enough_to_node( "TCR_b1", "tcr" );
+	enough_to_node( "TCR_b2", "tcr" );
+	enough_to_node( "CD28", "tcr" );
+
+	// If has enough contact with ecm or not
+	ind = pCell->boolean_network.get_node_index( "ECM_sensing" );
+	if ( ind >= 0 )
+		nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
+	// If has enough contact with ecm or not
+	ind = pCell->boolean_network.get_node_index( "ECM" );
+	if ( ind >= 0 )
+		nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
+	// If has enough contact with ecm or not
+	ind = pCell->boolean_network.get_node_index( "ECMicroenv" );
+	if ( ind >= 0 )
+		nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
+	
+	// If nucleus is deformed, probability of damage
+	// Change to increase proba with deformation ? + put as parameter
+	ind = pCell->boolean_network.get_node_index( "DNAdamage" );
+	//std::cout << mycell->nucleus_deformation() << std::endl;
+	if ( ind >= 0 )
+		nodes[ind] = ( pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0;
 	/// example
 }
 
