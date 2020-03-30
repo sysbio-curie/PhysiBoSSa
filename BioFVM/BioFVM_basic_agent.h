@@ -53,7 +53,10 @@
 #include "BioFVM_microenvironment.h"
 #include "BioFVM_matlab.h"
 #include "BioFVM_vector.h"
-
+#include "../core/PhysiCell_cell.h"
+#include "../core/PhysiCell_utilities.h"
+#include "../core/base/vector3d.h"
+#include "../core/PhysiCell_phenotype.h"
 namespace BioFVM{
 
 
@@ -75,7 +78,7 @@ class Basic_Agent
 	bool is_active;
 	
 	std::vector<double> total_extracellular_substrate_change; 
-	
+
  public:
 	std::vector<double> * secretion_rates; 
 	std::vector<double> * saturation_densities; 
@@ -116,11 +119,13 @@ class Basic_Agent
 	// directly access the substrate vector at the nearest voxel at the indicated microenvironment 
 	std::vector<double>& nearest_density_vector( int microenvironment_index ); // not implemented!
 	std::vector<double>& nearest_density_vector( void );
-	
+
 	// directly access the gradient of substrate n nearest to the cell 
 	std::vector<double>& nearest_gradient( int substrate_index );
 	// directly access a vector of gradients, one gradient per substrate 
-	std::vector<gradient>& nearest_gradient_vector( void ); 
+	std::vector<gradient>& nearest_gradient_vector( void );
+
+
 };
 
 extern std::vector<Basic_Agent*> all_basic_agents; 

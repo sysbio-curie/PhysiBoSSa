@@ -155,6 +155,37 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 
 		<ecm_file type="string" units="">ecm.txt</ecm_file>
+		<polarity_coefficient type="double" units="">0.5</polarity_coefficient>
+    	<motility_amplitude_min type="double" units=""> 0.1 </motility_amplitude_min>
+    	<motility_amplitude_max type="double" units=""> 0.5 </motility_amplitude_max>
+    	<mode_motility type="int" units=""> 1 </mode_motility>
+		<contact_cell_ECM_threshold type="double" units=""> 0.1 </contact_cell_ECM_threshold> <!-- minimal contact necessary to activate ECM pathway-->
+		<homotypic_adhesion_min type="double" units=""> 0.2 </homotypic_adhesion_min>
+		<homotypic_adhesion_max type="double" units=""> 0.8 </homotypic_adhesion_max>
+		<heterotypic_adhesion_min type="double" units=""> 0.2 </heterotypic_adhesion_min>
+		<heterotypic_adhesion_max type="double" units=""> 0.8 </heterotypic_adhesion_max>
+		<ecm_adhesion_min type="int" units=""> 1 </ecm_adhesion_min>
+		<ecm_adhesion_max type="int" units=""> 2 </ecm_adhesion_max>
+		<cell_ecm_repulsion type="int" units=""> 10 </cell_ecm_repulsion>
+		<ecm_degradation type="int" units=""> 5 </ecm_degradation>
+		<max_interaction_factor type="double" units=""> 1.3 </max_interaction_factor>
+		<cell_cell_repulsion type="int" units=""> 10 </cell_cell_repulsion>
+		<oxygen_necrotic type="int" units=""> 4 </oxygen_necrotic>
+		<oxygen_critical type="int" units=""> 3 </oxygen_critical>
+		<oxygen_no_proliferation type="doubel" units=""> 6.5 </oxygen_no_proliferation>
+		<oxygen_hypoxic type="int" units=""> 15 </oxygen_hypoxic>
+		<oxygen_reference type="double" units=""> 0.7 </oxygen_reference>
+		<oxygen_saturation type="int" units=""> 38 </oxygen_saturation>
+		<cell_radius type="double" units=""> 8.413 </cell_radius>
+		<nucleus_radius type="double" units=""> 5.052 </nucleus_radius>
+		<fluid_fraction type="double" units=""> 0.75 </fluid_fraction>
+		<solid_nuclear type="int" units=""> 135 </solid_nuclear>
+		<solid_cytoplasmic type="int" units=""> 486 </solid_cytoplasmic>
+		<cytoplasmic_nuclear_fraction type="double" units=""> 3.6 </cytoplasmic_nuclear_fraction>
+		<initial_uptake_rate type="int" units=""> 20 </initial_uptake_rate>
+		<protein_threshold type="int" units=""> 1 </protein_threshold>
+		<phenotype_number type="int" units=""> 0 </phenotype_number>
+		<secretion_rate type="int" units=""> 0 </secretion_rate>
 		<bnd_file type="string" units="">./config/boolean_network/bn_nodes.bnd</bnd_file>
 		<cfg_file type="string" units="">./config/boolean_network/bn_conf.cfg</cfg_file>
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>

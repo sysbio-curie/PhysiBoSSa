@@ -90,7 +90,8 @@ class PhysiCell_constants
 	static const int glucose_index = 1; // deprecate 
 	
 	static const int TUMOR_TYPE=0; // deprecate 
-	static const int VESSEL_TYPE=1; // deprecate 
+	static const int VESSEL_TYPE=1; // deprecate
+	static const int PASSIVE_TYPE=1; 
 
 	static const int mesh_min_x_index=0;
 	static const int mesh_min_y_index=1;
