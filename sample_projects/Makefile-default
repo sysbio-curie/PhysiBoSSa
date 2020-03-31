@@ -284,8 +284,8 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 # user-defined PhysiCell modules
 # PhysiBoSS modules from Gaelle's code:
 
-vector3d.o: /sample_projects/ECM_try/custom_modules/base/vector3d.cpp
-	$(COMPILE_COMMAND) -c /sample_projects/ECM_try/custom_modules/base/vector3d.cpp
+vector3d.o: /sample_projects/ECM_try/custom_modules/vector3d.cpp
+	$(COMPILE_COMMAND) -c /sample_projects/ECM_try/custom_modules/vector3d.cpp
 
 writeSVG.o: ./sample_projects/ECM_try/custom_modules/base/writeSVG.cpp
 	$(COMPILE_COMMAND) -c ./sample_projects/ECM_try/custom_modules/base/writeSVG.cpp

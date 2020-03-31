@@ -74,7 +74,7 @@
 #include "./PhysiCell_phenotype.h"
 #include "./PhysiCell_cell_container.h"
 #include "./PhysiCell_constants.h"
-#include "../sample_project/ECM_try/custom_modules/base/vector3d"
+#include "../sample_project/ECM_try/custom_modules/vector3d.h"
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
 #include <math.h>
 #include "../core/PhysiCell_utilities.h"

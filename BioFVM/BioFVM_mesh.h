@@ -51,7 +51,7 @@
 
 #include <iostream>
 #include <vector> 
-#include "../sample_project/ECM_try/custom_modules/base/vector3d"
+#include "../sample_projects/ECM_try/custom_modules/vector3d.h"
 #include "BioFVM_matlab.h"
 
 namespace BioFVM{
