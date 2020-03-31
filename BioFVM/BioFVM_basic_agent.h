@@ -53,10 +53,8 @@
 #include "BioFVM_microenvironment.h"
 #include "BioFVM_matlab.h"
 #include "BioFVM_vector.h"
-#include "../core/PhysiCell_cell.h"
-#include "../core/PhysiCell_utilities.h"
 #include "../core/base/vector3d.h"
-#include "../core/PhysiCell_phenotype.h"
+
 namespace BioFVM{
 
 

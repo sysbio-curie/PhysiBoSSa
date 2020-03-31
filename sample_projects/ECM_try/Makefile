@@ -118,7 +118,7 @@ BioFVM_mesh.o: ./BioFVM/BioFVM_mesh.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_mesh.cpp 
 
 BioFVM_microenvironment.o: ./BioFVM/BioFVM_microenvironment.cpp
-	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_microenvironment.cpp 
+	$(COMPILE_COMMAND) $(INC)-c ./BioFVM/BioFVM_microenvironment.cpp 
 
 BioFVM_solvers.o: ./BioFVM/BioFVM_solvers.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_solvers.cpp 
