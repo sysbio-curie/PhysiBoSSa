@@ -1202,7 +1202,7 @@ double Cell::adhesion( Cell* other_cell )
 	Ccca_homotypic[0] = PhysiCell::parameters.doubles("homotypic_adhesion_min");
 	Ccca_homotypic[1] = PhysiCell::parameters.doubles("homotypic_adhesion_max");
 	double adh = 0;
-	if ( Cell::phenotype == other_cell->phenotype )
+	if ( &(Cell::phenotype) == &(other_cell->Cell::phenotype) )
 		adh = std::min( get_homotypic_strength(padhesion), other_cell->get_homotypic_strength(padhesion) );
 	else
 		adh = std::min( get_heterotypic_strength(padhesion), other_cell->get_heterotypic_strength(padhesion) );
@@ -1338,7 +1338,7 @@ void Cell::update_velocity( double dt, double l, std::string shape )
 
 	for ( auto neighbor_voxel_index : container-> underlying_mesh.moore_connected_voxel_indices[get_current_mechanics_voxel_index()] )
 	{
-		if ( !is_neighbor_voxel((container->underlying_mesh.voxels[get_current_mechanics_voxel_index()].center), (container->underlying_mesh.voxels[neighbor_voxel_index].center), neighbor_voxel_index) )
+		if ( !is_neighbor_voxel(this, (container->underlying_mesh.voxels[get_current_mechanics_voxel_index()].center), (container->underlying_mesh.voxels[neighbor_voxel_index].center), neighbor_voxel_index) )
 			continue;
 		if ( ecm_index >= 0 )
 			add_ecm_interaction( ecm_index, neighbor_voxel_index );
