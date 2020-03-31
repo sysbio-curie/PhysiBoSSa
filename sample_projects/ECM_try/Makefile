@@ -23,7 +23,7 @@ CUR_DIR = $(shell pwd)
 CUSTOM_DIR = sample_projects/ECM_try/custom_modules
 LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS -ldl
 INC := -I$(CUR_DIR)/$(MABOSS_DIR)/include -DMAXNODES=$(MABOSS_MAX_NODES)
-CUS := -C$(CUR_DIR)/$(CUSTOM_DIR)/base
+CUS := -I$(CUR_DIR)/$(CUSTOM_DIR)
 
 # If max nodes > 64, change lib path 
 ifeq ($(shell expr $(MABOSS_MAX_NODES) '>' 64), 1)
@@ -182,8 +182,8 @@ custom_main.o: ./custom_modules/custom_main.cpp
 
 # PhysiBoSS modules from Gaelle's code:
 
-vector3d.o: ./sample_projects/ECM_try/custom_modules/base/vector3d.cpp
-	$(COMPILE_COMMAND) -c ./sample_projects/ECM_try/custom_modules/base/vector3d.cpp
+vector3d.o: ./sample_projects/ECM_try/custom_modules/vector3d.cpp
+	$(COMPILE_COMMAND) -c ./sample_projects/ECM_try/custom_modules/vector3d.cpp
 
 writeSVG.o: ./sample_projects/ECM_try/custom_modules/base/writeSVG.cpp
 	$(COMPILE_COMMAND) -c ./sample_projects/ECM_try/custom_modules/base/writeSVG.cpp
