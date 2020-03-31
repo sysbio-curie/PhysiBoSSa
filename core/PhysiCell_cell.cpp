@@ -418,7 +418,7 @@ Cell* Cell::divide( )
 	std::vector<double> rand_vec (3, 0.0);
 	
 	rand_vec[0]= cos( temp_angle ) * sin( temp_phi );
-	rand_vec[1]= cos( temp_angle ) * sin( temp_phi );
+	rand_vec[1]= sin( temp_angle ) * sin( temp_phi );
 	rand_vec[2]= cos( temp_phi );
 	rand_vec = rand_vec- phenotype.geometry.polarity*(rand_vec[0]*state.orientation[0]+ 
 		rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;

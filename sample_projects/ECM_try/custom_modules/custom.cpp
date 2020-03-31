@@ -74,7 +74,7 @@ using namespace BioFVM;
 // declare cell definitions here 
 
 // std::string ecm_file;
-///ReadXML reader;
+std::vector<bool> nodes;
 
 void create_cell_types( void )
 {

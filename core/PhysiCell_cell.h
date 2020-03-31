@@ -74,10 +74,9 @@
 #include "./PhysiCell_phenotype.h"
 #include "./PhysiCell_cell_container.h"
 #include "./PhysiCell_constants.h"
-#include "../core/base/vector3d.h"
+#include "../sample_project/ECM_try/custom_modules/base/vector3d"
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
 #include <math.h>
-#include "../core/base/readXML.h"
 #include "../core/PhysiCell_utilities.h"
 using namespace BioFVM; 
 

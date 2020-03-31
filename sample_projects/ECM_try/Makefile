@@ -20,8 +20,10 @@ endif
 # MaBoSS directory
 MABOSS_DIR = addons/PhysiBoSSa/MaBoSS-env-2.0/engine
 CUR_DIR = $(shell pwd)
+CUSTOM_DIR = sample_projects/ECM_try/custom_modules
 LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS -ldl
 INC := -I$(CUR_DIR)/$(MABOSS_DIR)/include -DMAXNODES=$(MABOSS_MAX_NODES)
+CUS := -C$(CUR_DIR)/$(CUSTOM_DIR)/base
 
 # If max nodes > 64, change lib path 
 ifeq ($(shell expr $(MABOSS_MAX_NODES) '>' 64), 1)
@@ -62,9 +64,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiBoSS_module_OBJECTS := readXML.o vector3d.o writeSVG.o 
-
-tinyxml_OBJECTS := tinyxml2.o
+PhysiBoSS_module_OBJECTS :=  vector3d.o writeSVG.o 
 
 PhysiBoSSa_OBJECTS := utils.o maboss_network.o boolean_network.o
 
@@ -73,7 +73,7 @@ PhysiCell_custom_module_OBJECTS := custom.o custom_main.o
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSSa_OBJECTS) $(PhysiBoSS_module_OBJECTS) $(tinyxml_OBJECTS)
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSSa_OBJECTS) $(PhysiBoSS_module_OBJECTS) 
 
 # compile the project 
 
@@ -115,7 +115,7 @@ BioFVM_agent_container.o: ./BioFVM/BioFVM_agent_container.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_agent_container.cpp 
 	
 BioFVM_mesh.o: ./BioFVM/BioFVM_mesh.cpp
-	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_mesh.cpp 
+	$(COMPILE_COMMAND) $(CUS) -c ./BioFVM/BioFVM_mesh.cpp 
 
 BioFVM_microenvironment.o: ./BioFVM/BioFVM_microenvironment.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./BioFVM/BioFVM_microenvironment.cpp 
@@ -182,17 +182,11 @@ custom_main.o: ./custom_modules/custom_main.cpp
 
 # PhysiBoSS modules from Gaelle's code:
 
-readXML.o: ./core/base/readXML.cpp
-	$(COMPILE_COMMAND) -c ./core/base/readXML.cpp
+vector3d.o: ./sample_projects/ECM_try/custom_modules/base/vector3d.cpp
+	$(COMPILE_COMMAND) -c ./sample_projects/ECM_try/custom_modules/base/vector3d.cpp
 
-vector3d.o: ./core/base/vector3d.cpp
-	$(COMPILE_COMMAND) -c ./core/base/vector3d.cpp
-
-writeSVG.o: ./core/base/writeSVG.cpp
-	$(COMPILE_COMMAND) -c ./core/base/writeSVG.cpp
-
-tinyxml2.o: ./core/tinyxml/tinyxml2.cpp
-	$(COMPILE_COMMAND) -c ./core/tinyxml/tinyxml2.cpp
+writeSVG.o: ./sample_projects/ECM_try/custom_modules/base/writeSVG.cpp
+	$(COMPILE_COMMAND) -c ./sample_projects/ECM_try/custom_modules/base/writeSVG.cpp
 
 
 # cleanup
