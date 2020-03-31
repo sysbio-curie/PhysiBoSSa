@@ -94,6 +94,7 @@ Cell_Parameters::Cell_Parameters()
 	max_necrosis_rate = 1.0 / (6.0 * 60.0); // assume cells survive 6 hours in very low oxygen 
 	necrosis_type = PhysiCell_constants::deterministic_necrosis;;
 
+	
 	return; 
 }
 
@@ -324,7 +325,9 @@ Cell::Cell()
 	
 	assign_orientation();
 	container = NULL;
-	
+	pintegrin = 0.5;
+	pmotility = 0.5;
+	padhesion = 0.5;
 	
 	return; 
 }
@@ -795,13 +798,14 @@ void Cell::add_potentials(Cell* other_agent)
 				{
 					adh = 0;
 				}
-					// active, active
-					else
-					{
-						cell_contact += (max_interactive_distance-distance);
-						adh = ( static_cast<Cell*>(this) )->adhesion( static_cast<Cell*>(other_agent) );
-					}
+				// active, active
+				else
+				{
+					cell_contact += (max_interactive_distance-distance);
+					adh = ( static_cast<Cell*>(this) )->adhesion( static_cast<Cell*>(other_agent) );
 				}
+			}
+		}
 	}
 	/////////////////////////////////////////////////////////////////
 	if( fabs(temp_r) < 1e-16 )
@@ -815,6 +819,7 @@ void Cell::add_potentials(Cell* other_agent)
 	velocity += temp_r * displacement;
 	return;
 }
+
 
 Cell* create_cell( void )
 {
@@ -962,7 +967,7 @@ bool is_neighbor_voxel(Cell* pCell, std::vector<double> my_voxel_center, std::ve
 	// @ToChange: my_voxel_center en Vector3d
 	std::vector<double> cp= 0.5*(my_voxel_center+other_voxel_center);
 	Vector3d corner_point( cp[0], cp[1], cp[2] );
-	double distance_squared = (corner_point - position).normSqr();
+	double distance_squared = (corner_point - pCell->position).normSqr();
 	if(distance_squared > max_interactive_distance * max_interactive_distance)
 		return false;
 	return true;
@@ -1073,29 +1078,25 @@ void Cell::lyse_cell( void )
 	return; 
 }
 
+
+
+
 /* Return value of adhesion strength with ECM according to integrin level */
 double Cell::integrinStrength()
 { 
-	return cell_line->get_integrin_strength( pintegrin ); 
+	Cecm[0] = PhysiCell::parameters.ints("ecm_adhesion_min");
+	Cecm[1] = PhysiCell::parameters.ints("ecm_adhesion_min");
+	return Cell::get_integrin_strength( pintegrin ); 
 }
 
-/* Return if level of protein given by index around the cell is high enough (compared to given threshold) */
-int Cell::feel_enough(std::string field)
-{	
-	//return local_density(field) > cell_line->prot_threshold; 
-	int ind = density_index(field);
-	if ( ind >= 0 )	
-		return bounded[ind] > cell_line->get_threshold(field); 
-	return -1;
-}
 
 /* Return if cell has enough contact with other cells (compared to given threshold determined by the given level) */	
 bool Cell::has_neighbor(int level)
 { 
 	if ( level == 0 )
-		return contact_cell() > cell_line->contact_cc_threshold; 
+		return contact_cell() > PhysiCell::parameters.doubles("contact_cell_cell_threshold"); 
 	else
-		return contact_cell() > (2 * cell_line->contact_cc_threshold); 
+		return contact_cell() > (2 * PhysiCell::parameters.doubles("contact_cell_cell_threshold")); 
 }
 
 
@@ -1115,9 +1116,45 @@ bool Cell::necrotic_oxygen()
 	double ox = local_density("oxygen");
 	//std::cout << ox << " " << (cell_line->o2_necrotic) - ox << std::endl;
 	if ( ox >= 0 )	
-		return ( UniformRandom() * 0.005 < (cell_line->o2_necrotic - ox) );
+		return ( UniformRandom() * 0.005 < (PhysiCell::parameters.ints("oxygen_necrotic") - ox) );
    return false;	
 }
+
+/* Motility with random direction, and magnitude of motion given by customed coefficient */
+void Cell::set_3D_random_motility( double dt )
+{
+	double probability = UniformRandom();
+	motility_magnitude[0] = PhysiCell::parameters.doubles("motility_amplitude_min");
+	motility_magnitude[1] = PhysiCell::parameters.doubles("motility_amplitude_max");
+	if ( probability < dt / PhysiCell::parameters.doubles("persistence") )
+	{
+		Vector3d tmp;
+		tmp.randomize_normed();
+		motility = get_motility_amplitude(pmotility) * tmp;
+	}
+}
+
+/*
+ * Motility in the polarity axis migration + little noise
+ * Persistence in the update polarization
+ * */
+void Cell::set_3D_polarized_motility( double dt )
+{
+	// mot = (1-p) * r + p * pol
+	motility.randomize_normed();
+	motility *= (1 - PhysiCell::parameters.doubles("polarity_coefficient"));
+	Vector3d polarization;
+	polarization[0]= state.orientation[0];
+	polarization[1]= state.orientation[1];
+	polarization[2]= state.orientation[2];
+	motility += PhysiCell::parameters.doubles("polarity_coefficient") * polarization.dir();
+	// Normalized it
+	motility.normalize();
+	// mot = mot_coef * mot_dir
+	motility *= get_motility_amplitude(pmotility);
+}
+
+
 
 /**
  * Calculate motility forces according to mode:
@@ -1128,7 +1165,7 @@ void Cell::set_motility( double dt )
 	// Cell frozen, cannot actively move
 	if ( freezed > 2 )
 		return;
-	switch( cell_line->mode_motility )
+	switch( PhysiCell::parameters.ints("mode_motility") )
 	{
 		case 0:
 			set_3D_random_motility(dt);
@@ -1160,11 +1197,15 @@ double Cell::get_adhesion()
 /* Calculate adhesion coefficient with other cell */
 double Cell::adhesion( Cell* other_cell )
 {
+	Ccca_heterotypic[0] = PhysiCell::parameters.doubles("heterotypic_adhesion_min");
+	Ccca_heterotypic[1] = PhysiCell::parameters.doubles("heterotypic_adhesion_max");
+	Ccca_homotypic[0] = PhysiCell::parameters.doubles("homotypic_adhesion_min");
+	Ccca_homotypic[1] = PhysiCell::parameters.doubles("homotypic_adhesion_max");
 	double adh = 0;
-	if ( cell_line == other_cell->cell_line )
-		adh = std::min( cell_line->get_homotypic_strength(padhesion), other_cell->cell_line->get_homotypic_strength(padhesion) );
+	if ( Cell::phenotype == other_cell->phenotype )
+		adh = std::min( get_homotypic_strength(padhesion), other_cell->get_homotypic_strength(padhesion) );
 	else
-		adh = std::min( cell_line->get_heterotypic_strength(padhesion), other_cell->cell_line->get_heterotypic_strength(padhesion) );
+		adh = std::min( get_heterotypic_strength(padhesion), other_cell->get_heterotypic_strength(padhesion) );
 
 	return adh;
 }
@@ -1174,7 +1215,7 @@ void Cell::add_cell_basement_membrane_interactions( double dt, double distance )
 {
 	double rad = phenotype.geometry.radius;
 	//Note that the distance_to_membrane function must set displacement values (as a normal vector)
-	double max_interactive_distance = cell_line->max_interaction_distance_factor * rad;
+	double max_interactive_distance = PhysiCell::parameters.doubles("max_interaction_factor") * rad;
 		
 	double temp_a=0;
 	// Adhesion to basement membrane
@@ -1182,7 +1223,7 @@ void Cell::add_cell_basement_membrane_interactions( double dt, double distance )
 	{
 		temp_a= (1- distance/max_interactive_distance);
 		temp_a*=temp_a;
-		temp_a*=- cell_line->Ccba;
+		temp_a*=- PhysiCell::parameters.doubles("cell_basement_membrane_adhesion");
 	}
 	// Repulsion from basement membrane
 	double temp_r=0;
@@ -1190,7 +1231,7 @@ void Cell::add_cell_basement_membrane_interactions( double dt, double distance )
 	{
 		temp_r= (1- distance/rad);
 		temp_r*=temp_r;
-		temp_r*= cell_line->Ccbr;
+		temp_r*= PhysiCell::parameters.doubles("cell_basement_membrane_repulsion");
 	}
 	temp_r+=temp_a;
 	if(temp_r==0)
@@ -1273,7 +1314,7 @@ void Cell::update_cell_motion( double time_since_last, double l, std::string sha
 	cell_contact = 0;
 	ecm_contact = 0;
 	nucleus_deform = 0;
-	if( !is_out_of_domain && is_moving)
+	if( !is_out_of_domain && is_movable)
 		update_velocity( time_since_last, l, shape );
 }
 
@@ -1351,11 +1392,11 @@ void Cell::add_ecm_interaction( int index_ecm, int index_voxel )
 				tmp_r = ( 1 - distance / dd );
 				tmp_r *= tmp_r;
 			}
-			tmp_r *= dens * get_ecm_repulsion();
+			tmp_r *= dens * PhysiCell::parameters.doubles("cell_ecm_repulsion");
 		}
 
 		// Cell adherence to ECM through integrins
-		double max_interactive_distance = max_interaction() + ecmrad;
+		double max_interactive_distance = (PhysiCell::parameters.doubles("max_interaction_factor")*phenotype.geometry.radius) + ecmrad;
 		if ( distance < max_interactive_distance ) 
 		{	
 			double temp_a = 1 - distance/max_interactive_distance; 
@@ -1378,5 +1419,5 @@ void Cell::add_ecm_interaction( int index_ecm, int index_voxel )
 
 };
 
-};
+
 

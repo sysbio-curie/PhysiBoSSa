@@ -77,6 +77,8 @@
 #include "../core/base/vector3d.h"
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
 #include <math.h>
+#include "../core/base/readXML.h"
+#include "../core/PhysiCell_utilities.h"
 using namespace BioFVM; 
 
 namespace PhysiCell{
@@ -108,6 +110,7 @@ class Cell_Parameters
 	// necrosis parameters (may evenually be moved into a reference necrotic phenotype 
 	double max_necrosis_rate; // deprecate
 	int necrosis_type; // deprecate 
+	
 	
 	Cell_Parameters(); 
 }; 
@@ -166,12 +169,30 @@ class Cell : public Basic_Agent
 	Vector3d position;  
 	Vector3d velocity; 
 	Vector3d displacement;
+	Vector3d motility;
+
+	double pintegrin;
+	double pmotility;
+	double padhesion;
 	double nucleus_deform;
 	double ecm_contact;
+	double Cecm[2];
+	double motility_magnitude[2];
+	double Ccca_homotypic[2];
+	double Ccca_heterotypic[2];
 	/** \brief Amount of contact with other cells */
 	double cell_contact;
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 
+	/** \brief Motility with random direction, and magnitude of motion given by customed coefficient */
+	void set_3D_random_motility( double dt );
+	/**
+	* Motility in the polarity axis migration
+	* Strength of alignement depends of the polarity parameter, as for division axis
+	* Persistence defined in the polarization direction updating.
+	* Polarity coefficient never reach 1 so there is some noise
+	* */
+	void set_3D_polarized_motility( double dt );
 	void set_motility(double );
 	void add_potentials(Cell*);       // Add repulsive and adhesive forces.
 	void set_previous_velocity(double xV, double yV, double zV);
@@ -220,10 +241,20 @@ class Cell : public Basic_Agent
 	{ return cell_contact / phenotype.geometry.radius ; };
 	/** \brief Return value of adhesion strength with ECM according to integrin level */
 	double integrinStrength();
-	int feel_enough(std::string field);
+	/** \brief Get the current value of heterotypic adhesion strength */
+	inline double get_heterotypic_strength( double percent )
+	{ return current_value( Ccca_heterotypic[0], Ccca_heterotypic[1], percent ); };
+	/** \brief Get the current value of homotypic adhesion strength */
+	inline double get_homotypic_strength( double percent )
+	{ return current_value( Ccca_homotypic[0], Ccca_homotypic[1], percent ); };
 	// I want to eventually deprecate this, by ensuring that 
 	// critical BioFVM and PhysiCell data elements are synced when they are needed 
-	
+	/** \brief Get the current value of integrin strength */
+	inline double get_integrin_strength( double percent )
+	{ return current_value( Cecm[0], Cecm[1], percent ); };
+	/** \brief Get the current value of motility coefficient */
+	inline double get_motility_amplitude( double percent )
+	{ return current_value( motility_magnitude[0], motility_magnitude[1], percent ); };
 	virtual void add_cell_basement_membrane_interactions(double t, double dist);
 	void set_phenotype( Phenotype& phenotype ); // no longer needed?
 	void update_radius();

@@ -238,18 +238,6 @@ int ind;
 	if ( ind >= 0 )
 		nodes[ind] = ( pCell->has_neighbor(1) );
 
-	enough_to_node( "Glucose", "glucose" );
-	enough_to_node( "EGF", "egf" );
-	enough_to_node( "IGF", "igf" );
-	enough_to_node( "TNF", "tnf" );
-	enough_to_node( "GF", "gf" );
-	enough_to_node( "TGFBR", "tgfb" );
-	enough_to_node( "IL2R_b1", "il2" );
-	enough_to_node( "IL2R_b2", "il2" );
-	enough_to_node( "TCR_b1", "tcr" );
-	enough_to_node( "TCR_b2", "tcr" );
-	enough_to_node( "CD28", "tcr" );
-
 	// If has enough contact with ecm or not
 	ind = pCell->boolean_network.get_node_index( "ECM_sensing" );
 	if ( ind >= 0 )

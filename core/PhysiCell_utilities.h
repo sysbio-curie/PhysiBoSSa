@@ -90,6 +90,9 @@ double dist(std::vector<double> p1, std::vector<double> p2);
 inline void strip( std::string* str ) 
 { (*str).erase(remove(str->begin(), (*str).end(), ' '), (*str).end()); };
 
+inline double current_value( double min, double max, double percent )
+{ return (min + (max-min) * percent); };
+
 static const std::string delim = "\t";
 static const double EPSILON = std::numeric_limits<double>::epsilon();
 inline double sign( double x ) { return (x > 0) ? 1 : -1; };

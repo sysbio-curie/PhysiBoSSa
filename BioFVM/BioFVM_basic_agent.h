@@ -76,7 +76,9 @@ class Basic_Agent
 	std::vector<double> cell_source_sink_solver_temp2;
 	std::vector<double> previous_velocity; 
 	bool is_active;
-	
+
+	/** \brief amount of density bounded to the cell*/
+	std::vector<double> bounded;
 	std::vector<double> total_extracellular_substrate_change; 
 
  public:
