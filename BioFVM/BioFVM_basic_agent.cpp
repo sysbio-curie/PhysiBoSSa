@@ -165,7 +165,7 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	secretion_rates->resize( microenvironment->density_vector(0).size() , 0.0 );
 	saturation_densities->resize( microenvironment->density_vector(0).size() , 0.0 );
 	uptake_rates->resize( microenvironment->density_vector(0).size() , 0.0 );	
-	bounded.resize(microenvironment->density_vector(0).size, 0.0);
+	bounded.resize(microenvironment->density_vector(0).size(), 0.0);
 	// some solver temporary variables 
 	cell_source_sink_solver_temp1.resize( microenvironment->density_vector(0).size() , 0.0 );
 	cell_source_sink_solver_temp2.resize( microenvironment->density_vector(0).size() , 1.0 );

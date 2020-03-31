@@ -64,6 +64,8 @@
 #                                                                             #
 ###############################################################################
 */
+#ifndef __Custom_h__
+#define __Custom_h__
 
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
@@ -107,3 +109,5 @@ void set_input_nodes(Cell* pCell);
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt);
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header);
 void load_ecm_file();
+
+#endif
