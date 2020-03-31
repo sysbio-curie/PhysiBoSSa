@@ -2,7 +2,7 @@
 #define __CELL_CYCLE_NETWORK_H
 
 #include "maboss_network.h"
-#include "../core/PhysiCell_cell.h"
+
 /**
  * \class BooleanNetwork
  * \brief Boolean network handeler

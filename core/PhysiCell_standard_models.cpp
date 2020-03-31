@@ -600,7 +600,11 @@ void standard_update_cell_velocity( Cell* pCell, Phenotype& phenotype, double dt
 	}
 
 	pCell->update_motility_vector(dt); 
-	pCell->velocity += phenotype.motility.motility_vector; 
+	Vector3d motility_vec;
+	motility_vec[0] = phenotype.motility.motility_vector[0];
+	motility_vec[1] = phenotype.motility.motility_vector[1];
+	motility_vec[2] = phenotype.motility.motility_vector[2];
+	pCell->velocity += motility_vec; 
 	
 	return; 
 }
