@@ -17,3 +17,4 @@ void BooleanNetwork::run_maboss()
 	this->maboss.run_simulation(&this->nodes);
 	this->set_time_to_update();
 }
+

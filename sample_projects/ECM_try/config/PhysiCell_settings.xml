@@ -156,14 +156,18 @@
 		<!-- example parameters from the template --> 
 		<ecm_file type="string" units="">ecm.txt</ecm_file>
 		<polarity_coefficient type="double" units="">0.5</polarity_coefficient>
+		<persistance type="double" units"">0.5</persistence>
     	<motility_amplitude_min type="double" units=""> 0.1 </motility_amplitude_min>
     	<motility_amplitude_max type="double" units=""> 0.5 </motility_amplitude_max>
     	<mode_motility type="int" units=""> 1 </mode_motility>
-		<contact_cell_ECM_threshold type="double" units=""> 0.1 </contact_cell_ECM_threshold> <!-- minimal contact necessary to activate ECM pathway-->
+		<contact_cell_ECM_threshold type="double" units=""> 0.1 </contact_cell_ECM_threshold>
+		<contact_cell_cell_threshold type="double" units=""> 1 </contact_cell_cell_threshold> <!-- minimal contact necessary to activate ECM pathway-->
 		<homotypic_adhesion_min type="double" units=""> 0.2 </homotypic_adhesion_min>
 		<homotypic_adhesion_max type="double" units=""> 0.8 </homotypic_adhesion_max>
 		<heterotypic_adhesion_min type="double" units=""> 0.2 </heterotypic_adhesion_min>
 		<heterotypic_adhesion_max type="double" units=""> 0.8 </heterotypic_adhesion_max>
+		<cell_basement_membrane_repulsion type="double" units="">10.0</cell_basement_membrane_repulsion>
+		<cell_basement_membrane_adhesion type="double" units="">1.70577155519015</cell_basement_membrane_adhesion>
 		<ecm_adhesion_min type="int" units=""> 1 </ecm_adhesion_min>
 		<ecm_adhesion_max type="int" units=""> 2 </ecm_adhesion_max>
 		<cell_ecm_repulsion type="int" units=""> 10 </cell_ecm_repulsion>
