@@ -70,7 +70,7 @@
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 #include "../core/PhysiCell_utilities.h"
-#include "../core/base/readXML.h"
+
 
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
 
@@ -90,14 +90,12 @@ struct init_record
 };
 
 ///std::string ecm_file;
-///ReadXML  reader;
 // setup functions to help us along 
 void create_cell_types( void );
 void setup_tissue( void ); 
 //std::vector<std::string> conc_names;
 // set up the BioFVM microenvironment 
 void setup_microenvironment( void ); 
-std::vector<bool> nodes;
 // custom pathology coloring function 
 std::vector<std::string> my_coloring_function( Cell* );
 

@@ -52,7 +52,7 @@
 #include "BioFVM_mesh.h"
 #include "BioFVM_agent_container.h"
 #include "BioFVM_MultiCellDS.h"
-#include "../core/base/vector3d.h"
+#include "../sample_project/ECM_try/custom_modules/base/vector3d"
 
 namespace BioFVM{
 
