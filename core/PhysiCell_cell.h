@@ -179,8 +179,17 @@ class Cell : public Basic_Agent
 	double motility_magnitude[2];
 	double Ccca_homotypic[2];
 	double Ccca_heterotypic[2];
+	int mmped;
 	/** \brief Amount of contact with other cells */
 	double cell_contact;
+	/** \brief Degrade the surrounding ECM 
+	*
+	* @param dt time step of mechanics, to scale degradation amount
+	* Currently, handle only the case of ECM as a density */
+	void degrade_ecm( double dt );
+	/** \brief (De)-Activate ECM degradation by the cell */
+	inline void set_mmp( int activate )
+	{ mmped = activate; };
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 
 	/** \brief Motility with random direction, and magnitude of motion given by customed coefficient */
