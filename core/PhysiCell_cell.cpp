@@ -72,6 +72,7 @@
 #include "../BioFVM/BioFVM_vector.h" 
 #include<limits.h>
 
+using namespace BioFVM;
 namespace PhysiCell{
 
 Cell_Parameters::Cell_Parameters()
@@ -328,7 +329,7 @@ Cell::Cell()
 	pintegrin = 0.5;
 	pmotility = 0.5;
 	padhesion = 0.5;
-	
+	mmped = 0;
 	return; 
 }
 
@@ -1078,7 +1079,30 @@ void Cell::lyse_cell( void )
 	return; 
 }
 
+/* Degrade the surrounding ECM 
+ *
+ * param dt time step */
+void Cell::degrade_ecm( double dt )
+{
+	if ( is_out_of_domain )
+		return;
+	if ( !mmped ) 
+		return;
 
+	// Check if there is ECM material in given voxel
+	int ecm_index = microenvironment.find_density_index("ecm");
+	int current_index = get_current_mechanics_voxel_index();
+	#pragma omp critical
+	{
+		double dens = microenvironment->nearest_density_vector(current_index)[ecm_index];
+		if ( dens > EPSILON )
+		{
+			dens -= (PhysiCell::parameters.ints("ecm_degradation") * pintegrin) * dt; // to change by a rate
+			dens = dens > 0 ? dens : 0;
+			microenvironment->nearest_density_vector(current_index)[ecm_index] = dens;
+		}
+	}
+}
 
 
 /* Return value of adhesion strength with ECM according to integrin level */
