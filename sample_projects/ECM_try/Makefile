@@ -84,19 +84,19 @@ all: MaBoSS main.cpp $(ALL_OBJECTS)
 # PhysiCell core components	
 
 PhysiCell_phenotype.o: ./core/PhysiCell_phenotype.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_phenotype.cpp
+	$(COMPILE_COMMAND) $(COR) -c ./core/PhysiCell_phenotype.cpp
 	
 PhysiCell_digital_cell_line.o: ./core/PhysiCell_digital_cell_line.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_digital_cell_line.cpp
 
 PhysiCell_cell.o: ./core/PhysiCell_cell.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_cell.cpp 
+	$(COMPILE_COMMAND) $(INC) $(COR) -c ./core/PhysiCell_cell.cpp 
 
 PhysiCell_cell_container.o: ./core/PhysiCell_cell_container.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_cell_container.cpp 
+	$(COMPILE_COMMAND) $(INC) $(COR) -c ./core/PhysiCell_cell_container.cpp 
 	
 PhysiCell_standard_models.o: ./core/PhysiCell_standard_models.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_standard_models.cpp 
+	$(COMPILE_COMMAND) $(INC) $(COR) -c ./core/PhysiCell_standard_models.cpp 
 	
 PhysiCell_utilities.o: ./core/PhysiCell_utilities.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_utilities.cpp 
@@ -113,28 +113,28 @@ BioFVM_vector.o: ./BioFVM/BioFVM_vector.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_vector.cpp 
 
 BioFVM_agent_container.o: ./BioFVM/BioFVM_agent_container.cpp
-	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_agent_container.cpp 
+	$(COMPILE_COMMAND) $(COR) -c ./BioFVM/BioFVM_agent_container.cpp 
 	
 BioFVM_mesh.o: ./BioFVM/BioFVM_mesh.cpp
-	$(COMPILE_COMMAND) $(CUR_DIR) -c ./BioFVM/BioFVM_mesh.cpp 
+	$(COMPILE_COMMAND) $(COR) -c ./BioFVM/BioFVM_mesh.cpp 
 
 BioFVM_microenvironment.o: ./BioFVM/BioFVM_microenvironment.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./BioFVM/BioFVM_microenvironment.cpp 
+	$(COMPILE_COMMAND) $(INC) $(COR) -c ./BioFVM/BioFVM_microenvironment.cpp 
 
 BioFVM_solvers.o: ./BioFVM/BioFVM_solvers.cpp
-	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_solvers.cpp 
+	$(COMPILE_COMMAND) $(COR) -c ./BioFVM/BioFVM_solvers.cpp 
 
 BioFVM_utilities.o: ./BioFVM/BioFVM_utilities.cpp
-	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_utilities.cpp 
+	$(COMPILE_COMMAND) $(COR) -c ./BioFVM/BioFVM_utilities.cpp 
 	
 BioFVM_basic_agent.o: ./BioFVM/BioFVM_basic_agent.cpp
-	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_basic_agent.cpp 
+	$(COMPILE_COMMAND) $(COR) -c ./BioFVM/BioFVM_basic_agent.cpp 
 	
 BioFVM_matlab.o: ./BioFVM/BioFVM_matlab.cpp
-	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_matlab.cpp
+	$(COMPILE_COMMAND) $(COR) -c ./BioFVM/BioFVM_matlab.cpp
 
 BioFVM_MultiCellDS.o: ./BioFVM/BioFVM_MultiCellDS.cpp
-	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_MultiCellDS.cpp
+	$(COMPILE_COMMAND) $(COR) -c ./BioFVM/BioFVM_MultiCellDS.cpp
 	
 pugixml.o: ./BioFVM/pugixml.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/pugixml.cpp

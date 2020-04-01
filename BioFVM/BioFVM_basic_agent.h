@@ -53,7 +53,7 @@
 #include "BioFVM_microenvironment.h"
 #include "BioFVM_matlab.h"
 #include "BioFVM_vector.h"
-#include "../sample_project/ECM_try/custom_modules/vector3d.h"
+#include "../sample_projects/ECM_try/custom_modules/vector3d.h"
 
 namespace BioFVM{
 

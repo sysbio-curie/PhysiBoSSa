@@ -1090,16 +1090,16 @@ void Cell::degrade_ecm( double dt )
 		return;
 
 	// Check if there is ECM material in given voxel
-	int ecm_index = microenvironment.find_density_index("ecm");
+	int ecm_index = get_microenvironment()->find_density_index("ecm");
 	int current_index = get_current_mechanics_voxel_index();
 	#pragma omp critical
 	{
-		double dens = microenvironment->nearest_density_vector(current_index)[ecm_index];
+		double dens = get_microenvironment()->nearest_density_vector(current_index)[ecm_index];
 		if ( dens > EPSILON )
 		{
 			dens -= (PhysiCell::parameters.ints("ecm_degradation") * pintegrin) * dt; // to change by a rate
 			dens = dens > 0 ? dens : 0;
-			microenvironment->nearest_density_vector(current_index)[ecm_index] = dens;
+			get_microenvironment()->nearest_density_vector(current_index)[ecm_index] = dens;
 		}
 	}
 }
