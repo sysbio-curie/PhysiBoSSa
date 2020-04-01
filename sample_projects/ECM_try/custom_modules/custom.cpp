@@ -276,14 +276,14 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 	bn_index = pCell->boolean_network.get_node_index("Matrix_modif");
 	if ( bn_index != -1 && (*nodes)[bn_index] )
 	{
-		pCell->set_mmp( nodes[bn_index] );
+		pCell->set_mmp( (*nodes)[bn_index] );
 		return;
 	}
 
 	bn_index = pCell->boolean_network.get_node_index("EMT");
 	if ( bn_index != -1 && (*nodes)[bn_index] )
 	{
-		pCell->set_mmp( nodes[bn_index] );
+		pCell->set_mmp( (*nodes)[bn_index] );
 		return;
 	}
 
