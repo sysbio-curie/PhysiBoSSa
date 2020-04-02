@@ -167,18 +167,20 @@ void setup_tissue( void )
 		int phase = cells[i].phase;
 		double elapsed_time = cells[i].elapsed_time;
 
-		pC = create_cell(); 
+		pC = create_cell();
+		 
 		pC->assign_position( x, y, z );
 		// pC->set_total_volume(sphere_volume_from_radius(radius));
-		
+		//std::cout<<(*all_cells)[i]->position<<std::endl;
 		// pC->phenotype.cycle.data.current_phase_index = phase;
 		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
 		pC->boolean_network = ecm_network;
 		pC->boolean_network.restart_nodes();
 		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
-		
+		//std::cout<< pC->position.size() << std::endl;
+		//std::cout<< pC->position << std::endl;
 	}
-
+	std::cout<<(*all_cells)[25]<<std::endl;
 	std::cout << "tissue created" << std::endl;
 
 	return; 

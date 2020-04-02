@@ -136,7 +136,8 @@ int main( int argc, char* argv[] )
 
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
-
+	std::cout<<(*all_cells)[25]->position<<std::endl;
+	std::cout<< all_basic_agents[25]->position<<std::endl;
 	std::cout << "fin qui tutto bene" << std::endl;
 
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
