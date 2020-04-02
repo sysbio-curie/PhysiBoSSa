@@ -76,7 +76,7 @@ class Basic_Agent
 	bool is_active;
 
 	/** \brief amount of density bounded to the cell*/
-	std::vector<double> bounded;
+	
 	std::vector<double> total_extracellular_substrate_change; 
 
  public:

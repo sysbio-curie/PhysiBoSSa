@@ -79,7 +79,7 @@ Basic_Agent::Basic_Agent()
 	fraction_released_at_death = new std::vector<double>(0); 
 	fraction_transferred_when_ingested = new std::vector<double>(0); 
 	register_microenvironment( get_default_microenvironment() );
-	bounded.resize(0);
+	
 	// these are done in register_microenvironment
 	// internalized_substrates.assign( get_default_microenvironment()->number_of_densities() , 0.0 ); 
 	
@@ -165,7 +165,7 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	secretion_rates->resize( microenvironment->density_vector(0).size() , 0.0 );
 	saturation_densities->resize( microenvironment->density_vector(0).size() , 0.0 );
 	uptake_rates->resize( microenvironment->density_vector(0).size() , 0.0 );	
-	bounded.resize(microenvironment->density_vector(0).size(), 0.0);
+	
 	// some solver temporary variables 
 	cell_source_sink_solver_temp1.resize( microenvironment->density_vector(0).size() , 0.0 );
 	cell_source_sink_solver_temp2.resize( microenvironment->density_vector(0).size() , 1.0 );
@@ -310,12 +310,6 @@ void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt
 		*internalized_substrates -= total_extracellular_substrate_change; // opposite of net extracellular change 	
 	}
 
-	// decrease 1 percent per min
-	double fact = dt * volume / ( (microenvironment->voxels(current_voxel_index)).volume ) ; 
-	bounded -= 0.01 * dt * bounded;
-	for ( int i = 0; i < bounded.size(); i++ )
-		bounded[i] = bounded[i] > 0 ? bounded[i] : 0;
-	bounded += fact * *uptake_rates * nearest_density_vector();
 
 	(*pS)(current_voxel_index) += cell_source_sink_solver_temp1; 
 	(*pS)(current_voxel_index) /= cell_source_sink_solver_temp2; 
@@ -323,4 +317,4 @@ void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt
 	return; 
 }
 
-}
+};
