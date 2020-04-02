@@ -74,7 +74,6 @@
 #include "./PhysiCell_phenotype.h"
 #include "./PhysiCell_cell_container.h"
 #include "./PhysiCell_constants.h"
-#include "../custom_modules/vector3d.h"
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
 #include <math.h>
 #include "../core/PhysiCell_utilities.h"
@@ -164,12 +163,8 @@ class Cell : public Basic_Agent
 	Phenotype phenotype; 
 	
 	BooleanNetwork boolean_network;
-	Vector3d previous_velocity;
-	Vector3d position;  
-	Vector3d velocity; 
-	Vector3d displacement;
-	Vector3d motility;
-
+	
+	std::vector<double> motility;
 	double pintegrin;
 	double pmotility;
 	double padhesion;
@@ -229,10 +224,9 @@ class Cell : public Basic_Agent
 	double adhesion(Cell* other_cell);
 	double local_density(std::string field);
 	double& get_total_volume(void); // NEW
-	inline Vector3d get_position() const { return position; };
 	// mechanics 
 	void update_position( double dt ); //
-	//std::vector<double> displacement; // this should be moved to state, or made private  
+	std::vector<double> displacement; // this should be moved to state, or made private  
 
 	
 	void assign_orientation();  // if set_orientaion is defined, uses it to assign the orientation

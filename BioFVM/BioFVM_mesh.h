@@ -51,7 +51,6 @@
 
 #include <iostream>
 #include <vector> 
-#include "../sample_projects/ECM_try/custom_modules/vector3d.h"
 #include "BioFVM_matlab.h"
 
 namespace BioFVM{
@@ -125,8 +124,7 @@ class General_Mesh
 	// each voxel[k] has a list of connected voxels -- helpful for some numerical methods 
 	std::vector< std::vector<int> > connected_voxel_indices; 
 	
-	int nearest_voxel_index( std::vector<double>& position );
-	int nearest_voxel_index( Vector3d& position );   
+	int nearest_voxel_index( std::vector<double>& position );   
 	bool is_position_valid(double x, double y, double z);
 	/* the following help manage the voxel faces */ 
 
@@ -199,8 +197,7 @@ class Cartesian_Mesh : public General_Mesh
 	void resize( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx, double dy, double dz ); 
 	void resize_uniform( double x_start, double x_end, double y_start, double y_end, double z_start, double z_end , double dx ); 
 	
-	int nearest_voxel_index( std::vector<double>& position ); 
-	int nearest_voxel_index( Vector3d& position );  
+	int nearest_voxel_index( std::vector<double>& position );   
 	int nearest_voxel_face_index( std::vector<double>& position );  
 	std::vector<unsigned int> nearest_cartesian_indices( std::vector<double>& position ); 
 	Voxel& nearest_voxel( std::vector<double>& position ); 

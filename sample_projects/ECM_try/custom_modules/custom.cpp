@@ -316,7 +316,10 @@ void load_ecm_file()
 		double y = std::stod(array[1]);
 		double z = std::stod(array[2]);
 		double amount = std::stod(array[3]);
-		Vector3d pos(x, y, z);
+		std::vector<double> pos;
+		pos[0] = x;
+		pos[1] = y;
+		pos[2] = z;
 		int voxel_index = microenvironment.nearest_voxel_index( pos );
 		microenvironment.density_vector(voxel_index)[microenvironment.find_density_index("ecm")] += amount; 	
 	}

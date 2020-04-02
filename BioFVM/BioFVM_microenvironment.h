@@ -52,7 +52,7 @@
 #include "BioFVM_mesh.h"
 #include "BioFVM_agent_container.h"
 #include "BioFVM_MultiCellDS.h"
-#include "../sample_projects/ECM_try/custom_modules/vector3d.h"
+
 
 namespace BioFVM{
 
@@ -150,6 +150,7 @@ class Microenvironment
 	std::vector< std::vector<double> > supply_target_densities_times_supply_rates; 
 	std::vector< std::vector<double> > supply_rates; 
 	std::vector< std::vector<double> > uptake_rates; 
+	std::vector<double> voxel_center;
 	void update_rates( void ); 
 	
 	Microenvironment(); 
@@ -191,7 +192,6 @@ class Microenvironment
 	std::vector<unsigned int> cartesian_indices( int n ); 
 	
 	int nearest_voxel_index( std::vector<double>& position );
-	int nearest_voxel_index( Vector3d& position );
 	std::vector<unsigned int> nearest_cartesian_indices( std::vector<double>& position ); 
 	Voxel& nearest_voxel( std::vector<double>& position ); 
 	Voxel& voxels( int voxel_index );
@@ -200,10 +200,13 @@ class Microenvironment
 	/** \brief Return the current voxel size */
 	inline double voxel_rad(int i)
 	{ return voxels(i).halfdiag; };
-	 
+
+	inline std::vector<double> get_voxel_center(int i)
+	{voxel_center.push_back(voxels(i).center[0]); voxel_center.push_back(voxels(i).center[1]); voxel_center.push_back(voxels(i).center[2]); return voxel_center;};
 	/** \brief Return center coordinates of i-th voxel */
-	inline Vector3d voxel_center( int i )
-	{ return Vector3d( voxels(i).center[0], voxels(i).center[1], voxels(i).center[2] ); };
+	//inline Vector3d voxel_center( int i )
+	//{ return Vector3d( voxels(i).center[0], voxels(i).center[1], voxels(i).center[2] ); };
+
 	/*! access the density vector at  [ X(i),Y(j),Z(k) ] */
 	std::vector<double>& operator()( int i, int j, int k ); 
 	/*! access the density vector at  [ X(i),Y(j),0 ]  -- helpful for 2-D problems */
