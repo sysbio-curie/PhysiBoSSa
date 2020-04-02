@@ -616,9 +616,9 @@ void Microenvironment::write_density( std::ostream& os, int dens )
 		double fill = nearest_density_vector(i)[dens];
 		if ( fill > small_value )
 		{
-			os << voxel_center(i)[0] << ";";
-			os << voxel_center(i)[1] << ";";
-			os << voxel_center(i)[2] << ";";
+			os << voxels(i).center[0] << ";";
+			os << voxels(i).center[1] << ";";
+			os << voxels(i).center[2] << ";";
 			os << nearest_density_vector(i)[dens] << std::endl;
 		}
 	}
@@ -667,9 +667,6 @@ std::vector<unsigned int> Microenvironment::cartesian_indices( int n )
 { return mesh.cartesian_indices( n ); }
 
 int Microenvironment::nearest_voxel_index( std::vector<double>& position )
-{ return mesh.nearest_voxel_index( position ); }
-
-int Microenvironment::nearest_voxel_index( Vector3d& position )
 { return mesh.nearest_voxel_index( position ); }
 
 Voxel& Microenvironment::voxels( int voxel_index )

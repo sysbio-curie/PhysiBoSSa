@@ -322,7 +322,7 @@ Cell::Cell()
 	
 	is_movable = true;
 	is_out_of_domain = false;
-	displacement[3, 0, 0]; // state? 
+	//displacement.resize(3, 0, 0); // state? 
 	
 	assign_orientation();
 	container = NULL;
@@ -424,8 +424,6 @@ Cell* Cell::divide( )
 	rand_vec = rand_vec- phenotype.geometry.polarity*(rand_vec[0]*state.orientation[0]+ 
 		rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;
 
-	Vector3d random_vector(rand_vec[0], rand_vec[1], rand_vec[2]);
-
 	if( norm(rand_vec) < 1e-16 )
 	{
 		std::cout<<"************ERROR********************"<<std::endl;
@@ -437,8 +435,8 @@ Cell* Cell::divide( )
 						 position[2] + 0.5 * radius*rand_vec[2]);
 	//change my position to keep the center of mass intact and then see if I need to update my voxel index
 	static double negative_one_half = -0.5; 
-	//naxpy( &position, negative_one_half , rand_vec );// position = position - 0.5*rand_vec; 
-	position -= -0.5*random_vector;
+	naxpy( &position, negative_one_half , rand_vec );// position = position - 0.5*rand_vec; 
+	
 	// position[0] -= 0.5*radius*rand_vec[0];
 	// position[1] -= 0.5*radius*rand_vec[1]; 
 	// position[2] -= 0.5*radius*rand_vec[2]; 
@@ -472,7 +470,9 @@ bool Cell::assign_position(std::vector<double> new_position)
 
 void Cell::set_previous_velocity(double xV, double yV, double zV)
 {
-	Vector3d previous_velocity( xV, yV, zV);
+	previous_velocity[0] = xV;
+	previous_velocity[1] = yV;
+	previous_velocity[2] = zV;
 
 	return; 
 }
@@ -597,11 +597,10 @@ void Cell::update_position( double dt )
 	if( default_microenvironment_options.simulate_2D == true )
 	{ velocity[2] = 0.0; }
 	
-	//std::vector<double> old_position(position); 
-	//axpy( &position , d1 , velocity );  
-	//axpy( &position , d2 , previous_velocity ); 
-	position += dt*1.5 * velocity;	
-	position += -0.5*dt * previous_velocity;
+	std::vector<double> old_position(position); 
+	axpy( &position , d1 , velocity );  
+	axpy( &position , d2 , previous_velocity ); 
+	
 
 	// overwrite previous_velocity for future use 
 	// if(sqrt(dist(old_position, position))>3* phenotype.geometry.radius)
@@ -816,8 +815,8 @@ void Cell::add_potentials(Cell* other_agent)
 	// {
 	//	velocity[i] += displacement[i] * temp_r; 
 	// }
-	//axpy( &velocity , temp_r , displacement ); 
-	velocity += temp_r * displacement;
+	axpy( &velocity , temp_r , displacement ); 
+	
 	return;
 }
 
@@ -859,7 +858,7 @@ Cell* create_cell( Cell_Definition& cd )
 	pNew->phenotype = cd.phenotype; 
 	pNew->is_movable = true;
 	pNew->is_out_of_domain = false;
-	pNew->displacement[3,0.0]; // state? 
+	pNew->displacement.resize(3,0.0); // state? 
 	
 	pNew->assign_orientation();
 	
@@ -965,12 +964,12 @@ bool is_neighbor_voxel(Cell* pCell, std::vector<double> my_voxel_center, std::ve
 		return true;
 	}
 
-	// @ToChange: my_voxel_center en Vector3d
-	std::vector<double> cp= 0.5*(my_voxel_center+other_voxel_center);
-	Vector3d corner_point( cp[0], cp[1], cp[2] );
-	double distance_squared = (corner_point - pCell->position).normSqr();
+	std::vector<double> corner_point= 0.5*(my_voxel_center+other_voxel_center);
+	double distance_squared= (corner_point[0]-pCell->position[0])*(corner_point[0]-pCell->position[0])
+		+(corner_point[1]-pCell->position[1])*(corner_point[1]-pCell->position[1]) 
+		+(corner_point[2]-pCell->position[2]) * (corner_point[2]-pCell->position[2]);
 	if(distance_squared > max_interactive_distance * max_interactive_distance)
-		return false;
+	{ return false; }
 	return true;
 }
 
@@ -1152,8 +1151,12 @@ void Cell::set_3D_random_motility( double dt )
 	motility_magnitude[1] = PhysiCell::parameters.doubles("motility_amplitude_max");
 	if ( probability < dt / PhysiCell::parameters.doubles("persistence") )
 	{
-		Vector3d tmp;
-		tmp.randomize_normed();
+		std::vector<double> tmp;
+		double temp_angle = 2 * M_PI * PhysiCell::UniformRandom();
+		double temp_phi = M_PI * PhysiCell::UniformRandom();
+		tmp[0] = cos( temp_angle ) * sin( temp_phi );
+		tmp[1] = sin( temp_angle ) * sin( temp_phi );
+		tmp[2] = cos( temp_phi );
 		motility = get_motility_amplitude(pmotility) * tmp;
 	}
 }
@@ -1165,15 +1168,24 @@ void Cell::set_3D_random_motility( double dt )
 void Cell::set_3D_polarized_motility( double dt )
 {
 	// mot = (1-p) * r + p * pol
-	motility.randomize_normed();
+	double temp_angle = 2 * M_PI * PhysiCell::UniformRandom();
+	double temp_phi = M_PI * PhysiCell::UniformRandom();
+	motility[0] = cos( temp_angle ) * sin( temp_phi );
+	motility[1] = sin( temp_angle ) * sin( temp_phi );
+	motility[2] = cos( temp_phi );
 	motility *= (1 - PhysiCell::parameters.doubles("polarity_coefficient"));
-	Vector3d polarization;
+	std::vector<double> polarization;
 	polarization[0]= state.orientation[0];
 	polarization[1]= state.orientation[1];
 	polarization[2]= state.orientation[2];
-	motility += PhysiCell::parameters.doubles("polarity_coefficient") * polarization.dir();
+	std::vector<double> pol_dir;
+	double pol_norm = norm(polarization); //normal to polaization used to calculate the vestor direction for polarization
+	pol_dir[0] = polarization[0]/pol_norm;
+	pol_dir[1] = polarization[1]/pol_norm;
+	pol_dir[2] = polarization[2]/pol_norm;
+	motility += PhysiCell::parameters.doubles("polarity_coefficient") * pol_dir;
 	// Normalized it
-	motility.normalize();
+	normalize(motility);
 	// mot = mot_coef * mot_dir
 	motility *= get_motility_amplitude(pmotility);
 }
@@ -1272,7 +1284,7 @@ double Cell::distance_to_membrane_duct(double length)
 	//Note that this function assumes that duct cap center is located at <0, 0, 0>
 	if ( position[0] >= 0 ) // Cell is within the cylinder part of the duct
 	{
-		double distance_to_x_axis= position.distance_to_xaxis();
+		double distance_to_x_axis= sqrt((position[1] * position[1]) + (position[2] * position[2]));
 		distance_to_x_axis = std::max(distance_to_x_axis, EPSILON);		// prevents division by zero
 		displacement[0]=0; 
 		displacement[1]= -position[1]/ distance_to_x_axis; 
@@ -1281,7 +1293,7 @@ double Cell::distance_to_membrane_duct(double length)
 	}
 
 	// Cell is inside the cap of the duct
-	double distance_to_origin= position.norm();  // distance to the origin 
+	double distance_to_origin= norm(position);  // distance to the origin 
 	distance_to_origin = std::max(distance_to_origin, EPSILON);			  // prevents division by zero
 	displacement = -1 / distance_to_origin * position;
 	return fabs(length - distance_to_origin);
@@ -1293,7 +1305,7 @@ double Cell::distance_to_membrane_duct(double length)
  * */
 double Cell::distance_to_membrane_sphere(double length)
 {
-	double distance_to_origin = position.norm();  // distance to the origin 
+	double distance_to_origin = norm(position);  // distance to the origin 
 	distance_to_origin = std::max(distance_to_origin, EPSILON);	  // prevents division by zero
 	displacement = -1 / distance_to_origin * position;
 	if ( (length - distance_to_origin) < 0 )
@@ -1388,8 +1400,8 @@ void Cell::add_ecm_interaction( int index_ecm, int index_voxel )
 	if ( dens > PhysiCell::EPSILON )
 	{
 		// Distance between agent center and ECM voxel center
-		displacement = position - get_microenvironment()->voxel_center(index_voxel);
-		double distance = displacement.norm();
+		displacement = position - get_microenvironment()->get_voxel_center(index_voxel);
+		double distance = norm(displacement);
 		// Make sure that the distance is not zero
 		distance = std::max(distance, PhysiCell::EPSILON);
 		
