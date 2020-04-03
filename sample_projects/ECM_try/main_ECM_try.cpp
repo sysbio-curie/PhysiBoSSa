@@ -136,8 +136,8 @@ int main( int argc, char* argv[] )
 
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
-	std::cout<<(*all_cells)[25]->position<<std::endl;
-	std::cout<< all_basic_agents[25]->position<<std::endl;
+	std::cout<<(*all_cells)[25]<<std::endl;
+	std::cout<< ((std::vector<Basic_Agent*>)all_basic_agents)[25]<<std::endl;
 	std::cout << "fin qui tutto bene" << std::endl;
 
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
@@ -158,7 +158,7 @@ int main( int argc, char* argv[] )
 	
 	display_citations(); 
 	
-	std::cout << "fin qui tutto bene";
+	std::cout << "fin qui tutto bene" << std:: endl; 
 
 	// set the performance timers 
 
@@ -216,8 +216,8 @@ int main( int argc, char* argv[] )
 			/*
 			  Custom add-ons could potentially go here. 
 			*/
-			int e = microenvironment.find_density_index("ecm");
-			writeDensity(e, PhysiCell_globals.current_time);
+			//int e = microenvironment.find_density_index("ecm");
+			//writeDensity(e, PhysiCell_globals.current_time);
 
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
@@ -225,7 +225,7 @@ int main( int argc, char* argv[] )
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
-
+			//std::cout<< "done" << std::endl;
 			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}

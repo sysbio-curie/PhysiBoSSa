@@ -109,8 +109,8 @@ void create_cell_types( void )
 
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
-	microenvironment.add_density("ecm", "dimensionless");
-	///reader.getStringValue("user_parameters", "ecm_file", &ecm_file );
+	//microenvironment.add_density("ecm", "dimensionless");
+	
 	load_ecm_file();
 
 	// set the rate terms in the default phenotype 
@@ -128,6 +128,10 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
 
+	//cell_defaults.phenotype.secretion.uptake_rates[ecm_substrate_index] = 10; 
+	//cell_defaults.phenotype.secretion.secretion_rates[ecm_substrate_index] = 0; 
+	//cell_defaults.phenotype.secretion.saturation_densities[ecm_substrate_index] = 38; 
+	
 	microenvironment.diffusion_coefficients[ecm_substrate_index] = 1e-85;
 	microenvironment.decay_rates[ecm_substrate_index] = 0;
 	return; 
@@ -221,7 +225,7 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 
 void set_input_nodes(Cell* pCell) {
 int ind;
-
+	nodes = *(pCell->boolean_network.get_nodes());
 	// Oxygen input node O2; Oxygen or Oxy
 	ind = pCell->boolean_network.get_node_index( "Oxygen" );
 	if ( ind < 0 )
@@ -264,11 +268,11 @@ int ind;
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {
-	std::vector<bool>* nodes = pCell->boolean_network.get_nodes();
+	std::vector<bool>* point_to_nodes = pCell->boolean_network.get_nodes();
 	int bn_index;
 
 	bn_index = pCell->boolean_network.get_node_index( "Apoptosis" );
-	if ( bn_index != -1 && (*nodes)[bn_index] )
+	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
@@ -276,16 +280,16 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 	}
 
 	bn_index = pCell->boolean_network.get_node_index("Matrix_modif");
-	if ( bn_index != -1 && (*nodes)[bn_index] )
+	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
 	{
-		pCell->set_mmp( (*nodes)[bn_index] );
+		pCell->set_mmp( (*point_to_nodes)[bn_index] );
 		return;
 	}
 
 	bn_index = pCell->boolean_network.get_node_index("EMT");
-	if ( bn_index != -1 && (*nodes)[bn_index] )
+	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
 	{
-		pCell->set_mmp( (*nodes)[bn_index] );
+		pCell->set_mmp( (*point_to_nodes)[bn_index] );
 		return;
 	}
 

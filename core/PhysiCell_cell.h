@@ -257,7 +257,7 @@ class Cell : public Basic_Agent
 	/** \brief Get the current value of motility coefficient */
 	inline double get_motility_amplitude( double percent )
 	{ return current_value( motility_magnitude[0], motility_magnitude[1], percent ); };
-	virtual void add_cell_basement_membrane_interactions(double t, double dist);
+	void add_cell_basement_membrane_interactions(double t, double dist);
 	void set_phenotype( Phenotype& phenotype ); // no longer needed?
 	void update_radius();
 	Cell_Container * get_container();

@@ -156,7 +156,7 @@
 		<!-- example parameters from the template --> 
 		<ecm_file type="string" units="">ecm.txt</ecm_file>
 		<polarity_coefficient type="double" units="">0.5</polarity_coefficient>
-		<persistence type="double" units="">0.5</persistence>
+		<persistance type="double" units"">0.5</persistence>
     	<motility_amplitude_min type="double" units=""> 0.1 </motility_amplitude_min>
     	<motility_amplitude_max type="double" units=""> 0.5 </motility_amplitude_max>
     	<mode_motility type="int" units=""> 1 </mode_motility>

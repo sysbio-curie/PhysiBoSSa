@@ -317,4 +317,4 @@ void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt
 	return; 
 }
 
-};
+}
