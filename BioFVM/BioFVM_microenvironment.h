@@ -121,8 +121,6 @@ class Microenvironment
 	bool diffusion_solver_setup_done; 
 	
 	// on "resize density" type operations, need to extend all of these 
-	/** \brief List of voxels indexes to write to output files */
-	std::vector<int> toWrite;
 	/*
 	std::vector<int> dirichlet_indices; 
 	std::vector< std::vector<double> > dirichlet_value_vectors; 
@@ -241,8 +239,6 @@ class Microenvironment
 	void simulate_cell_sources_and_sinks( std::vector<Basic_Agent*>& basic_agent_list , double dt ); 
 	// use the global list of cells 
 	void simulate_cell_sources_and_sinks( double dt ); 
-	/** \brief Write microenvironment given density values of voxels in the indixes toWrite list if it's not (nearly) empty */
-	void write_density( std::ostream& os, int dens );
 	void display_information( std::ostream& os ); 
 	
 	void add_dirichlet_node( int voxel_index, std::vector<double>& value ); 

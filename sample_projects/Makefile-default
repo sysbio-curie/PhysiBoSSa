@@ -41,9 +41,7 @@ PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o Physi
 PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
-PhysiCell_pugixml.o PhysiCell_settings.o
-
-PhysiBoSS_module_OBJECTS :=  vector3d.o writeSVG.o 
+PhysiCell_pugixml.o PhysiCell_settings.o 
 
 # put your custom objects here (they should be in the custom_modules directory)
 
@@ -52,7 +50,7 @@ PhysiCell_custom_module_OBJECTS := .o
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSS_module_OBJECTS) 
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)  
 
 EXAMPLES := ./examples/PhysiCell_test_mechanics_1.cpp ./examples/PhysiCell_test_mechanics_2.cpp \
  ./examples/PhysiCell_test_DCIS.cpp ./examples/PhysiCell_test_HDS.cpp \
@@ -282,14 +280,6 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
 	
 # user-defined PhysiCell modules
-# PhysiBoSS modules from Gaelle's code:
-
-vector3d.o: /sample_projects/ECM_try/custom_modules/vector3d.cpp
-	$(COMPILE_COMMAND) -c /sample_projects/ECM_try/custom_modules/vector3d.cpp
-
-writeSVG.o: ./sample_projects/ECM_try/custom_modules/base/writeSVG.cpp
-	$(COMPILE_COMMAND) -c ./sample_projects/ECM_try/custom_modules/base/writeSVG.cpp
-
 
 # cleanup
 

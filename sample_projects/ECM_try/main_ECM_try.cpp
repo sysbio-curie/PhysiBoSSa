@@ -216,8 +216,6 @@ int main( int argc, char* argv[] )
 			/*
 			  Custom add-ons could potentially go here. 
 			*/
-			//int e = microenvironment.find_density_index("ecm");
-			//writeDensity(e, PhysiCell_globals.current_time);
 
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );

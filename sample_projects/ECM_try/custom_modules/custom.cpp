@@ -68,7 +68,7 @@
 #include "./custom.h"
 #include "../BioFVM/BioFVM.h"  
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
-
+#include "custom_cell.h"
 using namespace BioFVM;
 
 // declare cell definitions here 
@@ -109,7 +109,7 @@ void create_cell_types( void )
 
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
-	//microenvironment.add_density("ecm", "dimensionless");
+	microenvironment.add_density("ecm", "dimensionless");
 	
 	load_ecm_file();
 
@@ -119,6 +119,8 @@ void create_cell_types( void )
 	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 	int ecm_substrate_index = microenvironment.find_density_index("ecm");
+	std::cout << "oxygen index is: " << oxygen_substrate_index << std::endl;
+	std::cout << "ecm index is: " << ecm_substrate_index << std::endl;
 
 	// initially no necrosis 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
@@ -154,7 +156,7 @@ void setup_microenvironment( void )
 
 void setup_tissue( void )
 {
-	Cell* pC;
+	Custom_cell* pC;
 	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
 	MaBoSSNetwork* maboss;
 	std::string bnd_file = parameters.strings("bnd_file");
@@ -171,7 +173,7 @@ void setup_tissue( void )
 		int phase = cells[i].phase;
 		double elapsed_time = cells[i].elapsed_time;
 
-		pC = create_cell();
+		pC = create_custom_cell();
 		 
 		pC->assign_position( x, y, z );
 		// pC->set_total_volume(sphere_volume_from_radius(radius));
@@ -184,7 +186,7 @@ void setup_tissue( void )
 		//std::cout<< pC->position.size() << std::endl;
 		//std::cout<< pC->position << std::endl;
 	}
-	std::cout<<(*all_cells)[25]<<std::endl;
+	
 	std::cout << "tissue created" << std::endl;
 
 	return; 
