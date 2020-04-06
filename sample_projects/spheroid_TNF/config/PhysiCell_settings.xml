@@ -172,7 +172,7 @@
 		<time_remove_tnf type="int" units="min">8000</time_remove_tnf> <!-- 8000 -->
 		<time_add_tnf type="int" units="min">150</time_add_tnf> <!-- 150 -->
 
-		<tnf_threshold type="double" units="dimensionless">0.14</tnf_threshold> <!-- 2.8e-05 -->
+		<tnf_threshold type="double" units="dimensionless">0.25</tnf_threshold> <!-- 2.8e-05 -->
 		<concentration_tnf type="double" units="ng/mL"> 0.5 </concentration_tnf> <!-- 0.5 -->
 		<membrane_length type="int" units=""> 470 </membrane_length>
 	</user_parameters>

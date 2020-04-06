@@ -178,7 +178,6 @@ void update_custom_variables( Cell* pCell )
 	int tnf_maboss_index = pCell->boolean_network.get_node_index("TNF");
 	int fadd_maboss_index = pCell->boolean_network.get_node_index("FADD");
 	static int tnf_index = microenvironment.find_density_index( "tnf" ); 
-	static double tnf_threshold = parameters.doubles("tnf_threshold");
 
 	pCell->custom_data["tnf_concentration"] = pCell->phenotype.molecular.internalized_total_substrates[tnf_index];
 	pCell->custom_data["tnf_node"] = (*nodes)[tnf_maboss_index];
@@ -221,8 +220,6 @@ void setup_tissue( void )
 	return; 
 }
 
-
-
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 	// start with ki67 coloring 
@@ -242,11 +239,11 @@ void set_input_nodes(Cell* pCell) {
 			pCell->boolean_network.set_node_value("TNF", 1);
 		else
 		{
-			double rate = (tnf_threshold - tnf_cell_concentration) / tnf_threshold;
-			pCell->boolean_network.set_node_value("TNF", uniform_random() > rate);
+			pCell->boolean_network.set_node_value("TNF", 0);
 		}
 		
-	}}
+	}
+}
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {
