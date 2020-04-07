@@ -1,19 +1,28 @@
 #include "../BioFVM/BioFVM_agent_container.h"
-#include "PhysiCell_constants.h"
+#include "../core/PhysiCell_constants.h"
 #include "../BioFVM/BioFVM_vector.h"
-#include "PhysiCell_cell.h"
+#include "custom_cell.h"
 #include "custom_cell_container.h"
 using namespace BioFVM;
 using namespace PhysiCell;
+
+Custom_cell_container::Custom_cell_container(){
+
+all_custom_cells = (std::vector<Custom_cell*> *) &all_basic_agents;
+std::vector<Custom_cell*> custom_cells_ready_to_divide;
+std::vector<Custom_cell*> custom_cells_ready_to_die;
+
+};
+
 
 void Custom_cell_container::update_all_cells(double t, double phenotype_dt_ , double mechanics_dt_ , double diffusion_dt_ )
 {
 	// secretions and uptakes. Syncing with BioFVM is automated. 
 
 	#pragma omp parallel for 
-	for( int i=0; i < (*all_cells).size(); i++ )
+	for( int i=0; i < (*all_custom_cells).size(); i++ )
 	{
-		(*all_cells)[i]->phenotype.secretion.advance( (*all_cells)[i], (*all_cells)[i]->phenotype , diffusion_dt_ );
+		(*all_custom_cells)[i]->phenotype.secretion.advance( (*all_custom_cells)[i], (*all_custom_cells)[i]->phenotype , diffusion_dt_ );
 	}
 	
 	//if it is the time for running cell cycle, do it!
@@ -36,28 +45,28 @@ void Custom_cell_container::update_all_cells(double t, double phenotype_dt_ , do
 		// new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
 		// checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
 		#pragma omp parallel for 
-		for( int i=0; i < (*all_cells).size(); i++ )
+		for( int i=0; i < (*all_custom_cells).size(); i++ )
 		{
-			if( (*all_cells)[i]->is_out_of_domain == false )
+			if( (*all_custom_cells)[i]->is_out_of_domain == false )
 			{
-				(*all_cells)[i]->advance_bundled_phenotype_functions( time_since_last_cycle ); 
+				(*all_custom_cells)[i]->advance_bundled_phenotype_functions( time_since_last_cycle ); 
 			}
 		}
 		
 		// process divides / removes 
-		for( int i=0; i < cells_ready_to_divide.size(); i++ )
+		for( int i=0; i < custom_cells_ready_to_divide.size(); i++ )
 		{
-			cells_ready_to_divide[i]->divide();
+			custom_cells_ready_to_divide[i]->divide();
 		}
-		for( int i=0; i < cells_ready_to_die.size(); i++ )
+		for( int i=0; i < custom_cells_ready_to_die.size(); i++ )
 		{	
-			cells_ready_to_die[i]->die();	
+			custom_cells_ready_to_die[i]->die();	
 		}
-		num_divisions_in_current_step+=  cells_ready_to_divide.size();
-		num_deaths_in_current_step+=  cells_ready_to_die.size();
+		num_divisions_in_current_step+=  custom_cells_ready_to_divide.size();
+		num_deaths_in_current_step+=  custom_cells_ready_to_die.size();
 		
-		cells_ready_to_die.clear();
-		cells_ready_to_divide.clear();
+		custom_cells_ready_to_die.clear();
+		custom_cells_ready_to_divide.clear();
 		last_cell_cycle_time= t;
 	}
 		
@@ -79,57 +88,43 @@ void Custom_cell_container::update_all_cells(double t, double phenotype_dt_ , do
 		
 		// Compute velocities
 		#pragma omp parallel for 
-		for( int i=0; i < (*all_cells).size(); i++ )
+		for( int i=0; i < (*all_custom_cells).size(); i++ )
 		{
 
-			if(!(*all_cells)[i]->is_out_of_domain && (*all_cells)[i]->is_movable && (*all_cells)[i]->functions.update_velocity )
+			if(!(*all_custom_cells)[i]->is_out_of_domain && (*all_custom_cells)[i]->is_movable && (*all_custom_cells)[i]->functions.update_velocity )
 			{
 				// update_velocity already includes the motility update 
 				//(*all_cells)[i]->phenotype.motility.update_motility_vector( (*all_cells)[i] ,(*all_cells)[i]->phenotype , time_since_last_mechanics ); 
-				(*all_cells)[i]->functions.update_velocity( (*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
+				(*all_custom_cells)[i]->functions.update_velocity( (*all_custom_cells)[i], (*all_custom_cells)[i]->phenotype, time_since_last_mechanics);
 			}
 
-			if ( !(*all_cells)[i]->passive() )
-				((*all_cells)[i])->degrade_ecm( mechanics_dt_ );
+			if ( !(*all_custom_cells)[i]->passive() )
+				((*all_custom_cells)[i])->degrade_ecm( mechanics_dt_ );
 
-			if( (*all_cells)[i]->functions.custom_cell_rule )
+			if( (*all_custom_cells)[i]->functions.custom_cell_rule )
 			{
-				(*all_cells)[i]->functions.custom_cell_rule((*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
+				(*all_custom_cells)[i]->functions.custom_cell_rule((*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
 			}
 		}
 		// Calculate new positions
 		#pragma omp parallel for 
-		for( int i=0; i < (*all_cells).size(); i++ )
+		for( int i=0; i < (*all_custom_cells).size(); i++ )
 		{
-			if(!(*all_cells)[i]->is_out_of_domain && (*all_cells)[i]->is_movable)
+			if(!(*all_custom_cells)[i]->is_out_of_domain && (*all_custom_cells)[i]->is_movable)
 			{
-				(*all_cells)[i]->update_position(time_since_last_mechanics);
+				(*all_custom_cells)[i]->update_position(time_since_last_mechanics);
 			}
 		}
 		
 		// When somebody reviews this code, let's add proper braces for clarity!!! 
 		
 		// Update cell indices in the container
-		for( int i=0; i < (*all_cells).size(); i++ )
-			if(!(*all_cells)[i]->is_out_of_domain && (*all_cells)[i]->is_movable)
-				(*all_cells)[i]->update_voxel_in_container();
+		for( int i=0; i < (*all_custom_cells).size(); i++ )
+			if(!(*all_custom_cells)[i]->is_out_of_domain && (*all_custom_cells)[i]->is_movable)
+				(*all_custom_cells)[i]->update_voxel_in_container();
 		last_mechanics_time=t;
 	}
 	
 	initialzed=true;
 	return;
-}
-
-void Custom_cell_container::custom_flag_cell_for_division( Custom_cell* pCell )
-{ 
-	#pragma omp critical 
-	{cells_ready_to_divide.push_back( pCell );} 
-	return; 
-}
-
-void Custom_cell_container::custom_flag_cell_for_removal( Custom_cell* pCell )
-{ 
-	#pragma omp critical 
-	{cells_ready_to_die.push_back( pCell );} 
-	return; 
 }

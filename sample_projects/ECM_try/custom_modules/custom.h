@@ -70,7 +70,7 @@
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 #include "../core/PhysiCell_utilities.h"
-
+#include "custom_cell.h"
 
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
 
@@ -97,13 +97,13 @@ void setup_tissue( void );
 // set up the BioFVM microenvironment 
 void setup_microenvironment( void ); 
 // custom pathology coloring function 
-std::vector<std::string> my_coloring_function( Cell* );
+std::vector<std::string> my_coloring_function( Custom_cell* );
 
 // custom cell phenotype functions could go here 
-void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt );
+void tumor_cell_phenotype_with_signaling( Custom_cell* pCell, Phenotype& phenotype, double dt );
 /** \brief Write Density values to output file */
-void set_input_nodes(Cell* pCell); 
-void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt);
+void set_input_nodes(Custom_cell* pCell); 
+void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt);
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header);
 void load_ecm_file();
 

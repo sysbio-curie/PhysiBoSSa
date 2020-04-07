@@ -199,7 +199,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	return output; 
 }
 
-void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
+void tumor_cell_phenotype_with_signaling( Custom_cell* pCell, Phenotype& phenotype, double dt )
 {
 	static int o2_index = microenvironment.find_density_index( "oxygen" );
 	double o2 = pCell->nearest_density_vector()[o2_index];
@@ -225,7 +225,7 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 	}
 }
 
-void set_input_nodes(Cell* pCell) {
+void set_input_nodes(Custom_cell* pCell) {
 int ind;
 	nodes = *(pCell->boolean_network.get_nodes());
 	// Oxygen input node O2; Oxygen or Oxy
@@ -268,7 +268,7 @@ int ind;
 	/// example
 }
 
-void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
+void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 {
 	std::vector<bool>* point_to_nodes = pCell->boolean_network.get_nodes();
 	int bn_index;

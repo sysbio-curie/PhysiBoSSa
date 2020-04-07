@@ -1,3 +1,6 @@
+#ifndef __Custom_cell_h__
+#define __Custom_cell_h__
+
 /* custom class for simulation that use cells that interact with extra cellular matrix
 
 */
@@ -17,19 +20,16 @@ using namespace PhysiCell;
 
 class Custom_cell : public Cell
 {
-private: 
-
-Custom_cell_container * custom_container;
-int freezed;
+protected:
+	int freezed;
+	Custom_cell_container * custom_container;
 
 public:
 
-    Custom_cell();
 	Custom_cell_container * get_custom_container();
+    Custom_cell();
 	void advance_bundled_phenotype_functions( double dt_ ); 
-	void add_potentials(Custom_cell* other_agent);
-	void custom_flag_for_removal();
-	void custom_flag_for_division();
+	void add_potentials(Custom_cell* );
     inline bool passive() { return type == PhysiCell_constants::PASSIVE_TYPE; };
 	std::vector<double> motility;
 	double pintegrin;
@@ -67,7 +67,7 @@ public:
     double get_adhesion();
     bool necrotic_oxygen();
 	bool has_neighbor(int);
-	double adhesion(Cell* other_cell);
+	double adhesion(Custom_cell* other_cell);
 	double local_density(std::string field);
     /** \brief Return amount of contact with other cells */
 	inline double contact_cell()
@@ -117,3 +117,5 @@ void save_all_cells_to_matlab( std::string filename );
 
 //function to check if a neighbor voxel contains any cell that can interact with me
 bool is_neighbor_voxel(Cell* pCell, std::vector<double> myVoxelCenter, std::vector<double> otherVoxelCenter, int otherVoxelIndex);
+
+#endif

@@ -76,29 +76,16 @@ void Custom_cell::advance_bundled_phenotype_functions( double dt_ )
 	phenotype.cycle.advance_cycle( this, phenotype, dt_ ); 
 	if( phenotype.flagged_for_removal )
 	{
-		custom_flag_for_removal(); 
+		flag_for_removal(); 
 		phenotype.flagged_for_removal = false; 
 	}
 	if( phenotype.flagged_for_division )
 	{
-		custom_flag_for_division(); 
+		flag_for_division(); 
 		phenotype.flagged_for_division = false; 
 	}
 	
 	return; 
-}
-
-
-void Custom_cell::custom_flag_for_division( void )
-{
-	get_custom_container()->custom_flag_cell_for_division( this );
-	return; 
-}
-
-void Custom_cell::custom_flag_for_removal( void )
-{
-	get_custom_container()->custom_flag_cell_for_removal( this );
-	return;
 }
 
 
@@ -187,7 +174,7 @@ void Custom_cell::add_potentials(Custom_cell* other_agent)
 		if ( thisadh == 0 && otadh == 1 )
 		{
 			ecm_contact += (max_interactive_distance-distance);
-			adh = static_cast<Cell*>(other_agent)->integrinStrength();
+			adh = static_cast<Custom_cell*>(other_agent)->integrinStrength();
 		}
 		else
 		{
@@ -195,7 +182,7 @@ void Custom_cell::add_potentials(Custom_cell* other_agent)
 			if ( thisadh == 1 && otadh == 0 )
 			{
 				ecm_contact += (max_interactive_distance-distance);
-				adh = static_cast<Cell*>(this)->integrinStrength();
+				adh = static_cast<Custom_cell*>(this)->integrinStrength();
 			}
 			else
 			{
@@ -208,7 +195,7 @@ void Custom_cell::add_potentials(Custom_cell* other_agent)
 				else
 				{
 					cell_contact += (max_interactive_distance-distance);
-					adh = ( static_cast<Cell*>(this) )->adhesion( static_cast<Cell*>(other_agent) );
+					adh = ( static_cast<Custom_cell*>(this) )->adhesion( static_cast<Custom_cell*>(other_agent) );
 				}
 			}
 		}
@@ -303,7 +290,7 @@ double Custom_cell::integrinStrength()
 { 
 	Cecm[0] = PhysiCell::parameters.ints("ecm_adhesion_min");
 	Cecm[1] = PhysiCell::parameters.ints("ecm_adhesion_min");
-	return Cell::get_integrin_strength( pintegrin ); 
+	return Custom_cell::get_integrin_strength( pintegrin ); 
 }
 
 
@@ -425,7 +412,7 @@ double Custom_cell::get_adhesion()
 }
 
 /* Calculate adhesion coefficient with other cell */
-double Custom_cell::adhesion( Cell* other_cell )
+double Custom_cell::adhesion( Custom_cell* other_cell )
 {
 	Ccca_heterotypic[0] = PhysiCell::parameters.doubles("heterotypic_adhesion_min");
 	Ccca_heterotypic[1] = PhysiCell::parameters.doubles("heterotypic_adhesion_max");
@@ -557,7 +544,7 @@ void Custom_cell::update_velocity( double dt, double l, std::string shape )
 
 
 	//First check the neighbors in my current voxel
-	for( Custom_cell * neighbor : get_custom_container()->agent_grid[get_current_mechanics_voxel_index()] )
+	for( Custom_cell * neighbor : get_custom_container()->custom_agent_grid[get_current_mechanics_voxel_index()] )
 	{
 		add_potentials( neighbor );
 	}
@@ -572,7 +559,7 @@ void Custom_cell::update_velocity( double dt, double l, std::string shape )
 			continue;
 		if ( ecm_index >= 0 )
 			add_ecm_interaction( ecm_index, neighbor_voxel_index );
-		for( Custom_cell * other_neighbor : get_custom_container()->agent_grid[neighbor_voxel_index] )
+		for( Custom_cell * other_neighbor : get_custom_container()->custom_agent_grid[neighbor_voxel_index] )
 		{
 			add_potentials( other_neighbor );
 		}
@@ -633,7 +620,7 @@ void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 			temp_a *= temp_a; 
 			/* \todo change dens with a maximal density ratio ? */
 			ecm_contact += dens * (max_interactive_distance-distance);
-			temp_a *= dens * ( static_cast<Cell*>(this) )->integrinStrength();
+			temp_a *= dens * ( static_cast<Custom_cell*>(this) )->integrinStrength();
 			tmp_r -= temp_a;
 		}
 		
@@ -645,4 +632,5 @@ void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 		velocity += tmp_r * displacement;
 	}
 }
+
 

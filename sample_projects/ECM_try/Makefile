@@ -67,7 +67,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 PhysiBoSSa_OBJECTS := utils.o maboss_network.o boolean_network.o
 
-PhysiCell_custom_module_OBJECTS := custom.o custom_cell.o 
+PhysiCell_custom_module_OBJECTS := custom.o custom_cell.o custom_cell_container.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -177,6 +177,9 @@ custom.o: ./custom_modules/custom.cpp
 
 custom_cell.o: ./custom_modules/custom_cell.cpp
 	$(COMPILE_COMMAND) $(INC)  -c ./custom_modules/custom_cell.cpp
+
+custom_cell_container.o: ./custom_modules/custom_cell_container.cpp
+	$(COMPILE_COMMAND) $(INC)  -c ./custom_modules/custom_cell_container.cpp
 
 
 # cleanup
