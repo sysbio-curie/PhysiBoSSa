@@ -6,14 +6,25 @@
 using namespace BioFVM;
 using namespace PhysiCell;
 
-Custom_cell_container::Custom_cell_container(){
+Custom_cell_container::Custom_cell_container()
+{
 
-all_custom_cells = (std::vector<Custom_cell*> *) &all_basic_agents;
-std::vector<Custom_cell*> custom_cells_ready_to_divide;
-std::vector<Custom_cell*> custom_cells_ready_to_die;
+all_custom_cells = (std::vector<Custom_cell*> *) &all_cells;
+custom_cells_ready_to_divide = (std::vector<Custom_cell*> *) &cells_ready_to_divide;
+custom_cells_ready_to_die= (std::vector<Custom_cell*> *) &cells_ready_to_die;
+
+return;
 
 };
 
+void Custom_cell_container::update_all_cells(double t)
+{
+	// update_all_cells(t, dt_settings.cell_cycle_dt_default, dt_settings.mechanics_dt_default);
+	
+	update_all_cells(t, phenotype_dt, mechanics_dt , diffusion_dt );
+	
+	return; 
+}
 
 void Custom_cell_container::update_all_cells(double t, double phenotype_dt_ , double mechanics_dt_ , double diffusion_dt_ )
 {
@@ -54,19 +65,19 @@ void Custom_cell_container::update_all_cells(double t, double phenotype_dt_ , do
 		}
 		
 		// process divides / removes 
-		for( int i=0; i < custom_cells_ready_to_divide.size(); i++ )
+		for( int i=0; i < (*custom_cells_ready_to_divide).size(); i++ )
 		{
-			custom_cells_ready_to_divide[i]->divide();
+			(*custom_cells_ready_to_divide)[i]->divide();
 		}
-		for( int i=0; i < custom_cells_ready_to_die.size(); i++ )
+		for( int i=0; i < (*custom_cells_ready_to_die).size(); i++ )
 		{	
-			custom_cells_ready_to_die[i]->die();	
+			(*custom_cells_ready_to_die)[i]->die();	
 		}
-		num_divisions_in_current_step+=  custom_cells_ready_to_divide.size();
-		num_deaths_in_current_step+=  custom_cells_ready_to_die.size();
+		num_divisions_in_current_step+=  (*custom_cells_ready_to_divide).size();
+		num_deaths_in_current_step+=  (*custom_cells_ready_to_die).size();
 		
-		custom_cells_ready_to_die.clear();
-		custom_cells_ready_to_divide.clear();
+		(*custom_cells_ready_to_die).clear();
+		(*custom_cells_ready_to_divide).clear();
 		last_cell_cycle_time= t;
 	}
 		

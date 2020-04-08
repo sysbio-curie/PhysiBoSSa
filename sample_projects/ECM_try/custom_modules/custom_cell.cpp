@@ -212,7 +212,7 @@ void Custom_cell::add_potentials(Custom_cell* other_agent)
 	
 	return;
 }
-
+/*
 Custom_cell* create_custom_cell( void )
 {
 	Custom_cell* pNew; 
@@ -256,7 +256,7 @@ Custom_cell* create_custom_cell( Cell_Definition& cd )
 	
 	return pNew; 
 }
-
+*/
 
 
 /* Degrade the surrounding ECM 
@@ -544,9 +544,9 @@ void Custom_cell::update_velocity( double dt, double l, std::string shape )
 
 
 	//First check the neighbors in my current voxel
-	for( Custom_cell * neighbor : get_custom_container()->custom_agent_grid[get_current_mechanics_voxel_index()] )
+	for( auto neighbor : get_container()->agent_grid[get_current_mechanics_voxel_index()] )
 	{
-		add_potentials( neighbor );
+		add_potentials( (Custom_cell*) neighbor );
 	}
 	
 	int ecm_index = BioFVM::microenvironment.find_density_index("ecm");
@@ -559,9 +559,9 @@ void Custom_cell::update_velocity( double dt, double l, std::string shape )
 			continue;
 		if ( ecm_index >= 0 )
 			add_ecm_interaction( ecm_index, neighbor_voxel_index );
-		for( Custom_cell * other_neighbor : get_custom_container()->custom_agent_grid[neighbor_voxel_index] )
+		for( auto other_neighbor : get_container()->agent_grid[neighbor_voxel_index] )
 		{
-			add_potentials( other_neighbor );
+			add_potentials( (Custom_cell*) other_neighbor );
 		}
 	}
 

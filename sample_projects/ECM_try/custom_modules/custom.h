@@ -97,10 +97,10 @@ void setup_tissue( void );
 // set up the BioFVM microenvironment 
 void setup_microenvironment( void ); 
 // custom pathology coloring function 
-std::vector<std::string> my_coloring_function( Custom_cell* );
+std::vector<std::string> my_coloring_function( Cell* );
 
 // custom cell phenotype functions could go here 
-void tumor_cell_phenotype_with_signaling( Custom_cell* pCell, Phenotype& phenotype, double dt );
+void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt );
 /** \brief Write Density values to output file */
 void set_input_nodes(Custom_cell* pCell); 
 void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt);

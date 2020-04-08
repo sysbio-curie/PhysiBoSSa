@@ -106,7 +106,7 @@ public:
 	 * @param index_voxel index of the current ECM voxel  */
 	void add_ecm_interaction( int index_ecm, int index_voxel );
 };
-
+/*
 Custom_cell* create_custom_cell( void );  
 Custom_cell* create_custom_cell( Cell_Definition& cd );  
 
@@ -117,5 +117,5 @@ void save_all_cells_to_matlab( std::string filename );
 
 //function to check if a neighbor voxel contains any cell that can interact with me
 bool is_neighbor_voxel(Cell* pCell, std::vector<double> myVoxelCenter, std::vector<double> otherVoxelCenter, int otherVoxelIndex);
-
+*/
 #endif

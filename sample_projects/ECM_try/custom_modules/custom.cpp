@@ -156,7 +156,7 @@ void setup_microenvironment( void )
 
 void setup_tissue( void )
 {
-	Custom_cell* pC;
+	Cell* pC;
 	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
 	MaBoSSNetwork* maboss;
 	std::string bnd_file = parameters.strings("bnd_file");
@@ -173,7 +173,7 @@ void setup_tissue( void )
 		int phase = cells[i].phase;
 		double elapsed_time = cells[i].elapsed_time;
 
-		pC = create_custom_cell();
+		pC = create_cell();
 		 
 		pC->assign_position( x, y, z );
 		// pC->set_total_volume(sphere_volume_from_radius(radius));
@@ -195,11 +195,11 @@ void setup_tissue( void )
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 	// start with live dead coloring 
-	std::vector<std::string> output = false_cell_coloring_live_dead(pCell); 
+	std::vector<std::string> output = false_cell_coloring_live_dead((Custom_cell*)pCell); 
 	return output; 
 }
 
-void tumor_cell_phenotype_with_signaling( Custom_cell* pCell, Phenotype& phenotype, double dt )
+void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	static int o2_index = microenvironment.find_density_index( "oxygen" );
 	double o2 = pCell->nearest_density_vector()[o2_index];
@@ -214,14 +214,14 @@ void tumor_cell_phenotype_with_signaling( Custom_cell* pCell, Phenotype& phenoty
 
 	if (PhysiCell_globals.current_time >= pCell->custom_data["next_physibossa_run"])
 	{
-		set_input_nodes(pCell);
+		set_input_nodes((Custom_cell*) pCell);
 
 		pCell->boolean_network.run_maboss();
 		// Get noisy step size
 		double next_run_in = pCell->boolean_network.get_time_to_update();
 		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
 		
-		from_nodes_to_cell(pCell, phenotype, dt);
+		from_nodes_to_cell((Custom_cell*)pCell, phenotype, dt);
 	}
 }
 
