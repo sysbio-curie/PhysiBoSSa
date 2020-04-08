@@ -25,4 +25,5 @@ public:
 };
 
 extern std::vector<Custom_cell*> *all_custom_cells;
+Custom_cell_container* create_custom_cell_container_for_microenvironment( BioFVM::Microenvironment& m , double mechanics_voxel_size );
 #endif

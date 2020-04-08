@@ -19,6 +19,23 @@ return;
 
 };
 
+
+Custom_cell_container* create_custom_cell_container_for_microenvironment( BioFVM::Microenvironment& m , double mechanics_voxel_size )
+{
+	Custom_cell_container* custom_cell_container = new Custom_cell_container;
+	custom_cell_container->initialize( m.mesh.bounding_box[0], m.mesh.bounding_box[3], 
+		m.mesh.bounding_box[1], m.mesh.bounding_box[4], 
+		m.mesh.bounding_box[2], m.mesh.bounding_box[5],  mechanics_voxel_size );
+	m.agent_container = (Agent_Container*) custom_cell_container; 
+	
+	if( BioFVM::get_default_microenvironment() == NULL )
+	{ 
+		BioFVM::set_default_microenvironment( &m ); 
+	}
+	
+	return custom_cell_container; 
+}
+
 void Custom_cell_container::update_all_cells(double t)
 {
 	// update_all_cells(t, dt_settings.cell_cycle_dt_default, dt_settings.mechanics_dt_default);
