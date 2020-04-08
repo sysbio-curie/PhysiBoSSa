@@ -6,6 +6,8 @@
 using namespace BioFVM;
 using namespace PhysiCell;
 
+std::vector<Custom_cell*> *all_custom_cells;
+
 Custom_cell_container::Custom_cell_container()
 {
 
