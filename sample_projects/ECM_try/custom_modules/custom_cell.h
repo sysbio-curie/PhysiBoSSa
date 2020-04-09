@@ -62,7 +62,7 @@ public:
 	* */
 	void set_3D_polarized_motility( double dt );
 	void set_motility(double );
-
+	//std::vector<double> displacement;
 	void freezer( int frozen );
     double get_adhesion();
     bool necrotic_oxygen();

@@ -322,7 +322,7 @@ Cell::Cell()
 	
 	is_movable = true;
 	is_out_of_domain = false;
-	///displacement.resize(3, 0.0); // state? 
+	displacement.resize(3, 0.0); // state? 
 	
 	assign_orientation();
 	container = NULL;

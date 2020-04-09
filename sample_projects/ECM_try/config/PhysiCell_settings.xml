@@ -194,6 +194,8 @@
 		<cfg_file type="string" units="">./config/boolean_network/bn_conf.cfg</cfg_file>
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
 		<x_threshold type="double" units="dimensionless">1.</x_threshold>
+		<membrane_shape type="string" units=""> sheet </membrane_shape>	
+		<membrane_length type="double" units=""> 10 </membrane_length>
 	</user_parameters>
 	
 	

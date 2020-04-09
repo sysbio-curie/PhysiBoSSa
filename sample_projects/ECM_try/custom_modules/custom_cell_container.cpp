@@ -11,10 +11,11 @@ std::vector<Custom_cell*> *all_custom_cells;
 Custom_cell_container::Custom_cell_container()
 {
 
-all_custom_cells = (std::vector<Custom_cell*> *) &all_cells;
+all_custom_cells = (std::vector<Custom_cell*> *) all_cells;
 custom_cells_ready_to_divide = (std::vector<Custom_cell*> *) &cells_ready_to_divide;
 custom_cells_ready_to_die= (std::vector<Custom_cell*> *) &cells_ready_to_die;
-
+membrane_length = 0;
+membrane_shape = "none";
 return;
 
 };
@@ -125,7 +126,7 @@ void Custom_cell_container::update_all_cells(double t, double phenotype_dt_ , do
 			{
 				// update_velocity already includes the motility update 
 				//(*all_cells)[i]->phenotype.motility.update_motility_vector( (*all_cells)[i] ,(*all_cells)[i]->phenotype , time_since_last_mechanics ); 
-				(*all_custom_cells)[i]->functions.update_velocity( (*all_custom_cells)[i], (*all_custom_cells)[i]->phenotype, time_since_last_mechanics);
+				(*all_custom_cells)[i]->update_velocity(time_since_last_mechanics, PhysiCell::parameters.doubles("membrane_length"), PhysiCell::parameters.strings("membrane_shape"));
 			}
 
 			if ( !(*all_custom_cells)[i]->passive() )
@@ -158,3 +159,4 @@ void Custom_cell_container::update_all_cells(double t, double phenotype_dt_ , do
 	initialzed=true;
 	return;
 }
+
