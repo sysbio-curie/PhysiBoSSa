@@ -581,7 +581,7 @@ void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 	if ( dens > PhysiCell::EPSILON )
 	{
 		// Distance between agent center and ECM voxel center
-		displacement = position - get_microenvironment()->get_voxel_center(index_voxel);
+		displacement = position - (get_container()->underlying_mesh.voxels[index_voxel].center);
 		double distance = norm(displacement);
 		// Make sure that the distance is not zero
 		distance = std::max(distance, PhysiCell::EPSILON);
