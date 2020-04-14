@@ -74,15 +74,15 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-500</x_min>
-		<x_max>500</x_max>
-		<y_min>-500</y_min>
-		<y_max>500</y_max>
-		<z_min>-500</z_min>
-		<z_max>500</z_max>
-		<dx>20</dx>
-		<dy>20</dy>
-		<dz>20</dz>
+		<x_min>-400</x_min>
+		<x_max>400</x_max>
+		<y_min>-400</y_min>
+		<y_max>400</y_max>
+		<z_min>-20</z_min>
+		<z_max>20</z_max>
+		<dx>10</dx>
+		<dy>10</dy>
+		<dz>10</dz>
 		<use_2D>false</use_2D>
 	</domain>
 	
@@ -193,7 +193,10 @@
 		<bnd_file type="string" units="">./config/boolean_network/bn_nodes.bnd</bnd_file>
 		<cfg_file type="string" units="">./config/boolean_network/bn_conf.cfg</cfg_file>
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
+		<init_ecm_filename type="string" units="">./config/ecm.txt</init_ecm_filename>
 		<x_threshold type="double" units="dimensionless">1.</x_threshold>
+		<membrane_shape type="string" units=""> sheet </membrane_shape>	
+		<membrane_length type="double" units=""> 10 </membrane_length>
 	</user_parameters>
 	
 	

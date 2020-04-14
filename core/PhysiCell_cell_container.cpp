@@ -313,6 +313,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		// end of new in Feb 2018 		
 		
 		// Compute velocities
+		std::ofstream outfile ("verify_output2.txt");
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
@@ -321,7 +322,8 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			{
 				// update_velocity already includes the motility update 
 				//(*all_cells)[i]->phenotype.motility.update_motility_vector( (*all_cells)[i] ,(*all_cells)[i]->phenotype , time_since_last_mechanics ); 
-				(*all_cells)[i]->functions.update_velocity( (*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
+				(*all_cells)[i]->update_velocity( time_since_last_mechanics, PhysiCell::parameters.doubles("membrane_length"), PhysiCell::parameters.strings("membrane_shape"));
+				outfile << "voxel_index: " << (*all_cells)[i]->get_current_mechanics_voxel_index() << std::endl;
 			}
 
 			if ( !(*all_cells)[i]->passive() )
@@ -332,6 +334,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 				(*all_cells)[i]->functions.custom_cell_rule((*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
 			}
 		}
+		outfile.close();
 		// Calculate new positions
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
