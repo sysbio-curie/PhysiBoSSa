@@ -330,6 +330,8 @@ Cell::Cell()
 	pmotility = 0.5;
 	padhesion = 0.5;
 	mmped = 0;
+	motility.resize(3, 0.0);
+	
 	return; 
 }
 
@@ -1175,10 +1177,12 @@ void Cell::set_3D_polarized_motility( double dt )
 	motility[2] = cos( temp_phi );
 	motility *= (1 - PhysiCell::parameters.doubles("polarity_coefficient"));
 	std::vector<double> polarization;
+	polarization.resize(3, 0.0);
 	polarization[0]= state.orientation[0];
 	polarization[1]= state.orientation[1];
 	polarization[2]= state.orientation[2];
 	std::vector<double> pol_dir;
+	pol_dir.resize(3, 0.0);
 	double pol_norm = norm(polarization); //normal to polaization used to calculate the vestor direction for polarization
 	pol_dir[0] = polarization[0]/pol_norm;
 	pol_dir[1] = polarization[1]/pol_norm;
@@ -1361,7 +1365,6 @@ void Cell::update_velocity( double dt, double l, std::string shape )
 	if ( dist > 0 )
 		add_cell_basement_membrane_interactions(dt, dist);
 
-
 	//First check the neighbors in my current voxel
 	for( auto neighbor : container->agent_grid[get_current_mechanics_voxel_index()] )
 	{
@@ -1376,14 +1379,16 @@ void Cell::update_velocity( double dt, double l, std::string shape )
 	{
 		if ( !is_neighbor_voxel(this, (container->underlying_mesh.voxels[get_current_mechanics_voxel_index()].center), (container->underlying_mesh.voxels[neighbor_voxel_index].center), neighbor_voxel_index) )
 			continue;
-		if ( ecm_index >= 0 )
+		if ( ecm_index >= 0 ){
 			add_ecm_interaction( ecm_index, neighbor_voxel_index );
+			
+		}
 		for( auto other_neighbor : container->agent_grid[neighbor_voxel_index] )
 		{
 			add_potentials( other_neighbor );
 		}
 	}
-
+	
 	// Add active motility term
 	if ( !passive() )
 		set_motility(dt);
@@ -1394,13 +1399,15 @@ void Cell::update_velocity( double dt, double l, std::string shape )
 void Cell::add_ecm_interaction( int index_ecm, int index_voxel )
 {
 	// Check if there is ECM material in given voxel
+	double dens2 = get_microenvironment()->density_vector(index_voxel)[index_ecm];
 	double dens = get_microenvironment()->nearest_density_vector(index_voxel)[index_ecm];
+	if (dens > PhysiCell::EPSILON || dens2 > PhysiCell::EPSILON) { std::cout << dens << "    " << dens2 << std::endl;};
 	// if voxel is "full", density is 1
 	dens = std::min( dens, 1.0 ); 
 	if ( dens > PhysiCell::EPSILON )
 	{
 		// Distance between agent center and ECM voxel center
-		displacement = position - get_microenvironment()->get_voxel_center(index_voxel);
+		displacement = position - get_container()->underlying_mesh.voxels[index_voxel].center;
 		double distance = norm(displacement);
 		// Make sure that the distance is not zero
 		distance = std::max(distance, PhysiCell::EPSILON);

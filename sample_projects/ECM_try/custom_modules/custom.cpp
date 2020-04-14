@@ -109,7 +109,7 @@ void create_cell_types( void )
 
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
-	//microenvironment.add_density("ecm", "dimensionless");
+	std::cout << microenvironment.find_density_index("ecm");
 	
 	load_ecm_file();
 
@@ -119,6 +119,7 @@ void create_cell_types( void )
 	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
 	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
 	int ecm_substrate_index = microenvironment.find_density_index("ecm");
+
 
 	// initially no necrosis 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
@@ -301,9 +302,10 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 void load_ecm_file()
 {
 	// strip( &ecm_file );
-	std::cout << "Loading ECM file " << parameters.strings("ecm_file") << std::endl;
+	std::cout << "Loading ECM file " << parameters.strings("init_ecm_filename") << std::endl;
 	std::ifstream infile;
-	infile.open( parameters.strings("ecm_file") );
+	infile.open( parameters.strings("init_ecm_filename") );
+	std::ofstream outfile ("verify_output.txt");
 	std::string array[4];
 	int i = 0;
 	std::string line;
@@ -322,13 +324,17 @@ void load_ecm_file()
 		double y = std::stod(array[1]);
 		double z = std::stod(array[2]);
 		double amount = std::stod(array[3]);
-		std::vector<double> pos;
+		std::vector<double> pos(3);
 		pos[0] = x;
 		pos[1] = y;
 		pos[2] = z;
 		int voxel_index = microenvironment.nearest_voxel_index( pos );
-		microenvironment.density_vector(voxel_index)[microenvironment.find_density_index("ecm")] += amount; 	
+		microenvironment.density_vector(voxel_index)[microenvironment.find_density_index("ecm")] += amount; 
+		
+		outfile << "voxel_index: " << voxel_index << "   " << "ecm_index: " << microenvironment.find_density_index("ecm") << "   " << "amount_of_density: " << microenvironment.density_vector(voxel_index)[microenvironment.find_density_index("ecm")] << std::endl;
+		
 	}
+	outfile.close();
 	infile.close();
 	std::cout << "File loaded !" << std::endl;
 
