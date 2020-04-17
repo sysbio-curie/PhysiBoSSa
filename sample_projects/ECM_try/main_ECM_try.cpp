@@ -211,13 +211,15 @@ int main( int argc, char* argv[] )
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
+			int e = microenvironment.find_density_index("ecm");
+			if (e > 0)
+				writeDensity(e, PhysiCell_globals.current_time);
 			}
 
 			/*
 			  Custom add-ons could potentially go here. 
 			*/
-			//int e = microenvironment.find_density_index("ecm");
-			//writeDensity(e, PhysiCell_globals.current_time);
+
 
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );

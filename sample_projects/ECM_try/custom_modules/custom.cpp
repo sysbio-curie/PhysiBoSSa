@@ -135,6 +135,7 @@ void create_cell_types( void )
 	
 	microenvironment.diffusion_coefficients[ecm_substrate_index] = 1e-85;
 	microenvironment.decay_rates[ecm_substrate_index] = 0;
+	microenvironment.list_indexes(0.5);
 	return; 
 }
 

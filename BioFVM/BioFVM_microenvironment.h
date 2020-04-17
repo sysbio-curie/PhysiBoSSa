@@ -52,6 +52,7 @@
 #include "BioFVM_mesh.h"
 #include "BioFVM_agent_container.h"
 #include "BioFVM_MultiCellDS.h"
+#include "../core/PhysiCell_utilities.h"
 
 
 namespace BioFVM{
@@ -241,6 +242,7 @@ class Microenvironment
 	void simulate_cell_sources_and_sinks( std::vector<Basic_Agent*>& basic_agent_list , double dt ); 
 	// use the global list of cells 
 	void simulate_cell_sources_and_sinks( double dt ); 
+	void list_indexes( double ratio );
 	/** \brief Write microenvironment given density values of voxels in the indixes toWrite list if it's not (nearly) empty */
 	void write_density( std::ostream& os, int dens );
 	void display_information( std::ostream& os ); 
