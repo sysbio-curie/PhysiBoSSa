@@ -2,6 +2,7 @@
 
 using namespace PhysiCell;
 
+
 std::string conc_names[2] = {"oxygen", "ecm"};
 
 void writeDensity( int index, double t )
@@ -14,4 +15,3 @@ void writeDensity( int index, double t )
 	microenvironment.write_density( outecm_file, index );
 	outecm_file.close();
 }
-
