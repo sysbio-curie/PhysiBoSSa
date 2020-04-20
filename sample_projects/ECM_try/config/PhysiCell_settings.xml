@@ -154,7 +154,6 @@
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 
-		<ecm_file type="string" units="">ecm.txt</ecm_file>
 		<polarity_coefficient type="double" units="">0.5</polarity_coefficient>
 		<persistence type="double" units="">0.5</persistence>
     	<motility_amplitude_min type="double" units=""> 0.1 </motility_amplitude_min>
@@ -176,7 +175,7 @@
 		<cell_cell_repulsion type="int" units=""> 10 </cell_cell_repulsion>
 		<oxygen_necrotic type="int" units=""> 4 </oxygen_necrotic>
 		<oxygen_critical type="int" units=""> 3 </oxygen_critical>
-		<oxygen_no_proliferation type="doubel" units=""> 6.5 </oxygen_no_proliferation>
+		<oxygen_no_proliferation type="double" units=""> 6.5 </oxygen_no_proliferation>
 		<oxygen_hypoxic type="int" units=""> 15 </oxygen_hypoxic>
 		<oxygen_reference type="double" units=""> 0.7 </oxygen_reference>
 		<oxygen_saturation type="int" units=""> 38 </oxygen_saturation>
