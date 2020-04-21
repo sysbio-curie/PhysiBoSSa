@@ -431,6 +431,7 @@ Cell* Cell::divide( )
 		std::cout<<"************ERROR********************"<<std::endl;
 	}
 	normalize( &rand_vec ); 
+	std::cout << "Rand vec for new child position : " << rand_vec << std::endl;
 	// rand_vec/= norm(rand_vec);
 	child->assign_position(position[0] + 0.5 * radius*rand_vec[0],
 						 position[1] + 0.5 * radius*rand_vec[1],
