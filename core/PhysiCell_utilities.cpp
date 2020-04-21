@@ -80,6 +80,7 @@ std::mt19937 gen(rd());
 
 long SeedRandom( long input )
 {
+	std::cout << "Setting seed with input : " << input << std::endl;
 	gen.seed(input);
 	return input;
 }
@@ -87,6 +88,7 @@ long SeedRandom( long input )
 
 long SeedRandom( void )
 { 
+	std::cout << "Settings seed with time" << std::endl;
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	gen.seed(seed);
 	return seed;
