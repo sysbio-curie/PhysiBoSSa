@@ -94,9 +94,7 @@ long SeedRandom( void )
 
 double UniformRandom()
 {
-	double t_rand = std::generate_canonical<double, 10>(gen);
-	std::cout << "Random number : " << t_rand << std::endl;
-	return t_rand;
+	return std::generate_canonical<double, 10>(gen);
 }
 
 double NormalRandom( double mean, double standard_deviation )
