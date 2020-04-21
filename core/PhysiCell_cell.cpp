@@ -292,6 +292,7 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	}
 	if( phenotype.flagged_for_division )
 	{
+		std::cout << "Cell " << this << " flagged for division" << std::endl;
 		flag_for_division(); 
 		phenotype.flagged_for_division = false; 
 	}
