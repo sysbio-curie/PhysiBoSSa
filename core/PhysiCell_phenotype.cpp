@@ -310,9 +310,11 @@ void Cycle_Model::advance_model( Cell* pCell, Phenotype& phenotype, double dt )
 			else
 			{
 				double prob = phenotype.cycle.data.transition_rates[i][k]*dt; 
-				if( UniformRandom() <= prob )
+				double rand = UniformRandom();
+				if( rand <= prob )
 				{
 					continue_transition = true; 
+					std::cout << "We continue transition cause lucky (" << rand << ")" << std::endl;
 				}
 			}
 			
