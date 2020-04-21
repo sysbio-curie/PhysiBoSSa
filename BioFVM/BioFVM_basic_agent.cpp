@@ -139,6 +139,9 @@ void Basic_Agent::set_internal_uptake_constants( double dt )
 	}
 */
 	
+	if (current_voxel_index == -1) {
+		std::cout << "Code is going to crash, current_voxel_index == -1" << std::endl;
+	}
 	double internal_constant_to_discretize_the_delta_approximation = dt * volume / ( (microenvironment->voxels(current_voxel_index)).volume ) ; // needs a fix 
 	
 	// temp1 = dt*(V_cell/V_voxel)*S*T 
