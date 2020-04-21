@@ -292,7 +292,6 @@ void Cell::advance_bundled_phenotype_functions( double dt_ )
 	}
 	if( phenotype.flagged_for_division )
 	{
-		std::cout << "Cell " << this << " flagged for division" << std::endl;
 		flag_for_division(); 
 		phenotype.flagged_for_division = false; 
 	}
@@ -432,7 +431,7 @@ Cell* Cell::divide( )
 		std::cout<<"************ERROR********************"<<std::endl;
 	}
 	normalize( &rand_vec ); 
-	std::cout << "Rand vec for new child position : " << rand_vec << std::endl;
+	// std::cout << "Rand vec for new child position : " << rand_vec << std::endl;
 	// rand_vec/= norm(rand_vec);
 	child->assign_position(position[0] + 0.5 * radius*rand_vec[0],
 						 position[1] + 0.5 * radius*rand_vec[1],
@@ -448,7 +447,7 @@ Cell* Cell::divide( )
 	//If this cell has been moved outside of the boundaries, mark it as such.
 	//(If the child cell is outside of the boundaries, that has been taken care of in the assign_position function.)
 	if( !get_container()->underlying_mesh.is_position_valid(position[0], position[1], position[2])){
-		std::cout << "Inactivating a cell in divide" << std::endl;
+		std::cout << std::endl << "Inactivating a cell in divide" << std::endl << std::endl;
 		is_out_of_domain = true;
 		is_active = false;
 		is_movable = false;
@@ -496,7 +495,7 @@ bool Cell::assign_position(double x, double y, double z)
 	
 	if( !get_container()->underlying_mesh.is_position_valid(x,y,z) )
 	{	
-		std::cout << "Inactivating a cell in assign_position" << std::endl;
+		std::cout << std::endl << "Inactivating a cell in assign_position" << std::endl << std::endl;
 		is_out_of_domain = true; 
 		is_active = false; 
 		is_movable = false; 
@@ -551,7 +550,7 @@ double& Cell::get_total_volume(void)
 
 void Cell::turn_off_reactions(double dt)
 {	
-	std::cout << "Inactivating a cell in turn_off_reactions" << std::endl;
+	std::cout << std::endl << "Inactivating a cell in turn_off_reactions" << std::endl << std::endl;
 	is_active = false;  
 	
 	for(int i=0;i< phenotype.secretion.uptake_rates.size();i++)
@@ -624,7 +623,7 @@ void Cell::update_position( double dt )
 	}
 	else
 	{
-		std::cout << "Inactivating a cell in update_position" << std::endl;
+		std::cout << std::endl << "Inactivating a cell in update_position" << std::endl << std::endl;
 		updated_current_mechanics_voxel_index=-1;
 		
 		is_out_of_domain = true; 

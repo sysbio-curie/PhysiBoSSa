@@ -314,7 +314,6 @@ void Cycle_Model::advance_model( Cell* pCell, Phenotype& phenotype, double dt )
 				if( rand <= prob )
 				{
 					continue_transition = true; 
-					std::cout << "We continue transition cause lucky (" << rand << ")" << std::endl;
 				}
 			}
 			
