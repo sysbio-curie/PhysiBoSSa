@@ -78,18 +78,6 @@ public:
 	void set_motility(double );
     void freezer( int frozen );
 
-    /** \brief Calculate agent distance to BM if defined */
-	double distance_to_membrane( double l, std::string shape);
-	/** \brief Distance of agent to BA for duct geometry */
-	double distance_to_membrane_duct( double l);
-	/** \brief Distance of agent to BA for sphere geometry */
-	double distance_to_membrane_sphere( double l);
-	/** \brief Distance to membrane Sheet
-	 * Basement membrane is a sheet of height 2*BM_radius 
-	 * Z value is in between -BM_radius and +BM_radius
-	 */
-
-	double distance_to_membrane_sheet(double length);
     /** \brief Calculate repulsion and adhesion between agent and ecm at given voxel index
 	 *
 	 * @param index_ecm index of the ECM density in the microenv vector of densities
