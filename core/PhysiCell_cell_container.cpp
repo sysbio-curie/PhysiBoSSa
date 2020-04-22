@@ -329,9 +329,6 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 				
 			}
 
-			if ( !(*all_cells)[i]->passive() )
-				((*all_cells)[i])->degrade_ecm( mechanics_dt_ );
-
 			if( (*all_cells)[i]->functions.custom_cell_rule )
 			{
 				(*all_cells)[i]->functions.custom_cell_rule((*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);

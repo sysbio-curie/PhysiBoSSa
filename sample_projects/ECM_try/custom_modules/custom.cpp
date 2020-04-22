@@ -163,6 +163,13 @@ Cell* create_custom_cell()
     return static_cast<Cell*>(pNew); 
 }
 
+// Here I'm hoping that the argument used, time_since_last_mechanics, has the same value
+// as mechanics_dt_. I should probably check later...
+void check_passive(Cell* cell, Phenotype& phenotype, double dt) {
+	if (!(cell->passive())) {
+		cell->degrade_ecm(dt);
+	}
+}
 
 void setup_tissue( void )
 {
@@ -196,6 +203,8 @@ void setup_tissue( void )
 		pC->boolean_network = ecm_network;
 		pC->boolean_network.restart_nodes();
 		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
+
+		pC->functions.custom_cell_rule = check_passive;
 		//std::cout<< pC->position.size() << std::endl;
 		//std::cout<< pC->position << std::endl;
 	}
