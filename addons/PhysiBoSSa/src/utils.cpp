@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "../core/PhysiCell_utilities.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -9,13 +10,8 @@ int UniformInt()
 	return int_dis(gen);
 }
 
-double UniformRandom()
-{
-	return std::generate_canonical<double, 10>(gen);
-}
-
 double UniformRandom11()
 {
-	double res = UniformRandom();
+	double res = PhysiCell::UniformRandom();
 	return ( 2.0 * ( res - 0.5 ) ); 
 }

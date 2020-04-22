@@ -24,6 +24,7 @@ CUSTOM_DIR = sample_projects/ECM_try/custom_modules
 LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS -ldl
 INC := -I$(CUR_DIR)/$(MABOSS_DIR)/include -DMAXNODES=$(MABOSS_MAX_NODES)
 CUS := -I$(CUR_DIR)/$(CUSTOM_DIR)
+INC_PHYSICELL := -I$(CUR_DIR)/core
 
 
 # If max nodes > 64, change lib path 
@@ -167,7 +168,7 @@ maboss_network.o: ./addons/PhysiBoSSa/src/maboss_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/maboss_network.cpp
 
 utils.o: ./addons/PhysiBoSSa/src/utils.cpp
-	$(COMPILE_COMMAND) -c ./addons/PhysiBoSSa/src/utils.cpp
+	$(COMPILE_COMMAND) $(INC_PHYSICELL) -c ./addons/PhysiBoSSa/src/utils.cpp
 
 boolean_network.o: ./addons/PhysiBoSSa/src/boolean_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/boolean_network.cpp

@@ -5,7 +5,6 @@
 #include <random>
 
 int UniformInt();
-double UniformRandom( void );
 double UniformRandom11( void );
 
 #endif

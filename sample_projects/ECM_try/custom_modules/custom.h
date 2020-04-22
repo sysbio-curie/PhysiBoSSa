@@ -70,7 +70,6 @@
 #include "custom_cell.h"
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
-#include "../core/PhysiCell_utilities.h"
 
 
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
