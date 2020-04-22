@@ -1154,89 +1154,11 @@ bool Cell::necrotic_oxygen()
    return false;	
 }
 
-/* Motility with random direction, and magnitude of motion given by customed coefficient */
-void Cell::set_3D_random_motility( double dt )
-{
-	double probability = UniformRandom();
-	motility_magnitude[0] = PhysiCell::parameters.doubles("motility_amplitude_min");
-	motility_magnitude[1] = PhysiCell::parameters.doubles("motility_amplitude_max");
-	if ( probability < dt / PhysiCell::parameters.doubles("persistence") )
-	{
-		std::vector<double> tmp;
-		double temp_angle = 2 * M_PI * PhysiCell::UniformRandom();
-		double temp_phi = M_PI * PhysiCell::UniformRandom();
-		tmp[0] = cos( temp_angle ) * sin( temp_phi );
-		tmp[1] = sin( temp_angle ) * sin( temp_phi );
-		tmp[2] = cos( temp_phi );
-		motility = get_motility_amplitude(pmotility) * tmp;
-	}
-}
-
-/*
- * Motility in the polarity axis migration + little noise
- * Persistence in the update polarization
- * */
-void Cell::set_3D_polarized_motility( double dt )
-{
-	// mot = (1-p) * r + p * pol
-	double temp_angle = 2 * M_PI * PhysiCell::UniformRandom();
-	double temp_phi = M_PI * PhysiCell::UniformRandom();
-	motility[0] = cos( temp_angle ) * sin( temp_phi );
-	motility[1] = sin( temp_angle ) * sin( temp_phi );
-	motility[2] = cos( temp_phi );
-	motility *= (1 - PhysiCell::parameters.doubles("polarity_coefficient"));
-	std::vector<double> polarization;
-	polarization.resize(3, 0.0);
-	polarization[0]= state.orientation[0];
-	polarization[1]= state.orientation[1];
-	polarization[2]= state.orientation[2];
-	std::vector<double> pol_dir;
-	pol_dir.resize(3, 0.0);
-	double pol_norm = norm(polarization); //normal to polaization used to calculate the vestor direction for polarization
-	pol_dir[0] = polarization[0]/pol_norm;
-	pol_dir[1] = polarization[1]/pol_norm;
-	pol_dir[2] = polarization[2]/pol_norm;
-	motility += PhysiCell::parameters.doubles("polarity_coefficient") * pol_dir;
-	// Normalized it
-	normalize(motility);
-	// mot = mot_coef * mot_dir
-	motility *= get_motility_amplitude(pmotility);
-}
 
 
 
-/**
- * Calculate motility forces according to mode:
- * 0, random; 1, along polarity axis; other: nothing
- * */
-void Cell::set_motility( double dt )
-{
-	// Cell frozen, cannot actively move
-	if ( freezed > 2 )
-		return;
-	switch( PhysiCell::parameters.ints("mode_motility") )
-	{
-		case 0:
-			set_3D_random_motility(dt);
-			break;
-		case 1:
-			set_3D_polarized_motility(dt);
-			break;
-		default:
-			return;
-			break;
-	}
-	velocity += motility;
-}
 
-/* Update the value of freezing of the cell with bitwise operation
-* Do a bitwise-or comparison on freezed and input parameter:
-* if freezed = 0, it will be the value of the parameter frozen
-* if freezed = 1, it will be either 1 (frozen = 0) or 3 (frozen = 3) */
-void Cell::freezer( int frozen )
-{
-	freezed = freezed | frozen;
-}
+
 
 double Cell::get_adhesion()
 {

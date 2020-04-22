@@ -151,7 +151,6 @@ class Cell : public Basic_Agent
 	Cell_Container * container;
 	int current_mechanics_voxel_index;
 	int updated_current_mechanics_voxel_index; // keeps the updated voxel index for later adjusting of current voxel index
-	int freezed;	
  public:
 	std::string type_name; 
  
@@ -186,21 +185,11 @@ class Cell : public Basic_Agent
 	{ mmped = activate; };
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 
-	/** \brief Motility with random direction, and magnitude of motion given by customed coefficient */
-	void set_3D_random_motility( double dt );
-	/**
-	* Motility in the polarity axis migration
-	* Strength of alignement depends of the polarity parameter, as for division axis
-	* Persistence defined in the polarization direction updating.
-	* Polarity coefficient never reach 1 so there is some noise
-	* */
-	void set_3D_polarized_motility( double dt );
-	void set_motility(double );
+	
 	void add_potentials(Cell*);       // Add repulsive and adhesive forces.
 	void set_previous_velocity(double xV, double yV, double zV);
 	int get_current_mechanics_voxel_index();
 	void turn_off_reactions(double); 		  // Turn off all the reactions of the cell
-	void freezer( int frozen );
 	bool is_out_of_domain;
 	bool is_movable;
 	double get_adhesion();

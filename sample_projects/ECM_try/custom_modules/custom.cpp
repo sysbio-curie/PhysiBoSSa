@@ -211,7 +211,7 @@ void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 	
 	// Add active motility term
 	if ( !(pCustomCell->passive()) )
-		pCell->set_motility(dt);
+		pCustomCell->set_motility(dt);
 	
 	return; 
 }
