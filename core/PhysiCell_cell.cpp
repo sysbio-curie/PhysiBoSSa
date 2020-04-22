@@ -75,6 +75,8 @@
 using namespace BioFVM;
 namespace PhysiCell{
 
+Cell* (*custom_create_cell)();
+
 Cell_Parameters::Cell_Parameters()
 {
 	o2_hypoxic_threshold = 15.0; // HIF-1alpha at half-max around 1.5-2%, and tumors often are below 2%
@@ -825,8 +827,15 @@ void Cell::add_potentials(Cell* other_agent)
 
 Cell* create_cell( void )
 {
+	
 	Cell* pNew; 
-	pNew = new Cell;		
+	
+	if (custom_create_cell) {
+		 pNew = custom_create_cell();
+	} else {
+		pNew = new Cell;		
+	}
+	
 	(*all_cells).push_back( pNew ); 
 	pNew->index=(*all_cells).size()-1;
 	

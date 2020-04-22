@@ -154,6 +154,16 @@ void setup_microenvironment( void )
 	return; 
 }
 
+
+
+Cell* create_custom_cell() 
+{
+    Custom_cell* pNew; 
+    pNew = new Custom_cell;		
+    return static_cast<Cell*>(pNew); 
+}
+
+
 void setup_tissue( void )
 {
 	Custom_cell* pC;
@@ -163,6 +173,9 @@ void setup_tissue( void )
 	std::string cfg_file = parameters.strings("cfg_file");
 	BooleanNetwork ecm_network;
 	ecm_network.initialize_boolean_network(bnd_file, cfg_file, 12);
+
+	//Setting the custom_create_cell pointer to our create_custom_cell
+	custom_create_cell = create_custom_cell;
 
 	for (int i = 0; i < cells.size(); i++)
 	{
