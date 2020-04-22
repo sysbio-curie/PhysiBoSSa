@@ -158,7 +158,6 @@ class Cell : public Basic_Agent
 	Custom_Cell_Data custom_data;
 	Cell_Parameters parameters;
 	Cell_Functions functions; 
-	inline bool passive() { return type == PhysiCell_constants::PASSIVE_TYPE; };
 	Cell_State state; 
 	Phenotype phenotype; 
 	
@@ -274,11 +273,6 @@ class Cell : public Basic_Agent
 	double distance_to_membrane_sheet(double length);
 	
 	std::vector<Cell*>& cells_in_my_container( void ); 
-			/** \brief Calculate repulsion and adhesion between agent and ecm at given voxel index
-	 *
-	 * @param index_ecm index of the ECM density in the microenv vector of densities
-	 * @param index_voxel index of the current ECM voxel  */
-	void add_ecm_interaction( int index_ecm, int index_voxel );
 
 	void convert_to_cell_definition( Cell_Definition& cd ); 
 };

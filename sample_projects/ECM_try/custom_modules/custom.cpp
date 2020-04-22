@@ -166,13 +166,16 @@ Cell* create_custom_cell()
 // Here I'm hoping that the argument used, time_since_last_mechanics, has the same value
 // as mechanics_dt_. I should probably check later...
 void check_passive(Cell* cell, Phenotype& phenotype, double dt) {
-	if (!(cell->passive())) {
-		cell->degrade_ecm(dt);
+	Custom_cell* t_cell = static_cast<Custom_cell*>(cell);
+	if (!(t_cell->passive())) {
+		t_cell->degrade_ecm(dt);
 	}
 }
 
 void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 {
+	Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
+
 	if( pCell->functions.add_cell_basement_membrane_interactions )
 	{
 		pCell->functions.add_cell_basement_membrane_interactions(pCell, phenotype,dt);
@@ -188,7 +191,7 @@ void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 
 	int ecm_index = BioFVM::microenvironment.find_density_index("ecm");
 	if ( ecm_index >= 0 )
-		pCell->add_ecm_interaction( ecm_index, pCell->get_current_mechanics_voxel_index() );
+		pCustomCell->add_ecm_interaction( ecm_index, pCell->get_current_mechanics_voxel_index() );
 
 	for (auto neighbor_voxel_index : pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()])
 	{
@@ -196,7 +199,7 @@ void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 			continue;
 
 		if ( ecm_index >= 0 ){
-			pCell->add_ecm_interaction( ecm_index, neighbor_voxel_index );
+			pCustomCell->add_ecm_interaction( ecm_index, neighbor_voxel_index );
 			
 		}
 	
@@ -207,7 +210,7 @@ void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 	}
 	
 	// Add active motility term
-	if ( !(pCell->passive()) )
+	if ( !(pCustomCell->passive()) )
 		pCell->set_motility(dt);
 	
 	return; 
