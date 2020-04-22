@@ -272,8 +272,7 @@ class Cell : public Basic_Agent
 	 * Z value is in between -BM_radius and +BM_radius
 	 */
 	double distance_to_membrane_sheet(double length);
-	void update_cell_motion( double dt, double l, std::string shape );
-	void update_velocity( double dt, double l, std::string shape );
+	
 	std::vector<Cell*>& cells_in_my_container( void ); 
 			/** \brief Calculate repulsion and adhesion between agent and ecm at given voxel index
 	 *

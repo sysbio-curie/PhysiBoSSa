@@ -325,7 +325,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			{
 				// update_velocity already includes the motility update 
 				//(*all_cells)[i]->phenotype.motility.update_motility_vector( (*all_cells)[i] ,(*all_cells)[i]->phenotype , time_since_last_mechanics ); 
-				(*all_cells)[i]->update_velocity( time_since_last_mechanics, PhysiCell::parameters.doubles("membrane_length"), PhysiCell::parameters.strings("membrane_shape"));
+				(*all_cells)[i]->functions.update_velocity( (*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
 				
 			}
 

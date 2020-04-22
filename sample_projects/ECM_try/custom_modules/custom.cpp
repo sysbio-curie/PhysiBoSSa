@@ -171,6 +171,48 @@ void check_passive(Cell* cell, Phenotype& phenotype, double dt) {
 	}
 }
 
+void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt)
+{
+	if( pCell->functions.add_cell_basement_membrane_interactions )
+	{
+		pCell->functions.add_cell_basement_membrane_interactions(pCell, phenotype,dt);
+	}
+	
+	pCell->state.simple_pressure = 0.0; 
+	
+	//First check the neighbors in my current voxel
+	for( auto neighbor : pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()] )
+	{
+		pCell->add_potentials( neighbor );
+	}
+
+	int ecm_index = BioFVM::microenvironment.find_density_index("ecm");
+	if ( ecm_index >= 0 )
+		pCell->add_ecm_interaction( ecm_index, pCell->get_current_mechanics_voxel_index() );
+
+	for (auto neighbor_voxel_index : pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()])
+	{
+		if(!is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[neighbor_voxel_index].center, neighbor_voxel_index))
+			continue;
+
+		if ( ecm_index >= 0 ){
+			pCell->add_ecm_interaction( ecm_index, neighbor_voxel_index );
+			
+		}
+	
+		for( auto other_neighbor : pCell->get_container()->agent_grid[neighbor_voxel_index] )
+		{
+			pCell->add_potentials(other_neighbor);
+		}
+	}
+	
+	// Add active motility term
+	if ( !(pCell->passive()) )
+		pCell->set_motility(dt);
+	
+	return; 
+}
+
 void setup_tissue( void )
 {
 	Custom_cell* pC;
@@ -205,6 +247,7 @@ void setup_tissue( void )
 		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
 
 		pC->functions.custom_cell_rule = check_passive;
+		pC->functions.update_velocity = custom_update_velocity;
 		//std::cout<< pC->position.size() << std::endl;
 		//std::cout<< pC->position << std::endl;
 	}

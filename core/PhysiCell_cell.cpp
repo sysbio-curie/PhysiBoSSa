@@ -1357,53 +1357,6 @@ double Cell::distance_to_membrane(double l, std::string shape)
 	return 0;
 }
 
-/* Update cell velocity */
-void Cell::update_cell_motion( double time_since_last, double l, std::string shape )
-{
-	cell_contact = 0;
-	ecm_contact = 0;
-	nucleus_deform = 0;
-	if( !is_out_of_domain && is_movable)
-		update_velocity( time_since_last, l, shape );
-}
-
-
-void Cell::update_velocity( double dt, double l, std::string shape ) 
-{
-	double dist = distance_to_membrane(l, shape);
-	if ( dist > 0 )
-		add_cell_basement_membrane_interactions(dt, dist);
-
-	//First check the neighbors in my current voxel
-	for( auto neighbor : container->agent_grid[get_current_mechanics_voxel_index()] )
-	{
-		add_potentials( neighbor );
-	}
-	
-	int ecm_index = BioFVM::microenvironment.find_density_index("ecm");
-	if ( ecm_index >= 0 )
-		add_ecm_interaction( ecm_index, get_current_mechanics_voxel_index() );
-
-	for ( auto neighbor_voxel_index : container-> underlying_mesh.moore_connected_voxel_indices[get_current_mechanics_voxel_index()] )
-	{
-		if ( !is_neighbor_voxel(this, (container->underlying_mesh.voxels[get_current_mechanics_voxel_index()].center), (container->underlying_mesh.voxels[neighbor_voxel_index].center), neighbor_voxel_index) )
-			continue;
-		if ( ecm_index >= 0 ){
-			add_ecm_interaction( ecm_index, neighbor_voxel_index );
-			
-		}
-		for( auto other_neighbor : container->agent_grid[neighbor_voxel_index] )
-		{
-			add_potentials( other_neighbor );
-		}
-	}
-	
-	// Add active motility term
-	if ( !passive() )
-		set_motility(dt);
-}
-
-
 /* Calculate repulsion/adhesion between agent and ecm according to its local density */
 void Cell::add_ecm_interaction( int index_ecm, int index_voxel )
 {
