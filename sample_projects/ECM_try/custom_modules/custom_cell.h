@@ -96,6 +96,14 @@ public:
 	 * @param index_voxel index of the current ECM voxel  */
 	void add_ecm_interaction( int index_ecm, int index_voxel );
 
+	static Cell* create_custom_cell();
+
+	// Here I'm hoping that the argument used, time_since_last_mechanics, has the same value
+	// as mechanics_dt_. I should probably check later...
+	static void check_passive(Cell* cell, Phenotype& phenotype, double dt);
+
+	static void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt);
+	static double custom_adhesion_function(Cell* pCell, Cell* otherCell, double distance);
 };
 
 #endif

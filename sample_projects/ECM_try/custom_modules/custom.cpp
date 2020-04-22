@@ -136,6 +136,10 @@ void create_cell_types( void )
 	microenvironment.diffusion_coefficients[ecm_substrate_index] = 1e-85;
 	microenvironment.decay_rates[ecm_substrate_index] = 0;
 	microenvironment.list_indexes(0.5);
+
+	//Setting the custom_create_cell pointer to our create_custom_cell
+	custom_create_cell = Custom_cell::create_custom_cell;
+
 	return; 
 }
 
@@ -156,106 +160,6 @@ void setup_microenvironment( void )
 
 
 
-Cell* create_custom_cell() 
-{
-    Custom_cell* pNew; 
-    pNew = new Custom_cell;		
-    return static_cast<Cell*>(pNew); 
-}
-
-// Here I'm hoping that the argument used, time_since_last_mechanics, has the same value
-// as mechanics_dt_. I should probably check later...
-void check_passive(Cell* cell, Phenotype& phenotype, double dt) {
-	Custom_cell* t_cell = static_cast<Custom_cell*>(cell);
-	if (!(t_cell->passive())) {
-		t_cell->degrade_ecm(dt);
-	}
-}
-
-void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt)
-{
-	Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
-
-	if( pCell->functions.add_cell_basement_membrane_interactions )
-	{
-		pCell->functions.add_cell_basement_membrane_interactions(pCell, phenotype,dt);
-	}
-	
-	pCell->state.simple_pressure = 0.0; 
-	
-	//First check the neighbors in my current voxel
-	for( auto neighbor : pCell->get_container()->agent_grid[pCell->get_current_mechanics_voxel_index()] )
-	{
-		pCell->add_potentials( neighbor );
-	}
-
-	int ecm_index = BioFVM::microenvironment.find_density_index("ecm");
-	if ( ecm_index >= 0 )
-		pCustomCell->add_ecm_interaction( ecm_index, pCell->get_current_mechanics_voxel_index() );
-
-	for (auto neighbor_voxel_index : pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()])
-	{
-		if(!is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[neighbor_voxel_index].center, neighbor_voxel_index))
-			continue;
-
-		if ( ecm_index >= 0 ){
-			pCustomCell->add_ecm_interaction( ecm_index, neighbor_voxel_index );
-			
-		}
-	
-		for( auto other_neighbor : pCell->get_container()->agent_grid[neighbor_voxel_index] )
-		{
-			pCell->add_potentials(other_neighbor);
-		}
-	}
-	
-	// Add active motility term
-	if ( !(pCustomCell->passive()) )
-		pCustomCell->set_motility(dt);
-	
-	return; 
-}
-
-double custom_adhesion_function(Cell* pCell, Cell* otherCell, double distance) {
-
-	Custom_cell* custom_pCell = static_cast<Custom_cell*>(pCell);
-	Custom_cell* custom_otherCell = static_cast<Custom_cell*>(otherCell);
-	// hyp: junction strength is limited by weakest cell
-	double adh;
-	double thisadh = custom_pCell->get_adhesion();
-	double otadh = custom_otherCell->get_adhesion();
-
-	// first case, passive cell with active cell
-	if ( thisadh == 0 && otadh == 1 )
-	{
-		custom_pCell->ecm_contact += distance;
-		adh = custom_otherCell->integrinStrength();
-	}
-	else
-	{
-		// second case, active cell with passive cell
-		if ( thisadh == 1 && otadh == 0 )
-		{
-			custom_pCell->ecm_contact += distance;
-			adh = custom_pCell->integrinStrength();
-		}
-		else
-		{
-			// passive, passive
-			if ( thisadh == 0 && otadh == 0 )
-			{
-				adh = 0;
-			}
-			// active, active
-			else
-			{
-				custom_pCell->cell_contact += distance;
-				adh = custom_pCell->adhesion(custom_otherCell);
-			}
-		}
-	}
-	return adh;
-}
 
 void setup_tissue( void )
 {
@@ -266,9 +170,6 @@ void setup_tissue( void )
 	std::string cfg_file = parameters.strings("cfg_file");
 	BooleanNetwork ecm_network;
 	ecm_network.initialize_boolean_network(bnd_file, cfg_file, 12);
-
-	//Setting the custom_create_cell pointer to our create_custom_cell
-	custom_create_cell = create_custom_cell;
 
 	for (int i = 0; i < cells.size(); i++)
 	{
@@ -290,9 +191,6 @@ void setup_tissue( void )
 		pC->boolean_network.restart_nodes();
 		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
 
-		pC->functions.custom_cell_rule = check_passive;
-		pC->functions.update_velocity = custom_update_velocity;
-		pC->functions.custom_adhesion = custom_adhesion_function;
 		//std::cout<< pC->position.size() << std::endl;
 		//std::cout<< pC->position << std::endl;
 	}
