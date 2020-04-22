@@ -156,7 +156,7 @@ void setup_microenvironment( void )
 
 void setup_tissue( void )
 {
-	Cell* pC;
+	Custom_cell* pC;
 	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
 	MaBoSSNetwork* maboss;
 	std::string bnd_file = parameters.strings("bnd_file");
@@ -173,7 +173,7 @@ void setup_tissue( void )
 		int phase = cells[i].phase;
 		double elapsed_time = cells[i].elapsed_time;
 
-		pC = create_cell();
+		pC = (Custom_cell* ) create_cell();
 		 
 		pC->assign_position( x, y, z );
 		// pC->set_total_volume(sphere_volume_from_radius(radius));

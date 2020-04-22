@@ -67,6 +67,7 @@
 #ifndef __Custom_h__
 #define __Custom_h__
 
+#include "custom_cell.h"
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 #include "../core/PhysiCell_utilities.h"
