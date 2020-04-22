@@ -304,8 +304,18 @@ void setup_tissue( void )
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
-	// start with live dead coloring 
-	std::vector<std::string> output = false_cell_coloring_live_dead(pCell); 
+	std::vector< std::string > output( 4 , "black" );
+
+
+	static int ecm = microenvironment.find_density_index( "ecm" );
+
+	double ecm_value = pCell->nearest_density_vector()[ecm];
+
+
+	int color = (int) round( ecm_value * 255.0  );
+	char szTempString [128];
+	sprintf( szTempString , "rgb(%u,0,%u)", color, 255-color );
+	output[0].assign( szTempString );
 	return output; 
 }
 
