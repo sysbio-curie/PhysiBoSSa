@@ -173,7 +173,7 @@ void setup_tissue( void )
 		int phase = cells[i].phase;
 		double elapsed_time = cells[i].elapsed_time;
 
-		pC = (Custom_cell* ) create_cell();
+		pC = static_cast<Custom_cell*>(create_cell());
 		 
 		pC->assign_position( x, y, z );
 		// pC->set_total_volume(sphere_volume_from_radius(radius));
@@ -214,18 +214,19 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 
 	if (PhysiCell_globals.current_time >= pCell->custom_data["next_physibossa_run"])
 	{
-		set_input_nodes(pCell);
+		Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
+		set_input_nodes(pCustomCell);
 
 		pCell->boolean_network.run_maboss();
 		// Get noisy step size
 		double next_run_in = pCell->boolean_network.get_time_to_update();
 		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
 		
-		from_nodes_to_cell(pCell, phenotype, dt);
+		from_nodes_to_cell(pCustomCell, phenotype, dt);
 	}
 }
 
-void set_input_nodes(Cell* pCell) {
+void set_input_nodes(Custom_cell* pCell) {
 int ind;
 	nodes = *(pCell->boolean_network.get_nodes());
 	// Oxygen input node O2; Oxygen or Oxy
@@ -268,7 +269,7 @@ int ind;
 	/// example
 }
 
-void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
+void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 {
 	std::vector<bool>* point_to_nodes = pCell->boolean_network.get_nodes();
 	int bn_index;
