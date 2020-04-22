@@ -1,5 +1,13 @@
 #include "custom_cell.h"
 
+Custom_cell::Custom_cell() {
+    pintegrin = 0.5;
+	pmotility = 0.5;
+	padhesion = 0.5;
+	mmped = 0;
+	motility.resize(3, 0.0);
+}
+
 /* Calculate repulsion/adhesion between agent and ecm according to its local density */
 void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 {
@@ -51,7 +59,8 @@ void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 			temp_a *= temp_a; 
 			/* \todo change dens with a maximal density ratio ? */
 			ecm_contact += dens * (max_interactive_distance-distance);
-			temp_a *= dens * ( static_cast<Cell*>(this) )->integrinStrength();
+			// temp_a *= dens * ( static_cast<Cell*>(this) )->integrinStrength();
+			temp_a *= dens * integrinStrength();
 			tmp_r -= temp_a;
 		}
 		
@@ -63,6 +72,73 @@ void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 		velocity += tmp_r * displacement;
 	}
 }
+
+/* Degrade the surrounding ECM 
+ *
+ * param dt time step */
+void Custom_cell::degrade_ecm( double dt )
+{
+	if ( is_out_of_domain )
+		return;
+	if ( !mmped ) 
+		return;
+
+	// Check if there is ECM material in given voxel
+	int ecm_index = get_microenvironment()->find_density_index("ecm");
+	int current_index = get_current_mechanics_voxel_index();
+	#pragma omp critical
+	{
+		double dens = get_microenvironment()->nearest_density_vector(current_index)[ecm_index];
+		if ( dens > EPSILON )
+		{
+			dens -= (PhysiCell::parameters.ints("ecm_degradation") * pintegrin) * dt; // to change by a rate
+			dens = dens > 0 ? dens : 0;
+			get_microenvironment()->nearest_density_vector(current_index)[ecm_index] = dens;
+		}
+	}
+}
+
+
+/* Return value of adhesion strength with ECM according to integrin level */
+double Custom_cell::integrinStrength()
+{ 
+	Cecm[0] = PhysiCell::parameters.ints("ecm_adhesion_min");
+	Cecm[1] = PhysiCell::parameters.ints("ecm_adhesion_min");
+	return get_integrin_strength( pintegrin ); 
+}
+
+/* Return if cell has enough contact with other cells (compared to given threshold determined by the given level) */	
+bool Custom_cell::has_neighbor(int level)
+{ 
+	if ( level == 0 )
+		return contact_cell() > PhysiCell::parameters.doubles("contact_cell_cell_threshold"); 
+	else
+		return contact_cell() > (2 * PhysiCell::parameters.doubles("contact_cell_cell_threshold")); 
+}
+
+/* Calculate adhesion coefficient with other cell */
+double Custom_cell::adhesion( Cell* other_cell )
+{
+    Custom_cell* custom_other_cell = static_cast<Custom_cell*>(other_cell);
+	Ccca_heterotypic[0] = PhysiCell::parameters.doubles("heterotypic_adhesion_min");
+	Ccca_heterotypic[1] = PhysiCell::parameters.doubles("heterotypic_adhesion_max");
+	Ccca_homotypic[0] = PhysiCell::parameters.doubles("homotypic_adhesion_min");
+	Ccca_homotypic[1] = PhysiCell::parameters.doubles("homotypic_adhesion_max");
+	double adh = 0;
+	if ( &(Cell::phenotype) == &(other_cell->Cell::phenotype) )
+		adh = std::min( get_homotypic_strength(padhesion), custom_other_cell->get_homotypic_strength(padhesion) );
+	else
+		adh = std::min( get_heterotypic_strength(padhesion), custom_other_cell->get_heterotypic_strength(padhesion) );
+
+	return adh;
+}
+
+
+double Custom_cell::get_adhesion()
+{
+	return 1;
+}
+
 
 /* Motility with random direction, and magnitude of motion given by customed coefficient */
 void Custom_cell::set_3D_random_motility( double dt )
@@ -146,5 +222,68 @@ void Custom_cell::freezer( int frozen )
     freezed = freezed | frozen;
 }
 
+/// Distance to membrane functions
+double Custom_cell::distance_to_membrane_duct(double length)
+{
+	//Note that this function assumes that duct cap center is located at <0, 0, 0>
+	if ( position[0] >= 0 ) // Cell is within the cylinder part of the duct
+	{
+		double distance_to_x_axis= sqrt((position[1] * position[1]) + (position[2] * position[2]));
+		distance_to_x_axis = std::max(distance_to_x_axis, EPSILON);		// prevents division by zero
+		displacement[0]=0; 
+		displacement[1]= -position[1]/ distance_to_x_axis; 
+		displacement[2]= -position[2]/ distance_to_x_axis; 
+		return fabs(length - distance_to_x_axis);
+	}
 
+	// Cell is inside the cap of the duct
+	double distance_to_origin= norm(position);  // distance to the origin 
+	distance_to_origin = std::max(distance_to_origin, EPSILON);			  // prevents division by zero
+	displacement = -1 / distance_to_origin * position;
+	return fabs(length - distance_to_origin);
+}
 
+/* Distance to membrane Sphere 
+ * Basement membrane is a sphere of radius BM_radius 
+ * Sphere center is (0,0,0)
+ * */
+double Custom_cell::distance_to_membrane_sphere(double length)
+{
+	double distance_to_origin = norm(position);  // distance to the origin 
+	distance_to_origin = std::max(distance_to_origin, EPSILON);	  // prevents division by zero
+	displacement = -1 / distance_to_origin * position;
+	if ( (length - distance_to_origin) < 0 )
+		displacement *= 2.0; // penalize more outside of the sphere cells, stronger rappel
+	return fabs(length - distance_to_origin);
+}
+
+/* Distance to membrane Sheet
+ * Basement membrane is a sheet of height 2*BM_radius 
+ * Z value is in between -BM_radius and +BM_radius
+ * */
+double Custom_cell::distance_to_membrane_sheet(double length)
+{
+	double distance = fabs(position[2]);  // |z| position
+	distance = std::max(distance, EPSILON);	  // prevents division by zero
+	displacement[0] = 0;
+	displacement[1] = 0;
+	displacement[2] = -1 / distance * position[2];
+	if ( (length - distance) < 0 )
+		displacement *= 2.0; // penalize more outside of the sphere cells, stronger rappel
+	return fabs(length - distance);
+}
+
+/* Calculate agent distance to BM if defined */
+double Custom_cell::distance_to_membrane(double l, std::string shape)
+{
+	if ( l > 0 )
+	{
+		if ( shape == "duct" )
+			return distance_to_membrane_duct(l);
+		else if ( shape == "sphere" )
+			return distance_to_membrane_sphere(l);
+		else if ( shape == "sheet" )
+			return distance_to_membrane_sheet(l);
+	}
+	return 0;
+}

@@ -216,6 +216,47 @@ void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 	return; 
 }
 
+double custom_adhesion_function(Cell* pCell, Cell* otherCell, double distance) {
+
+	Custom_cell* custom_pCell = static_cast<Custom_cell*>(pCell);
+	Custom_cell* custom_otherCell = static_cast<Custom_cell*>(otherCell);
+	// hyp: junction strength is limited by weakest cell
+	double adh;
+	double thisadh = custom_pCell->get_adhesion();
+	double otadh = custom_otherCell->get_adhesion();
+
+	// first case, passive cell with active cell
+	if ( thisadh == 0 && otadh == 1 )
+	{
+		custom_pCell->ecm_contact += distance;
+		adh = custom_otherCell->integrinStrength();
+	}
+	else
+	{
+		// second case, active cell with passive cell
+		if ( thisadh == 1 && otadh == 0 )
+		{
+			custom_pCell->ecm_contact += distance;
+			adh = custom_pCell->integrinStrength();
+		}
+		else
+		{
+			// passive, passive
+			if ( thisadh == 0 && otadh == 0 )
+			{
+				adh = 0;
+			}
+			// active, active
+			else
+			{
+				custom_pCell->cell_contact += distance;
+				adh = custom_pCell->adhesion(custom_otherCell);
+			}
+		}
+	}
+	return adh;
+}
+
 void setup_tissue( void )
 {
 	Custom_cell* pC;
@@ -251,6 +292,7 @@ void setup_tissue( void )
 
 		pC->functions.custom_cell_rule = check_passive;
 		pC->functions.update_velocity = custom_update_velocity;
+		pC->functions.custom_adhesion = custom_adhesion_function;
 		//std::cout<< pC->position.size() << std::endl;
 		//std::cout<< pC->position << std::endl;
 	}

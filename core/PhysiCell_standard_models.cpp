@@ -632,9 +632,7 @@ void standard_add_basement_membrane_interactions( Cell* pCell, Phenotype phenoty
 	if( fabs( temp_r ) < 1e-16 )
 	{ return; }
 	
-	axpy( &( pCell->velocity ) , temp_r , pCell->displacement );
-
-	 
+	axpy( &( pCell->velocity ) , temp_r , pCell->displacement ); 
 	return;	
 }
 
