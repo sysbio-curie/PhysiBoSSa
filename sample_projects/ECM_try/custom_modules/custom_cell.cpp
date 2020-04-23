@@ -226,6 +226,17 @@ void Custom_cell::freezer( int frozen )
     freezed = freezed | frozen;
 }
 
+/*
+void Custom_cell::update_cycle( double cycle_dt, double time_since_last, double t )
+{
+	if ( is_out_of_domain )
+		return;
+	ccycle->do_one_cycle_step( time_since_last, t );
+	if ( freezed == 0 )
+		update_volume( time_since_last );
+}
+*/
+
 Cell* Custom_cell::create_custom_cell()
 {
 	Custom_cell* pNew; 

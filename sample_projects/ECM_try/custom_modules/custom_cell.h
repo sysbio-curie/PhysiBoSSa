@@ -6,6 +6,7 @@
 
 #include "../core/PhysiCell_cell.h" 
 #include "../core/PhysiCell_constants.h"
+#include "custom_main.h"
 using namespace PhysiCell;
 
 class Custom_cell : public Cell {
@@ -92,6 +93,17 @@ public:
 
 	static void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt);
 	static double custom_adhesion_function(Cell* pCell, Cell* otherCell, double distance);
+
+
+	/** \brief Change the current value of motility percent coeff, increase or decrease according to up value */
+	inline void evolve_motility_coef( int up, double dt )
+	{ evolve_coef( up, &pmotility, dt); };
+	/** \brief Set the value of freezed */
+	inline void freezing( int frozen )
+	{ freezed = frozen; };
+
+	/** \brief Update cell cycle state */
+	void update_cycle( double cycle_dt, double time_since_last, double t );
 };
 
 #endif

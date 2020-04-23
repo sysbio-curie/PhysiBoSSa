@@ -70,7 +70,7 @@
 #include "custom_cell.h"
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
-
+#include "custom_main.h"
 
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
 
@@ -106,5 +106,7 @@ void set_input_nodes(Custom_cell* pCell);
 void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt);
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header);
 void load_ecm_file();
+/** \brief Go to proliferative phase if proliferation ON and in G0 phase */
+void do_proliferation(Cell* pCell, Phenotype& phenotype, double dt);
 
 #endif

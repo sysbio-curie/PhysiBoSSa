@@ -300,18 +300,34 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		return;
 	}
 
+	bn_index = pCell->boolean_network.get_node_index( "Migration" );
+	if ( bn_index >= 0 )
+	{
+		pCell->evolve_motility_coef( (*point_to_nodes)[bn_index], dt );
+	}
+
+	bn_index = pCell->boolean_network.get_node_index( "GF" );
+	if ( bn_index >= 0 )
+	{
+		do_proliferation( pCell, phenotype, dt );
+	}
+
+	bn_index = pCell->boolean_network.get_node_index("CCA");
+	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
+	{
+		pCell->freezing(1);
+	}	
+
 	bn_index = pCell->boolean_network.get_node_index("Matrix_modif");
 	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
 	{
 		pCell->set_mmp( (*point_to_nodes)[bn_index] );
-		return;
 	}
 
 	bn_index = pCell->boolean_network.get_node_index("EMT");
 	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
 	{
 		pCell->set_mmp( (*point_to_nodes)[bn_index] );
-		return;
 	}
 
 	/// example
@@ -410,4 +426,12 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 	} while (!fin.eof());
 	
 	return result;
+}
+
+/* Go to proliferative if needed */
+void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// If cells is in G0 (quiescent) switch to pre-mitotic phase
+	if ( pCell->phenotype.cycle.current_phase_index() == PhysiCell_constants::Ki67_negative )
+		pCell->phenotype.cycle.advance_cycle(pCell, phenotype, dt);
 }
