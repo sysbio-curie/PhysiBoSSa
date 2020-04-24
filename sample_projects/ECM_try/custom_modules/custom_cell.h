@@ -15,7 +15,7 @@ private:
 	int freezed;	
 
 protected:
-
+	
 public:
 	inline bool passive() { return type == PhysiCell_constants::PASSIVE_TYPE; };
 	

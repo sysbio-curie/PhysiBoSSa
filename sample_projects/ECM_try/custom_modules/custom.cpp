@@ -135,7 +135,7 @@ void create_cell_types( void )
 	
 	microenvironment.diffusion_coefficients[ecm_substrate_index] = 1e-85;
 	microenvironment.decay_rates[ecm_substrate_index] = 0;
-	microenvironment.list_indexes(0.5);
+	microenvironment.list_indexes(0.9);
 
 	//Setting the custom_create_cell pointer to our create_custom_cell
 	custom_create_cell = Custom_cell::create_custom_cell;
@@ -207,18 +207,15 @@ void setup_tissue( void )
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
+	Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
 	std::vector< std::string > output( 4 , "black" );
-
-
-	static int ecm = microenvironment.find_density_index( "ecm" );
-
-	double ecm_value = pCell->nearest_density_vector()[ecm];
-
-
-	int color = (int) round( ecm_value * 255.0  );
+	double ecm_value = pCustomCell->ecm_contact;
+	int color = (int) round( ecm_value * 255.0 / (pCell->phenotype.geometry.radius)  );
 	char szTempString [128];
 	sprintf( szTempString , "rgb(%u,0,%u)", color, 255-color );
 	output[0].assign( szTempString );
+
+	//std::vector< std::string > output = false_cell_coloring_live_dead(pCell);
 	return output; 
 }
 
@@ -311,7 +308,7 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		pCell->evolve_motility_coef( (*point_to_nodes)[bn_index], dt );
 	}
 
-	bn_index = pCell->boolean_network.get_node_index( "GF" );
+	bn_index = pCell->boolean_network.get_node_index( "Survival" );
 	if ( bn_index >= 0 )
 	{
 		do_proliferation( pCell, phenotype, dt );
@@ -439,4 +436,10 @@ void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
 	// If cells is in G0 (quiescent) switch to pre-mitotic phase
 	if ( pCell->phenotype.cycle.current_phase_index() == PhysiCell_constants::Ki67_negative )
 		pCell->phenotype.cycle.advance_cycle(pCell, phenotype, dt);
+}
+
+double sphere_volume_from_radius(double rad)
+{
+	double PI4_3 = 4.0 / 3.0 * M_PI;
+return PI4_3 * rad * rad * rad;
 }
