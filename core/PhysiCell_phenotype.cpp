@@ -295,6 +295,8 @@ void Cycle_Model::advance_model( Cell* pCell, Phenotype& phenotype, double dt )
 		if( phase_links[i][k].arrest_function )
 		{
 			transition_arrested = phase_links[i][k].arrest_function( pCell,phenotype,dt ); 
+			// if (transition_arrested == 0)
+			// { std::cout << "Cell is in " << phenotype.cycle.data.current_phase().name << ", arrest is " << transition_arrested << std::endl;}
 		}
 		if( !transition_arrested )
 		{
@@ -305,6 +307,7 @@ void Cycle_Model::advance_model( Cell* pCell, Phenotype& phenotype, double dt )
 				if( phenotype.cycle.data.elapsed_time_in_phase > 1.0/phenotype.cycle.data.transition_rates[i][k] )
 				{
 					continue_transition = true; 
+					// std::cout << "Cell is in " << phenotype.cycle.data.current_phase().name << ", passing transition because duration =  " << 1.0/phenotype.cycle.data.transition_rates[i][k] << std::endl;
 				}
 			}
 			else

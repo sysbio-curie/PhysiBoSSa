@@ -97,6 +97,11 @@ static const std::string delim = "\t";
 static const double EPSILON = std::numeric_limits<double>::epsilon();
 inline double sign( double x ) { return (x > 0) ? 1 : -1; };
 
+/** \brief Relative difference between two numbers */
+inline double relative_diff( double a, double b )
+{ if ( b < EPSILON ) return 0; return ( fabs(a-b)/b ); };
+
+
 std::string get_PhysiCell_version( void ); 
 void get_PhysiCell_version( std::string& pString ); 
 

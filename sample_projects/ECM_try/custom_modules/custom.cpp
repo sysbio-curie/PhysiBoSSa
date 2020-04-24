@@ -97,7 +97,7 @@ void create_cell_types( void )
 	
 	// set default cell cycle model 
 
-	cell_defaults.functions.cycle_model = live; 
+	cell_defaults.functions.cycle_model = Ki67_advanced; 
 	
 	// set default_cell_functions; 
 	
@@ -183,14 +183,19 @@ void setup_tissue( void )
 		pC = static_cast<Custom_cell*>(create_cell());
 		 
 		pC->assign_position( x, y, z );
-		// pC->set_total_volume(sphere_volume_from_radius(radius));
+		pC->set_total_volume(sphere_volume_from_radius(radius));
 		//std::cout<<(*all_cells)[i]->position<<std::endl;
-		// pC->phenotype.cycle.data.current_phase_index = phase;
+		pC->phenotype.cycle.data.current_phase_index = phase+1;
 		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
 		pC->boolean_network = ecm_network;
 		pC->boolean_network.restart_nodes();
 		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
 
+		// std::cout 	<< "New cell : " << std::endl
+		// 			<< "- Phase : " << pC->phenotype.cycle.pCycle_Model->phases[pC->phenotype.cycle.data.current_phase_index].name << std::endl
+		// 			<< "- Volume : " << pC->phenotype.volume.total << std::endl
+		// 			<< "- Target : " << pC->phenotype.volume.target_solid_cytoplasmic + pC->phenotype.volume.target_solid_nuclear << std::endl
+		// 			<< std::endl << std::endl;
 		//std::cout<< pC->position.size() << std::endl;
 		//std::cout<< pC->position << std::endl;
 	}
@@ -222,7 +227,7 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 	static int o2_index = microenvironment.find_density_index( "oxygen" );
 	double o2 = pCell->nearest_density_vector()[o2_index];
 
-	update_cell_and_death_parameters_O2_based(pCell, phenotype, dt);
+	// update_cell_and_death_parameters_O2_based(pCell, phenotype, dt);
 
 	if( phenotype.death.dead == true )
 	{

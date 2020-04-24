@@ -67,7 +67,8 @@
 
 #include "PhysiCell_standard_models.h" 
 #include "PhysiCell_cell.h" 
-
+#include "PhysiCell_utilities.h"
+#include <math.h>
 namespace PhysiCell{
 	
 bool PhysiCell_standard_models_initialized = false; 
@@ -219,6 +220,14 @@ bool standard_necrosis_arrest_function( Cell* pCell, Phenotype& phenotype, doubl
 }
 
 /* create standard models */ 
+bool wait_for_nucleus_growth (Cell* cell, Phenotype& phenotype, double dt) {
+
+	// std::cout << "Volume : " << phenotype.volume.total << ", target = " << pow(parameters.doubles("cell_radius"), 3.0) * 3.14159 * (4.0/3.0) * 2.0 << std::endl;
+	return relative_diff( phenotype.volume.total, pow(parameters.doubles("cell_radius"), 3.0) * 3.14159 * (4.0/3.0) * 2.0 ) > UniformRandom() * 0.1;
+	
+
+}
+
 
 void create_ki67_models( void )
 {
@@ -261,16 +270,19 @@ void create_ki67_models( void )
 	Ki67_advanced.add_phase_link( 1 , 2 , NULL ); // + (pre-mitotic) to + (post-mitotic) 
 	Ki67_advanced.add_phase_link( 2 , 0 , NULL ); // + to - 
 	
+	Ki67_advanced.phase_link(0,1).fixed_duration = true; 
 	Ki67_advanced.phase_link(1,2).fixed_duration = true; 
+	Ki67_advanced.phase_link(1,2).arrest_function = wait_for_nucleus_growth;
 	Ki67_advanced.phase_link(2,0).fixed_duration = true; 
 
-	Ki67_advanced.transition_rate(0,1) = 1.0/(3.62*60.0); // MCF10A cells ~3.62 hours in Ki67- in this fitted model
-	Ki67_advanced.transition_rate(1,2) = 1.0/(13.0*60.0); 
+	Ki67_advanced.transition_rate(0,1) = 1.0/(1*60.0); // MCF10A cells ~3.62 hours in Ki67- in this fitted model
+	Ki67_advanced.transition_rate(1,2) = std::numeric_limits<double>::infinity();//1.0/(13.0*60.0); 
 	Ki67_advanced.transition_rate(2,0) = 1.0/(2.5*60.0);
 
 	Ki67_advanced.phases[0].entry_function = NULL; // standard_Ki67_negative_phase_entry_function;
 	Ki67_advanced.phases[1].entry_function = standard_Ki67_positive_phase_entry_function;	
 	
+
 	return; 
 }
 
