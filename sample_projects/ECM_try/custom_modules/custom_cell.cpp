@@ -1,6 +1,7 @@
 #include "custom_cell.h"
 
 Custom_cell::Custom_cell() {
+	freezed = 0;
     pintegrin = 0.5;
 	pmotility = 0.5;
 	padhesion = 0.5;
