@@ -74,15 +74,15 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-400</x_min>
-		<x_max>400</x_max>
-		<y_min>-400</y_min>
-		<y_max>400</y_max>
-		<z_min>-20</z_min>
-		<z_max>20</z_max>
-		<dx>10</dx>
-		<dy>10</dy>
-		<dz>10</dz>
+		<x_min>-500</x_min>
+		<x_max>500</x_max>
+		<y_min>-500</y_min>
+		<y_max>500</y_max>
+		<z_min>-500</z_min>
+		<z_max>500</z_max>
+		<dx>20</dx>
+		<dy>20</dy>
+		<dz>20</dz>
 		<use_2D>false</use_2D>
 	</domain>
 	
@@ -138,8 +138,8 @@
 		</variable>
 
 		<options>
-			<calculate_gradients>true</calculate_gradients>
-			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
+			<calculate_gradients>false</calculate_gradients>
+			<track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">
 				<filename>./config/initial.mat</filename>
@@ -154,8 +154,9 @@
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 
+		<ecm_file type="string" units="">ecm.txt</ecm_file>
 		<polarity_coefficient type="double" units="">0.5</polarity_coefficient>
-		<persistence type="double" units="">0.5</persistence>
+		<persistance type="double" units"">0.5</persistence>
     	<motility_amplitude_min type="double" units=""> 0.1 </motility_amplitude_min>
     	<motility_amplitude_max type="double" units=""> 0.5 </motility_amplitude_max>
     	<mode_motility type="int" units=""> 1 </mode_motility>
@@ -175,7 +176,7 @@
 		<cell_cell_repulsion type="int" units=""> 10 </cell_cell_repulsion>
 		<oxygen_necrotic type="int" units=""> 4 </oxygen_necrotic>
 		<oxygen_critical type="int" units=""> 3 </oxygen_critical>
-		<oxygen_no_proliferation type="double" units=""> 6.5 </oxygen_no_proliferation>
+		<oxygen_no_proliferation type="doubel" units=""> 6.5 </oxygen_no_proliferation>
 		<oxygen_hypoxic type="int" units=""> 15 </oxygen_hypoxic>
 		<oxygen_reference type="double" units=""> 0.7 </oxygen_reference>
 		<oxygen_saturation type="int" units=""> 38 </oxygen_saturation>
@@ -192,10 +193,7 @@
 		<bnd_file type="string" units="">./config/boolean_network/bn_nodes.bnd</bnd_file>
 		<cfg_file type="string" units="">./config/boolean_network/bn_conf.cfg</cfg_file>
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
-		<init_ecm_filename type="string" units="">./config/ecm.txt</init_ecm_filename>
 		<x_threshold type="double" units="dimensionless">1.</x_threshold>
-		<membrane_shape type="string" units=""> sheet </membrane_shape>	
-		<membrane_length type="double" units=""> 10 </membrane_length>
 	</user_parameters>
 	
 	

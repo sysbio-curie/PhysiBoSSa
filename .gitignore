@@ -42,3 +42,8 @@
 
 #Custom
 Makefile-backup
+
+output/*
+!output/empty.txt
+microutput/*
+!microutput/empty.txt
