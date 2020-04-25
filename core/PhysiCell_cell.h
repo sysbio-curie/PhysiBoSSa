@@ -74,9 +74,9 @@
 #include "./PhysiCell_phenotype.h"
 #include "./PhysiCell_cell_container.h"
 #include "./PhysiCell_constants.h"
+
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
-#include <math.h>
-#include "../core/PhysiCell_utilities.h"
+
 using namespace BioFVM; 
 
 namespace PhysiCell{
@@ -150,7 +150,7 @@ class Cell : public Basic_Agent
 	Cell_Container * container;
 	int current_mechanics_voxel_index;
 	int updated_current_mechanics_voxel_index; // keeps the updated voxel index for later adjusting of current voxel index
-
+		
  public:
 	std::string type_name; 
  
@@ -173,7 +173,7 @@ class Cell : public Basic_Agent
 	
 	bool is_out_of_domain;
 	bool is_movable;
-
+	
 	void flag_for_division( void ); // done 
 	void flag_for_removal( void ); // done 
 	
@@ -188,10 +188,9 @@ class Cell : public Basic_Agent
 	bool assign_position(std::vector<double> new_position);
 	bool assign_position(double, double, double);
 	void set_total_volume(double);
-	bool necrotic_oxygen();
-	double local_density(std::string field);
+	
 	double& get_total_volume(void); // NEW
-
+	
 	// mechanics 
 	void update_position( double dt ); //
 	std::vector<double> displacement; // this should be moved to state, or made private  
@@ -209,13 +208,13 @@ class Cell : public Basic_Agent
 
 	// I want to eventually deprecate this, by ensuring that 
 	// critical BioFVM and PhysiCell data elements are synced when they are needed 
-
+	
 	void set_phenotype( Phenotype& phenotype ); // no longer needed?
 	void update_radius();
 	Cell_Container * get_container();
 	
 	std::vector<Cell*>& cells_in_my_container( void ); 
-
+	
 	void convert_to_cell_definition( Cell_Definition& cd ); 
 };
 

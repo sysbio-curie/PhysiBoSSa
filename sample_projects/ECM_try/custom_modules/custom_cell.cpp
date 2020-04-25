@@ -6,10 +6,11 @@ Custom_cell::Custom_cell() {
 	pmotility = 0.5;
 	padhesion = 0.5;
 	mmped = 0;
+	ecmrad = sqrt(3.0) * get_microenvironment()->mesh.dx / 2.0;
 	motility.resize(3, 0.0);
 	functions.custom_cell_rule = Custom_cell::check_passive;
 	functions.update_velocity = Custom_cell::custom_update_velocity;
-	functions.custom_adhesion = Custom_cell::custom_adhesion_function;		
+	functions.custom_adhesion = Custom_cell::custom_adhesion_function;	
 }
 
 /* Calculate repulsion/adhesion between agent and ecm according to its local density */
@@ -29,7 +30,6 @@ void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 		// Make sure that the distance is not zero
 		distance = std::max(distance, PhysiCell::EPSILON);
 		
-		double ecmrad = get_microenvironment()->voxel_rad(index_voxel);
 		double dd = phenotype.geometry.radius + ecmrad;  
 		double dnuc = phenotype.geometry.nuclear_radius + ecmrad;  
 

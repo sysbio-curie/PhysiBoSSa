@@ -116,6 +116,25 @@ int writePov(std::vector<Cell*> all_cells, double timepoint, double scale)
 	return 0;
 }
 
+void writeDensityReport(int dens, std::string filename) 
+{
+	std::ofstream outecm_file( filename );
+	
+	double fill;
+	for (auto i=0; i < microenvironment.number_of_voxels(); i++)
+	{	
+		fill = microenvironment.nearest_density_vector(i)[dens];
+		if ( fill > PhysiCell::EPSILON )
+		{
+			outecm_file << microenvironment.voxels(i).center[0] << ";";
+			outecm_file << microenvironment.voxels(i).center[1] << ";";
+			outecm_file << microenvironment.voxels(i).center[2] << ";";
+			outecm_file << microenvironment.nearest_density_vector(i)[dens] << std::endl;
+		}
+	}
+	outecm_file.close();
+}
+
 int writeCellReport(std::vector<Cell*> all_cells, double timepoint)
 {
 	std::string filename; 

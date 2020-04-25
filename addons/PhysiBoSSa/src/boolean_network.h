@@ -57,7 +57,6 @@ class BooleanNetwork
 		
 		/** \brief Print name and values from the network */
 		inline void print_nodes() {this->maboss.print_nodes(&this->nodes);}
-
 };
 
 #endif

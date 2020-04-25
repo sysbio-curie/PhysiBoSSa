@@ -13,7 +13,8 @@ class Custom_cell : public Cell {
 
 private:
 	int freezed;	
-
+	double ecmrad;
+	
 protected:
 	
 public:

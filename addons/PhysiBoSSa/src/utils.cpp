@@ -1,14 +1,5 @@
 #include "utils.h"
-#include "../core/PhysiCell_utilities.h"
-
-std::random_device rd;
-std::mt19937 gen(rd());
-
-int UniformInt()
-{
-	std::uniform_int_distribution<int> int_dis;
-	return int_dis(gen);
-}
+#include "../../../core/PhysiCell_utilities.h"
 
 double UniformRandom11()
 {

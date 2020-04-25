@@ -83,6 +83,7 @@ namespace PhysiCell{
 long SeedRandom( long input );
 long SeedRandom( void );
 double UniformRandom( void );
+int UniformInt();
 double NormalRandom( double mean, double standard_deviation );
 double dist_squared(std::vector<double> p1, std::vector<double> p2);
 double dist(std::vector<double> p1, std::vector<double> p2);
@@ -112,6 +113,5 @@ void add_software_citation( std::string name , std::string version, std::string 
 int choose_event( std::vector<double>& probabilities ); 
 
 };
-
 
 #endif

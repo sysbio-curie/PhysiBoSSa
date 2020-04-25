@@ -162,7 +162,6 @@ Microenvironment::Microenvironment()
 	
 	if(default_microenvironment==NULL)
 	{ default_microenvironment=this; }
-	toWrite.clear();
 
 	return; 
 }
@@ -608,36 +607,6 @@ void Microenvironment::add_density( std::string name , std::string units, double
 	
 	return; 
 }
-
-/* Generate list of voxels indexes to write for a given ratio (random) 
-   ratio: proportion of voxels values to write: from 1 all to 0 none*/
-void Microenvironment::list_indexes( double ratio )
-{
-	toWrite.clear();
-	for ( int i = 0; i < number_of_voxels(); i++ )
-	{
-		if ( PhysiCell::UniformRandom() <= ratio )
-			toWrite.push_back(i);
-	}
-}
-
-
-/* Write microenvironment given density values of the voxels in the toWrite list */
-void Microenvironment::write_density( std::ostream& os, int dens )
-{
-	for ( int i : toWrite )
-	{
-		double fill = nearest_density_vector(i)[dens];
-		if ( fill > small_value )
-		{
-			os << voxels(i).center[0] << ";";
-			os << voxels(i).center[1] << ";";
-			os << voxels(i).center[2] << ";";
-			os << nearest_density_vector(i)[dens] << std::endl;
-		}
-	}
-}
-
 
 int Microenvironment::find_density_index( std::string name )
 {

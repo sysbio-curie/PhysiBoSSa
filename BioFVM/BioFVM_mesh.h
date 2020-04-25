@@ -51,6 +51,7 @@
 
 #include <iostream>
 #include <vector> 
+
 #include "BioFVM_matlab.h"
 
 namespace BioFVM{
@@ -80,7 +81,7 @@ class Voxel
  public:
 	Voxel(); 
 	int mesh_index; /*!< voxel's index in a General_Mesh */ 
-	double halfdiag;
+
 	double volume; /*!< voxel's volume (cubic spatial units) */ 
 	std::vector<double> center; /*!< center of volume */
 	bool is_Dirichlet;

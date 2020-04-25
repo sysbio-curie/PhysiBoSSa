@@ -62,7 +62,6 @@ Voxel::Voxel()
 {
 	mesh_index = 0; 
 	volume = 10*10*10;
-	halfdiag = 10;
 	center.assign( 3 , 0.0 ); 
 	is_Dirichlet = false;
 }
@@ -403,8 +402,7 @@ Cartesian_Mesh::Cartesian_Mesh()
 	dS_xz = dx*dz; 
 	
 	Voxel template_voxel;
-	template_voxel.volume = dV;
-	template_voxel.halfdiag = sqrt(3.0) * dx / 2.0; 
+	template_voxel.volume = dV; 
  
 	voxels.assign( x_coordinates.size() * y_coordinates.size() * z_coordinates.size() , template_voxel ); 
 	voxels[0].center[0] = x_coordinates[0]; 
@@ -499,7 +497,6 @@ Cartesian_Mesh::Cartesian_Mesh( int xnodes, int ynodes, int znodes )
 	
 	Voxel template_voxel;
 	template_voxel.volume = dV; 
-	template_voxel.halfdiag = sqrt(3.0) * dx / 2.0;
 
 	units = "none"; 
 	
@@ -518,8 +515,7 @@ Cartesian_Mesh::Cartesian_Mesh( int xnodes, int ynodes, int znodes )
 				voxels[n].center[1] = y_coordinates[j]; 
 				voxels[n].center[2] = z_coordinates[k]; 
 				voxels[n].mesh_index = n; 
-				voxels[n].volume = dV;
-				voxels[n].halfdiag = sqrt(3)*dx/2.0; 
+				voxels[n].volume = dV; 
 
 				n++; 
 			}
@@ -672,7 +668,6 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 
 	Voxel template_voxel;
 	template_voxel.volume = dV; 
-	template_voxel.halfdiag = sqrt(3)*dx/2.0;
 
 	voxels.assign( x_coordinates.size() * y_coordinates.size() * z_coordinates.size() , template_voxel ); 
 
@@ -795,7 +790,7 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 	
 	Voxel template_voxel;
 	template_voxel.volume = dV; 
-	template_voxel.halfdiag = sqrt(3) * dx / 2.0;
+
 	voxels.assign( x_coordinates.size() * y_coordinates.size() * z_coordinates.size() , template_voxel ); 
 	
 	int n=0; 
@@ -810,7 +805,6 @@ void Cartesian_Mesh::resize( double x_start, double x_end, double y_start, doubl
 				voxels[n].center[2] = z_coordinates[k]; 
 				voxels[n].mesh_index = n; 
 				voxels[n].volume = dV; 
-				voxels[n].halfdiag = sqrt(3) * dx / 2.0;
 
 				n++; 
 			}
@@ -902,8 +896,6 @@ int Cartesian_Mesh::nearest_voxel_index( std::vector<double>& position )
 
 	return ( k*y_coordinates.size() + j )*x_coordinates.size() + i; 
 }
-
-
 
 std::vector<unsigned int> Cartesian_Mesh::nearest_cartesian_indices( std::vector<double>& position )
 {

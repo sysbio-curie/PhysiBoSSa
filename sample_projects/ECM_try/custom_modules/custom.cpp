@@ -109,7 +109,6 @@ void create_cell_types( void )
 
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
-	std::cout << microenvironment.find_density_index("ecm");
 	
 	load_ecm_file();
 
@@ -136,7 +135,6 @@ void create_cell_types( void )
 	
 	microenvironment.diffusion_coefficients[ecm_substrate_index] = 1e-85;
 	microenvironment.decay_rates[ecm_substrate_index] = 0;
-	microenvironment.list_indexes(0.9);
 
 	//Setting the custom_create_cell pointer to our create_custom_cell
 	custom_create_cell = Custom_cell::create_custom_cell;
@@ -195,7 +193,6 @@ void setup_tissue( void )
 		pC->boolean_network.restart_nodes();
 		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
 	}
-	std::cout<<(*all_cells)[25]<<std::endl;
 	std::cout << "tissue created" << std::endl;
 
 	return; 
@@ -339,7 +336,6 @@ void load_ecm_file()
 	std::cout << "Loading ECM file " << parameters.strings("init_ecm_filename") << std::endl;
 	std::ifstream infile;
 	infile.open( parameters.strings("init_ecm_filename") );
-	std::ofstream outfile ("verify_output.txt");
 	std::string array[4];
 	int i = 0;
 	std::string line;
@@ -363,15 +359,9 @@ void load_ecm_file()
 		pos[1] = y;
 		pos[2] = z;
 		int voxel_index = microenvironment.nearest_voxel_index( pos );
-		microenvironment.density_vector(voxel_index)[microenvironment.find_density_index("ecm")] += amount; 
-		
-		outfile << "voxel_index: " << voxel_index << "   " << "ecm_index: " << microenvironment.find_density_index("ecm") << "   " << "amount_of_density: " << microenvironment.density_vector(voxel_index)[microenvironment.find_density_index("ecm")] << std::endl;
-		
+		microenvironment.density_vector(voxel_index)[microenvironment.find_density_index("ecm")] += amount; 		
 	}
-	outfile.close();
 	infile.close();
-	std::cout << "File loaded !" << std::endl;
-
 }
 
 

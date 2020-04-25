@@ -165,7 +165,7 @@ void Basic_Agent::register_microenvironment( Microenvironment* microenvironment_
 	secretion_rates->resize( microenvironment->density_vector(0).size() , 0.0 );
 	saturation_densities->resize( microenvironment->density_vector(0).size() , 0.0 );
 	uptake_rates->resize( microenvironment->density_vector(0).size() , 0.0 );	
-	
+
 	// some solver temporary variables 
 	cell_source_sink_solver_temp1.resize( microenvironment->density_vector(0).size() , 0.0 );
 	cell_source_sink_solver_temp2.resize( microenvironment->density_vector(0).size() , 1.0 );
@@ -309,12 +309,11 @@ void Basic_Agent::simulate_secretion_and_uptake( Microenvironment* pS, double dt
 		
 		*internalized_substrates -= total_extracellular_substrate_change; // opposite of net extracellular change 	
 	}
-
-
+	
 	(*pS)(current_voxel_index) += cell_source_sink_solver_temp1; 
 	(*pS)(current_voxel_index) /= cell_source_sink_solver_temp2; 
 
 	return; 
 }
 
-}
+};

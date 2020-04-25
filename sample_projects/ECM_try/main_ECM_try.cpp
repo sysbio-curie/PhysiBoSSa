@@ -136,14 +136,9 @@ int main( int argc, char* argv[] )
 
 	char filename[1024];
 	sprintf( filename , "%s/initial" , PhysiCell_settings.folder.c_str() ); 
-	std::cout<<(*all_cells)[25]<<std::endl;
-	std::cout<< ((std::vector<Basic_Agent*>)all_basic_agents)[25]<<std::endl;
-	std::cout << "fin qui tutto bene" << std::endl;
-
+	
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
-	std::cout << "fin qui tutto bene" << std::endl;
-
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
 
@@ -158,8 +153,6 @@ int main( int argc, char* argv[] )
 	
 	display_citations(); 
 	
-	std::cout << "fin qui tutto bene" << std:: endl; 
-
 	// set the performance timers 
 
 	BioFVM::RUNTIME_TIC();
@@ -211,9 +204,14 @@ int main( int argc, char* argv[] )
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
-			int e = microenvironment.find_density_index("ecm");
-			if (e > 0)
-				writeDensity(e, PhysiCell_globals.current_time);
+				int e = microenvironment.find_density_index("ecm");
+				if (e > 0){
+					std::string ecmname; 
+					ecmname.resize( 1024 );
+					sprintf( (char*) ecmname.c_str() , "_t%05d.txt", (int)round(PhysiCell_globals.current_time) );
+					ecmname = "microutput//ecm"+ecmname;
+					writeDensityReport(e, ecmname);
+				}
 			}
 
 			/*

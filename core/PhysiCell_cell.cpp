@@ -75,7 +75,6 @@
 namespace PhysiCell{
 
 Cell* (*custom_create_cell)();
-
 Cell_Parameters::Cell_Parameters()
 {
 	o2_hypoxic_threshold = 15.0; // HIF-1alpha at half-max around 1.5-2%, and tumors often are below 2%
@@ -327,7 +326,7 @@ Cell::Cell()
 	assign_orientation();
 	container = NULL;
 	
-
+	
 	return; 
 }
 
@@ -421,7 +420,7 @@ Cell* Cell::divide( )
 	rand_vec[2]= cos( temp_phi );
 	rand_vec = rand_vec- phenotype.geometry.polarity*(rand_vec[0]*state.orientation[0]+ 
 		rand_vec[1]*state.orientation[1]+rand_vec[2]*state.orientation[2])*state.orientation;
-
+	
 	if( norm(rand_vec) < 1e-16 )
 	{
 		std::cout<<"************ERROR********************"<<std::endl;
@@ -794,7 +793,7 @@ Cell* create_cell( void )
 	if (custom_create_cell) {
 		 pNew = custom_create_cell();
 	} else {
-		pNew = new Cell;		
+		pNew = new Cell;	
 	}
 	
 	(*all_cells).push_back( pNew ); 
@@ -1049,34 +1048,5 @@ void Cell::lyse_cell( void )
 	return; 
 }
 
-
-/* Return level of protein given by index around the cell */
-double Cell::local_density(std::string field)
-{ 
-	int ind = BioFVM::microenvironment.find_density_index(field);
-	if ( ind >= 0 )
-		return (nearest_density_vector())[ind]; 
-	return -1;
-}
-
-
-/* Return true if level of oxygen is lower than necrosis critical level */
-bool Cell::necrotic_oxygen()
-{
-	double ox = local_density("oxygen");
-	//std::cout << ox << " " << (cell_line->o2_necrotic) - ox << std::endl;
-	if ( ox >= 0 )	
-		return ( UniformRandom() * 0.005 < (PhysiCell::parameters.ints("oxygen_necrotic") - ox) );
-   return false;	
-}
-
-
-
-
-
-
-
 };
-
-
 

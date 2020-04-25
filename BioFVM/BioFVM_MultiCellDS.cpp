@@ -50,7 +50,6 @@
 // #include "BioFVM_strings.h" 
 #include "BioFVM_MultiCellDS.h"
 
-
 namespace BioFVM{
 std::string BioFVM_Version = "1.1.7";
 std::string BioFVM_URL = "http://BioFVM.MathCancer.org"; 
@@ -921,7 +920,7 @@ void add_BioFVM_agents_to_open_xml_pugi( pugi::xml_document& xml_dom, std::strin
 		{
 			double ID_temp = (double) all_basic_agents[i]->ID;
 			fwrite( (char*) &( ID_temp ) , sizeof(double) , 1 , fp ); 
-			
+
 			fwrite( (char*) &( all_basic_agents[i]->position[0] ) , sizeof(double) , 1 , fp ); 
 			fwrite( (char*) &( all_basic_agents[i]->position[1] ) , sizeof(double) , 1 , fp ); 
 			fwrite( (char*) &( all_basic_agents[i]->position[2] ) , sizeof(double) , 1 , fp ); 
