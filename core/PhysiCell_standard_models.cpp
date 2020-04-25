@@ -89,6 +89,16 @@ void standard_Ki67_positive_phase_entry_function( Cell* pCell, Phenotype& phenot
 	// the cell wants to double its volume 
 	phenotype.volume.target_solid_nuclear *= 2.0; 
 	phenotype.volume.target_solid_cytoplasmic *= 2.0; 
+	
+	return; 
+}
+
+void standard_Ki67_postmitotic_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
+{
+	// the cell wants to stay to a quiescent size
+	phenotype.volume.target_solid_nuclear *= 0.5; 
+	phenotype.volume.target_solid_cytoplasmic *= 0.5; 
+	
 	return; 
 }
 
@@ -221,11 +231,7 @@ bool standard_necrosis_arrest_function( Cell* pCell, Phenotype& phenotype, doubl
 
 /* create standard models */ 
 bool wait_for_nucleus_growth (Cell* cell, Phenotype& phenotype, double dt) {
-
-	// std::cout << "Volume : " << phenotype.volume.total << ", target = " << pow(parameters.doubles("cell_radius"), 3.0) * 3.14159 * (4.0/3.0) * 2.0 << std::endl;
 	return relative_diff( phenotype.volume.total, pow(parameters.doubles("cell_radius"), 3.0) * 3.14159 * (4.0/3.0) * 2.0 ) > UniformRandom() * 0.1;
-	
-
 }
 
 
@@ -281,6 +287,7 @@ void create_ki67_models( void )
 
 	Ki67_advanced.phases[0].entry_function = NULL; // standard_Ki67_negative_phase_entry_function;
 	Ki67_advanced.phases[1].entry_function = standard_Ki67_positive_phase_entry_function;	
+	Ki67_advanced.phases[2].entry_function = standard_Ki67_postmitotic_phase_entry_function;	
 	
 
 	return; 
@@ -422,6 +429,16 @@ bool create_standard_cell_cycle_models( void )
 	return true; 
 }
 
+bool waiting_to_remove(Cell* cell, Phenotype& phenotype, double dt) {
+	if (phenotype.cycle.data.elapsed_time_in_phase >= (8.6 * 60.0))
+		return false;
+	
+	if (phenotype.volume.total < PhysiCell_constants::cell_removal_threshold_volume) 
+		return false;
+
+	return true;
+}
+
 void create_standard_apoptosis_model( void )
 {
 	// set default parameters for apoptosis
@@ -454,10 +471,14 @@ void create_standard_apoptosis_model( void )
 		// Add a link between these phases. Set the cell to be removed 
 		// upon this transition. (So the "debris" phase should never be entered). 
 	apoptosis.add_phase_link( 0, 1, NULL ); 
-	apoptosis.transition_rate( 0, 1) = 1.0 / (8.6 * 60.0); 
+	// apoptosis.transition_rate( 0, 1) = 1.0 / (8.6 * 60.0); 
+	apoptosis.phase_link(0,1).fixed_duration = true;
 
 		// Use the deterministic model, where this phase has fixed duration
-	apoptosis.phase_link(0,1).fixed_duration = true; 
+
+	// Use an arrest function to put the transition condition to duration OR small cell size
+	apoptosis.transition_rate( 0, 1) = std::numeric_limits<double>::infinity();//1.0 / (8.6 * 60.0); 
+	apoptosis.phase_link(0,1).arrest_function = waiting_to_remove; 
 	
 	return; 
 }

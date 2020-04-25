@@ -122,6 +122,7 @@ void create_cell_types( void )
 
 
 	// initially no necrosis 
+	// cell_defaults.phenotype.death.rates[apoptosis_model_index] = 0.0; 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
 
 	// set oxygen uptake / secretion parameters for the default cell type 
@@ -184,20 +185,15 @@ void setup_tissue( void )
 		 
 		pC->assign_position( x, y, z );
 		pC->set_total_volume(sphere_volume_from_radius(radius));
-		//std::cout<<(*all_cells)[i]->position<<std::endl;
+		
 		pC->phenotype.cycle.data.current_phase_index = phase+1;
 		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
+		if ((phase+1) == 1)
+			pC->phenotype.cycle.pCycle_Model->phases[1].entry_function(pC, pC->phenotype, 0);
+		
 		pC->boolean_network = ecm_network;
 		pC->boolean_network.restart_nodes();
 		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
-
-		// std::cout 	<< "New cell : " << std::endl
-		// 			<< "- Phase : " << pC->phenotype.cycle.pCycle_Model->phases[pC->phenotype.cycle.data.current_phase_index].name << std::endl
-		// 			<< "- Volume : " << pC->phenotype.volume.total << std::endl
-		// 			<< "- Target : " << pC->phenotype.volume.target_solid_cytoplasmic + pC->phenotype.volume.target_solid_nuclear << std::endl
-		// 			<< std::endl << std::endl;
-		//std::cout<< pC->position.size() << std::endl;
-		//std::cout<< pC->position << std::endl;
 	}
 	std::cout<<(*all_cells)[25]<<std::endl;
 	std::cout << "tissue created" << std::endl;
