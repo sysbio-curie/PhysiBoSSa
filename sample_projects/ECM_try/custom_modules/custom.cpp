@@ -246,32 +246,32 @@ void set_input_nodes(Custom_cell* pCell) {
 int ind;
 	nodes = *(pCell->boolean_network.get_nodes());
 	// Oxygen input node O2; Oxygen or Oxy
-	ind = pCell->boolean_network.get_node_index( "Oxygen" );
-	if ( ind < 0 )
-		ind = pCell->boolean_network.get_node_index( "Oxy" );
-	if ( ind < 0 )
-		ind = pCell->boolean_network.get_node_index( "O2" );
-	if ( ind >= 0 )
-		nodes[ind] = ( !pCell->necrotic_oxygen() );
+	// ind = pCell->boolean_network.get_node_index( "Oxygen" );
+	// if ( ind < 0 )
+	// 	ind = pCell->boolean_network.get_node_index( "Oxy" );
+	// if ( ind < 0 )
+	// 	ind = pCell->boolean_network.get_node_index( "O2" );
+	// if ( ind >= 0 )
+	// 	nodes[ind] = ( !pCell->necrotic_oxygen() );
 	
 
-	ind = pCell->boolean_network.get_node_index( "Neighbours" );
-	if ( ind >= 0 )
-		nodes[ind] = ( pCell->has_neighbor(0) );
+	// ind = pCell->boolean_network.get_node_index( "Neighbours" );
+	// if ( ind >= 0 )
+	// 	nodes[ind] = ( pCell->has_neighbor(0) );
 	
-	ind = pCell->boolean_network.get_node_index( "Nei2" );
-	if ( ind >= 0 )
-		nodes[ind] = ( pCell->has_neighbor(1) );
+	// ind = pCell->boolean_network.get_node_index( "Nei2" );
+	// if ( ind >= 0 )
+	// 	nodes[ind] = ( pCell->has_neighbor(1) );
 
-	// If has enough contact with ecm or not
-	ind = pCell->boolean_network.get_node_index( "ECM_sensing" );
-	if ( ind >= 0 )
-		nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
-	// If has enough contact with ecm or not
-	ind = pCell->boolean_network.get_node_index( "ECM" );
-	if ( ind >= 0 )
-		nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
-	// If has enough contact with ecm or not
+	// // If has enough contact with ecm or not
+	// ind = pCell->boolean_network.get_node_index( "ECM_sensing" );
+	// if ( ind >= 0 )
+	// 	nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
+	// // If has enough contact with ecm or not
+	// ind = pCell->boolean_network.get_node_index( "ECM" );
+	// if ( ind >= 0 )
+	// 	nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
+	// // If has enough contact with ecm or not
 	ind = pCell->boolean_network.get_node_index( "ECMicroenv" );
 	if ( ind >= 0 )
 		nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
@@ -304,11 +304,11 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		pCell->evolve_motility_coef( (*point_to_nodes)[bn_index], dt );
 	}
 
-	bn_index = pCell->boolean_network.get_node_index( "Survival" );
-	if ( bn_index >= 0 )
-	{
-		do_proliferation( pCell, phenotype, dt );
-	}
+	// bn_index = pCell->boolean_network.get_node_index( "Survival" );
+	// if ( bn_index >= 0 )
+	// {
+	// 	do_proliferation( pCell, phenotype, dt );
+	// }
 
 	bn_index = pCell->boolean_network.get_node_index("CCA");
 	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
@@ -316,11 +316,11 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		pCell->freezing(1);
 	}	
 
-	bn_index = pCell->boolean_network.get_node_index("Matrix_modif");
-	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
-	{
-		pCell->set_mmp( (*point_to_nodes)[bn_index] );
-	}
+	// bn_index = pCell->boolean_network.get_node_index("Matrix_modif");
+	// if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
+	// {
+	// 	pCell->set_mmp( (*point_to_nodes)[bn_index] );
+	// }
 
 	bn_index = pCell->boolean_network.get_node_index("EMT");
 	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
