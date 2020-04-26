@@ -180,9 +180,12 @@ void setup_tissue( void )
 		double elapsed_time = cells[i].elapsed_time;
 
 		pC = static_cast<Custom_cell*>(create_cell());
-		 
 		pC->assign_position( x, y, z );
-		pC->set_total_volume(sphere_volume_from_radius(radius));
+		double volume = sphere_volume_from_radius(radius);
+		pC->set_total_volume(volume);
+		pC->phenotype.volume.target_solid_nuclear = cell_defaults.phenotype.volume.target_solid_nuclear;
+		pC->phenotype.volume.target_solid_cytoplasmic = cell_defaults.phenotype.volume.target_solid_cytoplasmic;
+		pC->phenotype.volume.rupture_volume = cell_defaults.phenotype.volume.rupture_volume;
 		
 		pC->phenotype.cycle.data.current_phase_index = phase+1;
 		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;

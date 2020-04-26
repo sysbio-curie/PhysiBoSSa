@@ -593,8 +593,8 @@ void Volume::multiply_by_ratio( double ratio )
 	
 	rupture_volume *= ratio; 
 	
-	// target_solid_nuclear *= ratio;
-	// target_solid_cytoplasmic *= ratio; 	
+	target_solid_nuclear *= ratio;
+	target_solid_cytoplasmic *= ratio; 	
 	
 	return; 
 }

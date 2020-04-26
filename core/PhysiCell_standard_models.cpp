@@ -92,14 +92,6 @@ void standard_Ki67_positive_phase_entry_function( Cell* pCell, Phenotype& phenot
 	return; 
 }
 
-void standard_Ki67_postmitotic_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	// the cell wants to stay to a quiescent size
-	phenotype.volume.target_solid_nuclear *= 0.5; 
-	phenotype.volume.target_solid_cytoplasmic *= 0.5; 
-	return; 
-}
-
 void standard_Ki67_negative_phase_entry_function( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	return; 
@@ -284,7 +276,6 @@ void create_ki67_models( void )
 
 	Ki67_advanced.phases[0].entry_function = NULL; // standard_Ki67_negative_phase_entry_function;
 	Ki67_advanced.phases[1].entry_function = standard_Ki67_positive_phase_entry_function;	
-	Ki67_advanced.phases[2].entry_function = standard_Ki67_postmitotic_phase_entry_function;
 	
 	return; 
 }
