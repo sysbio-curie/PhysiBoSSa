@@ -67,8 +67,7 @@
 
 #include "PhysiCell_standard_models.h" 
 #include "PhysiCell_cell.h" 
-#include "PhysiCell_utilities.h"
-#include <math.h>
+
 namespace PhysiCell{
 	
 bool PhysiCell_standard_models_initialized = false; 
@@ -220,9 +219,6 @@ bool standard_necrosis_arrest_function( Cell* pCell, Phenotype& phenotype, doubl
 }
 
 /* create standard models */ 
-bool wait_for_nucleus_growth (Cell* cell, Phenotype& phenotype, double dt) {
-	return relative_diff( phenotype.volume.total, pow(parameters.doubles("cell_radius"), 3.0) * 3.14159 * (4.0/3.0) * 2.0 ) > UniformRandom() * 0.1;
-}
 
 void create_ki67_models( void )
 {
@@ -265,13 +261,11 @@ void create_ki67_models( void )
 	Ki67_advanced.add_phase_link( 1 , 2 , NULL ); // + (pre-mitotic) to + (post-mitotic) 
 	Ki67_advanced.add_phase_link( 2 , 0 , NULL ); // + to - 
 	
-	Ki67_advanced.phase_link(0,1).fixed_duration = true; 
 	Ki67_advanced.phase_link(1,2).fixed_duration = true; 
-	Ki67_advanced.phase_link(1,2).arrest_function = wait_for_nucleus_growth;
 	Ki67_advanced.phase_link(2,0).fixed_duration = true; 
 
-	Ki67_advanced.transition_rate(0,1) = 1.0/(1*60.0); // MCF10A cells ~3.62 hours in Ki67- in this fitted model
-	Ki67_advanced.transition_rate(1,2) = std::numeric_limits<double>::infinity();//1.0/(13.0*60.0); 
+	Ki67_advanced.transition_rate(0,1) = 1.0/(3.62*60.0); // MCF10A cells ~3.62 hours in Ki67- in this fitted model
+	Ki67_advanced.transition_rate(1,2) = 1.0/(13.0*60.0); 
 	Ki67_advanced.transition_rate(2,0) = 1.0/(2.5*60.0);
 
 	Ki67_advanced.phases[0].entry_function = NULL; // standard_Ki67_negative_phase_entry_function;
@@ -416,16 +410,6 @@ bool create_standard_cell_cycle_models( void )
 	return true; 
 }
 
-bool waiting_to_remove(Cell* cell, Phenotype& phenotype, double dt) {
-	if (phenotype.cycle.data.elapsed_time_in_phase >= (8.6 * 60.0))
-		return false;
-	
-	if (phenotype.volume.total < PhysiCell_constants::cell_removal_threshold_volume) 
-		return false;
-
-	return true;
-}
-
 void create_standard_apoptosis_model( void )
 {
 	// set default parameters for apoptosis
@@ -458,14 +442,10 @@ void create_standard_apoptosis_model( void )
 		// Add a link between these phases. Set the cell to be removed 
 		// upon this transition. (So the "debris" phase should never be entered). 
 	apoptosis.add_phase_link( 0, 1, NULL ); 
-	// apoptosis.transition_rate( 0, 1) = 1.0 / (8.6 * 60.0); 
-	apoptosis.phase_link(0,1).fixed_duration = true;
+	apoptosis.transition_rate( 0, 1) = 1.0 / (8.6 * 60.0); 
 
 		// Use the deterministic model, where this phase has fixed duration
-
-	// Use an arrest function to put the transition condition to duration OR small cell size
-	apoptosis.transition_rate( 0, 1) = std::numeric_limits<double>::infinity();//1.0 / (8.6 * 60.0); 
-	apoptosis.phase_link(0,1).arrest_function = waiting_to_remove; 
+	apoptosis.phase_link(0,1).fixed_duration = true; 
 	
 	return; 
 }

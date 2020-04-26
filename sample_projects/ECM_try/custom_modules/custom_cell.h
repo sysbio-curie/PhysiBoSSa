@@ -94,7 +94,8 @@ public:
 
 	static void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt);
 	static double custom_adhesion_function(Cell* pCell, Cell* otherCell, double distance);
-
+	static bool wait_for_nucleus_growth(Cell* cell, Phenotype& phenotype, double dt);
+	static bool waiting_to_remove(Cell* cell, Phenotype& phenotype, double dt);
 	/** \brief Change the current value of motility percent coeff, increase or decrease according to up value */
 	inline void evolve_motility_coef( int up, double dt )
 	{ evolve_coef( up, &pmotility, dt); };

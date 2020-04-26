@@ -68,7 +68,7 @@
 #include "./custom.h"
 #include "../BioFVM/BioFVM.h"  
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
-
+#include <math.h>
 using namespace BioFVM;
 
 // declare cell definitions here 
@@ -123,6 +123,22 @@ void create_cell_types( void )
 	// initially no necrosis 
 	// cell_defaults.phenotype.death.rates[apoptosis_model_index] = 0.0; 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
+	cell_defaults.functions.cycle_model.phase_link(0,1).fixed_duration = true; 
+	cell_defaults.functions.cycle_model.phase_link(1,2).arrest_function = Custom_cell::wait_for_nucleus_growth;
+	cell_defaults.functions.cycle_model.transition_rate(0,1) = 1.0/(1*60.0); 
+	cell_defaults.functions.cycle_model.transition_rate(1,2) = std::numeric_limits<double>::infinity();
+	cell_defaults.phenotype.cycle.data.transition_rate(0,1) = 1.0/(1*60.0); 
+	cell_defaults.phenotype.cycle.data.transition_rate(1,2) = std::numeric_limits<double>::infinity();
+
+	cell_defaults.phenotype.death.models[apoptosis_model_index]->phase_link(0,1).fixed_duration = true;
+
+		// Use the deterministic model, where this phase has fixed duration
+
+	// Use an arrest function to put the transition condition to duration OR small cell size
+	cell_defaults.phenotype.death.models[apoptosis_model_index]->transition_rate( 0, 1) = std::numeric_limits<double>::infinity();//1.0 / (8.6 * 60.0); 
+	cell_defaults.phenotype.death.models[apoptosis_model_index]->phase_link(0,1).arrest_function = Custom_cell::waiting_to_remove; 
+	
+
 
 	// set oxygen uptake / secretion parameters for the default cell type 
 	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 

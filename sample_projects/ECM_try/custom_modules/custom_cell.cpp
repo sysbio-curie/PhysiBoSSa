@@ -338,3 +338,20 @@ double Custom_cell::custom_adhesion_function(Cell* pCell, Cell* otherCell, doubl
 	}
 	return adh;
 }
+
+bool Custom_cell::wait_for_nucleus_growth (Cell* cell, Phenotype& phenotype, double dt) {
+	return relative_diff( 
+		phenotype.volume.total, 
+		pow(PhysiCell::parameters.doubles("cell_radius"), 3.0) * 3.14159 * (4.0/3.0) * 2.0 
+	) > UniformRandom() * 0.1;
+}
+
+bool Custom_cell::waiting_to_remove(Cell* cell, Phenotype& phenotype, double dt) {
+	if (phenotype.cycle.data.elapsed_time_in_phase >= (8.6 * 60.0))
+		return false;
+	
+	if (phenotype.volume.total < PhysiCell_constants::cell_removal_threshold_volume) 
+		return false;
+
+	return true;
+}
