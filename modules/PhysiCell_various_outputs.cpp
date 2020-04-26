@@ -116,9 +116,14 @@ int writePov(std::vector<Cell*> all_cells, double timepoint, double scale)
 	return 0;
 }
 
-void writeDensityReport(int dens, std::string filename) 
+void writeDensityReport(int dens, std::string name, double timepoint) 
 {
-	std::ofstream outecm_file( filename );
+	std::string ecmname; 
+	ecmname.resize( 1024 );
+	sprintf( (char*) ecmname.c_str() , "_t%05d.txt", (int)round(timepoint) );
+	ecmname = "output//"+name+ecmname;
+					
+	std::ofstream outecm_file( ecmname );
 	
 	double fill;
 	for (auto i=0; i < microenvironment.number_of_voxels(); i++)

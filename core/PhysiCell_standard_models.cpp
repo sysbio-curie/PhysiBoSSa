@@ -89,7 +89,6 @@ void standard_Ki67_positive_phase_entry_function( Cell* pCell, Phenotype& phenot
 	// the cell wants to double its volume 
 	phenotype.volume.target_solid_nuclear *= 2.0; 
 	phenotype.volume.target_solid_cytoplasmic *= 2.0; 
-	
 	return; 
 }
 
@@ -98,7 +97,6 @@ void standard_Ki67_postmitotic_phase_entry_function( Cell* pCell, Phenotype& phe
 	// the cell wants to stay to a quiescent size
 	phenotype.volume.target_solid_nuclear *= 0.5; 
 	phenotype.volume.target_solid_cytoplasmic *= 0.5; 
-	
 	return; 
 }
 
@@ -234,7 +232,6 @@ bool wait_for_nucleus_growth (Cell* cell, Phenotype& phenotype, double dt) {
 	return relative_diff( phenotype.volume.total, pow(parameters.doubles("cell_radius"), 3.0) * 3.14159 * (4.0/3.0) * 2.0 ) > UniformRandom() * 0.1;
 }
 
-
 void create_ki67_models( void )
 {
 	// Ki67_basic: 
@@ -287,9 +284,8 @@ void create_ki67_models( void )
 
 	Ki67_advanced.phases[0].entry_function = NULL; // standard_Ki67_negative_phase_entry_function;
 	Ki67_advanced.phases[1].entry_function = standard_Ki67_positive_phase_entry_function;	
-	Ki67_advanced.phases[2].entry_function = standard_Ki67_postmitotic_phase_entry_function;	
+	Ki67_advanced.phases[2].entry_function = standard_Ki67_postmitotic_phase_entry_function;
 	
-
 	return; 
 }
 

@@ -147,7 +147,6 @@ class Microenvironment
 	std::vector< std::vector<double> > supply_target_densities_times_supply_rates; 
 	std::vector< std::vector<double> > supply_rates; 
 	std::vector< std::vector<double> > uptake_rates; 
-	std::vector<double> voxel_center;
 	void update_rates( void ); 
 	
 	Microenvironment(); 
@@ -195,9 +194,6 @@ class Microenvironment
 	std::vector<double>& nearest_density_vector( std::vector<double>& position );  
 	std::vector<double>& nearest_density_vector( int voxel_index );  
 
-	inline std::vector<double> get_voxel_center(int i)
-	{voxel_center.push_back(voxels(i).center[0]); voxel_center.push_back(voxels(i).center[1]); voxel_center.push_back(voxels(i).center[2]); return voxel_center;};
-	/** \brief Return center coordinates of i-th voxel */
 	/*! access the density vector at  [ X(i),Y(j),Z(k) ] */
 	std::vector<double>& operator()( int i, int j, int k ); 
 	/*! access the density vector at  [ X(i),Y(j),0 ]  -- helpful for 2-D problems */

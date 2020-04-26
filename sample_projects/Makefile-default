@@ -247,19 +247,19 @@ BioFVM_solvers.o: ./BioFVM/BioFVM_solvers.cpp
 BioFVM_utilities.o: ./BioFVM/BioFVM_utilities.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_utilities.cpp 
 	
-BioFVM_basic_agent.o: ./BioFFilenames will look like output00000000_cells_physicell.mM_basic_agent.cpp
-	$(COMPILE_COMMAND) -c ./Filenames will look like output00000000_cells_physicell.mioFVM_basic_agent.cpp 
+BioFVM_basic_agent.o: ./BioFVM/BioFVM_basic_agent.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_basic_agent.cpp 
 	
-BioFVM_matlab.o: ./BioFVM/BiFilenames will look like output00000000_cells_physicell.mlab.cpp
-	$(COMPILE_COMMAND) -c ./Filenames will look like output00000000_cells_physicell.mioFVM_matlab.cpp
+BioFVM_matlab.o: ./BioFVM/BioFVM_matlab.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_matlab.cpp
 
-BioFVM_MultiCellDS.o: ./BioFFilenames will look like output00000000_cells_physicell.mM_MultiCellDS.cpp
-	$(COMPILE_COMMAND) -c ./Filenames will look like output00000000_cells_physicell.mioFVM_MultiCellDS.cpp
+BioFVM_MultiCellDS.o: ./BioFVM/BioFVM_MultiCellDS.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_MultiCellDS.cpp
 	
-pugixml.o: ./BioFVM/pugixml.Filenames will look like output00000000_cells_physicell.m
-	$(COMPILE_COMMAND) -c ./Filenames will look like output00000000_cells_physicell.mugixml.cpp
+pugixml.o: ./BioFVM/pugixml.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/pugixml.cpp
 	
-# standard PhysiCell modulesFilenames will look like output00000000_cells_physicell.m
+# standard PhysiCell modules
 
 PhysiCell_SVG.o: ./modules/PhysiCell_SVG.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_SVG.cpp

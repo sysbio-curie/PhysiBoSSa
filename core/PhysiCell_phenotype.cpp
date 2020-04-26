@@ -278,7 +278,7 @@ Phase_Link& Cycle_Model::phase_link( int start_index, int end_index )
 void Cycle_Model::advance_model( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	int i = phenotype.cycle.data.current_phase_index; 
-	//std::cout << i << std::endl;
+	
 	phenotype.cycle.data.elapsed_time_in_phase += dt; 
 
 	// Evaluate each linked phase: 

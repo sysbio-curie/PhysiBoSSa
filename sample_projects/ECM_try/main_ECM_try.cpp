@@ -206,11 +206,7 @@ int main( int argc, char* argv[] )
 				}
 				int e = microenvironment.find_density_index("ecm");
 				if (e > 0){
-					std::string ecmname; 
-					ecmname.resize( 1024 );
-					sprintf( (char*) ecmname.c_str() , "_t%05d.txt", (int)round(PhysiCell_globals.current_time) );
-					ecmname = "microutput//ecm"+ecmname;
-					writeDensityReport(e, ecmname);
+					writeDensityReport(e, "ecm", PhysiCell_globals.current_time);
 				}
 			}
 
