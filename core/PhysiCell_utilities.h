@@ -75,8 +75,6 @@
 #include <vector>
 #include <random>
 #include <chrono>
-#include <limits>
-#include <algorithm>
 
 namespace PhysiCell{
 
@@ -87,21 +85,6 @@ int UniformInt();
 double NormalRandom( double mean, double standard_deviation );
 double dist_squared(std::vector<double> p1, std::vector<double> p2);
 double dist(std::vector<double> p1, std::vector<double> p2);
-
-inline void strip( std::string* str ) 
-{ (*str).erase(remove(str->begin(), (*str).end(), ' '), (*str).end()); };
-
-inline double current_value( double min, double max, double percent )
-{ return (min + (max-min) * percent); };
-
-static const std::string delim = "\t";
-static const double EPSILON = std::numeric_limits<double>::epsilon();
-inline double sign( double x ) { return (x > 0) ? 1 : -1; };
-
-/** \brief Relative difference between two numbers */
-inline double relative_diff( double a, double b )
-{ if ( b < EPSILON ) return 0; return ( fabs(a-b)/b ); };
-
 
 std::string get_PhysiCell_version( void ); 
 void get_PhysiCell_version( std::string& pString ); 

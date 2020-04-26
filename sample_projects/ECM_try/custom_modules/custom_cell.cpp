@@ -22,13 +22,13 @@ void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 	//if (dens > PhysiCell::EPSILON || dens2 > PhysiCell::EPSILON) { std::cout << dens << "    " << dens2 << std::endl;};
 	// if voxel is "full", density is 1
 	dens = std::min( dens, 1.0 ); 
-	if ( dens > PhysiCell::EPSILON )
+	if ( dens > EPSILON )
 	{
 		// Distance between agent center and ECM voxel center
 		displacement = position - get_container()->underlying_mesh.voxels[index_voxel].center;
 		double distance = norm(displacement);
 		// Make sure that the distance is not zero
-		distance = std::max(distance, PhysiCell::EPSILON);
+		distance = std::max(distance, EPSILON);
 		
 		double dd = phenotype.geometry.radius + ecmrad;  
 		double dnuc = phenotype.geometry.nuclear_radius + ecmrad;  

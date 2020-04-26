@@ -129,7 +129,7 @@ void writeDensityReport(int dens, std::string name, double timepoint)
 	for (auto i=0; i < microenvironment.number_of_voxels(); i++)
 	{	
 		fill = microenvironment.nearest_density_vector(i)[dens];
-		if ( fill > PhysiCell::EPSILON )
+		if ( fill > std::numeric_limits<double>::epsilon() )
 		{
 			outecm_file << microenvironment.voxels(i).center[0] << ";";
 			outecm_file << microenvironment.voxels(i).center[1] << ";";

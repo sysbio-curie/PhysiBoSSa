@@ -66,7 +66,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)  
 
-PhysiBoSSa_OBJECTS := utils.o maboss_network.o boolean_network.o
+PhysiBoSSa_OBJECTS := maboss_network.o boolean_network.o
 
 PhysiCell_custom_module_OBJECTS := custom.o custom_main.o custom_cell.o
 
@@ -166,9 +166,6 @@ MaBoSS:
 
 maboss_network.o: ./addons/PhysiBoSSa/src/maboss_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/maboss_network.cpp
-
-utils.o: ./addons/PhysiBoSSa/src/utils.cpp
-	$(COMPILE_COMMAND) $(INC_PHYSICELL) -c ./addons/PhysiBoSSa/src/utils.cpp
 
 boolean_network.o: ./addons/PhysiBoSSa/src/boolean_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/boolean_network.cpp

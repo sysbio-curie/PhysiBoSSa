@@ -14,7 +14,6 @@
 #include "StochasticSimulationEngine.h"
 #include "BooleanNetwork.h"
 #include "RunConfig.h"
-#include "utils.h"
 
 class MaBoSSNetwork
 {
