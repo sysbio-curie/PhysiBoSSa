@@ -81,6 +81,7 @@ namespace PhysiCell{
 long SeedRandom( long input );
 long SeedRandom( void );
 double UniformRandom( void );
+int UniformInt();
 double NormalRandom( double mean, double standard_deviation );
 double dist_squared(std::vector<double> p1, std::vector<double> p2);
 double dist(std::vector<double> p1, std::vector<double> p2);
