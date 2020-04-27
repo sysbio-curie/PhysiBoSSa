@@ -150,6 +150,18 @@ spheroid-TNF:
 	mkdir ./scripts/
 	cp ./sample_projects/spheroid_TNF/scripts/* ./scripts/
 
+ecm-try: 	
+	cp -r ./sample_projects/ECM_try/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/ECM_try/main_ECM_try.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/ECM_try/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/ECM_try/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/ECM_try/scripts/* ./scripts/
+
+
 drug-AGS: 	
 	cp ./sample_projects/drug_AGS/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
