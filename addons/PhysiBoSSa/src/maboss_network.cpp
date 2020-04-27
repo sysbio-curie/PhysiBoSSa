@@ -1,4 +1,5 @@
 #include "maboss_network.h"
+#include "../../../core/PhysiCell_utilities.h"
 
 /* Default constructor */
 void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile)
@@ -61,7 +62,7 @@ void MaBoSSNetwork::restart_node_values(std::vector<bool>* node_values)
 {
 	NetworkState network_state;
 	RandomGeneratorFactory *randgen_factory = this->config->getRandomGeneratorFactory();
-  	RandomGenerator *random_generator = randgen_factory->generateRandomGenerator(UniformInt());
+  	RandomGenerator *random_generator = randgen_factory->generateRandomGenerator(PhysiCell::UniformInt());
 	this->network->initStates(network_state, random_generator);
 
 	int i = 0;
@@ -80,7 +81,7 @@ void MaBoSSNetwork::run_simulation(std::vector<bool>* node_values)
 	NetworkState_Impl state = this->load_state(node_values);
 
 	StochasticSimulationEngine* engine = new StochasticSimulationEngine(this->network, this->config);
-	engine->setSeed(UniformInt());
+	engine->setSeed(PhysiCell::UniformInt());
 	state = engine->run(&state, NULL);
 	delete engine;
 
