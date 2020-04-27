@@ -1,6 +1,8 @@
 #include "custom_cell.h"
 
 Custom_cell::Custom_cell() {
+	ecm_contact = 0;
+	nucleus_deform = 0;
 	freezed = 0;
     pintegrin = 0.5;
 	pmotility = 0.5;
