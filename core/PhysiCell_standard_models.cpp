@@ -218,6 +218,11 @@ bool standard_necrosis_arrest_function( Cell* pCell, Phenotype& phenotype, doubl
 	return false; 
 }
 
+double standard_adhesion_function( Cell* pCell, Cell* otherCell, double distance)
+{
+	return sqrt( pCell->phenotype.mechanics.cell_cell_adhesion_strength * otherCell->phenotype.mechanics.cell_cell_adhesion_strength );
+}   
+
 /* create standard models */ 
 
 void create_ki67_models( void )
@@ -685,7 +690,7 @@ void initialize_default_cell_definition( void )
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
 	cell_defaults.functions.set_orientation = NULL;
-
+	cell_defaults.functions.adhesion_function = standard_adhesion_function;
 	// add the standard death models to the default phenotype. 
 	cell_defaults.phenotype.death.add_death_model( 0.00319/60.0 , &apoptosis , apoptosis_parameters );
 		// MCF10A, to get a 2% apoptotic index 

@@ -449,6 +449,7 @@ class Cell_Functions
 	void (*contact_function)(Cell* pMyself, Phenotype& my_phenotype, 
 		Cell* pOther, Phenotype& other_phenotype, double dt ); 
 		
+	double (*adhesion_function)(Cell* pCell, Cell* otherCell, double distance);
 	/* prototyping / beta in 1.5.0 */ 
 /*	
 	void (*internal_substrate_function)(Cell* pCell, Phenotype& phenotype , double dt ); 

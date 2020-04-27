@@ -765,8 +765,7 @@ void Cell::add_potentials(Cell* other_agent)
 		temp_a *= temp_a; // (1-d/S)^2 
 		// temp_a *= phenotype.mechanics.cell_cell_adhesion_strength; // original 
 		
-		// August 2017 - back to the original if both have same coefficient 
-		double effective_adhesion = sqrt( phenotype.mechanics.cell_cell_adhesion_strength * other_agent->phenotype.mechanics.cell_cell_adhesion_strength ); 
+		double effective_adhesion = functions.adhesion_function(this, other_agent, (max_interactive_distance-distance));
 		temp_a *= effective_adhesion; 
 		
 		temp_r -= temp_a;
