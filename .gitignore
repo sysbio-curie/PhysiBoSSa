@@ -42,3 +42,10 @@
 
 #Custom
 Makefile-backup
+
+output/*
+!output/empty.txt
+custom_modules/*
+!custom_modules/empty.txt
+config/*
+!config/PhysiCell_settings.xml
