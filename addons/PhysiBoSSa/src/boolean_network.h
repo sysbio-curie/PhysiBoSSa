@@ -2,6 +2,7 @@
 #define __CELL_CYCLE_NETWORK_H
 
 #include "maboss_network.h"
+#include "../../../core/PhysiCell_utilities.h"
 
 /**
  *	\class BooleanNetwork
@@ -27,9 +28,8 @@ class BooleanNetwork
 	
 		/** \brief choose a random update time, to asynchronize it between all cells 
 		 *
-		 * Set the next time at which to update the current cell's network. The time in between two udpates is chosen randomly in order to not update all cells together. 
-		 */
-		inline void set_time_to_update(){this->time_to_update = (1 + 0.5*UniformRandom11()) * this->maboss.get_update_time_step();}
+		 * Set the next time at which to update the current cell's network. The time in between two udpates is chosen randomly in order to not update all cells together. */
+		inline void set_time_to_update(){this->time_to_update = (PhysiCell::UniformRandom()+0.5) * this->maboss.get_update_time_step();}
 
 	public:
 		/** 
