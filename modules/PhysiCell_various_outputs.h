@@ -82,6 +82,7 @@
 namespace PhysiCell{
 
 int writePov(std::vector<Cell*> all_cells, double timepoint, double scale);
+void writeDensityReport(int dens, std::string name, double timepoint); 
 int writeCellReport(std::vector<Cell*> all_cells, double timepoint);
 
 void display_simulation_status( std::ostream& os ); 
