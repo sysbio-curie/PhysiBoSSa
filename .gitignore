@@ -53,3 +53,15 @@ custom_modules/*
 !custom_modules/empty.txt
 config/*
 !config/PhysiCell_settings.xml
+addons/PhysiBoSSa/MaBoSS-env-2.0/engine/src/depend.mk
+addons/PhysiBoSSa/MaBoSS-env-2.0/engine/src/depend_tmp.mk
+addons/PhysiBoSSa/MaBoSS-env-2.0/engine/src/BooleanGrammar.cc
+addons/PhysiBoSSa/MaBoSS-env-2.0/engine/src/BooleanGrammar.output
+addons/PhysiBoSSa/MaBoSS-env-2.0/engine/src/BooleanGrammar.tab.c
+addons/PhysiBoSSa/MaBoSS-env-2.0/engine/src/RunConfigGrammar.cc
+addons/PhysiBoSSa/MaBoSS-env-2.0/engine/src/RunConfigGrammar.output
+addons/PhysiBoSSa/MaBoSS-env-2.0/engine/src/RunConfigGrammar.tab.c
+addons/PhysiBoSSa/MaBoSS-env-2.0/engine/src/lex.CTBNDL.cc
+addons/PhysiBoSSa/MaBoSS-env-2.0/engine/src/lex.RC.cc
+addons/PhysiBoSSa/MaBoSS-env-2.0/engine/src/maboss-config.h
+
