@@ -169,6 +169,17 @@ spheroid-TNF-v2:
 	cp -r ./sample_projects/spheroid_TNF_v2/config/* ./config/
 	mkdir ./scripts/
 	cp ./sample_projects/spheroid_TNF_v2/scripts/* ./scripts/
+	
+ecm-try: 	
+	cp -r ./sample_projects/ECM_try/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/ECM_try/main_ECM_try.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/ECM_try/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/ECM_try/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/ECM_try/scripts/* ./scripts/
 
 drug-AGS: 	
 	cp ./sample_projects/drug_AGS/custom_modules/* ./custom_modules/
@@ -255,19 +266,19 @@ BioFVM_solvers.o: ./BioFVM/BioFVM_solvers.cpp
 BioFVM_utilities.o: ./BioFVM/BioFVM_utilities.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_utilities.cpp 
 	
-BioFVM_basic_agent.o: ./BioFFilenames will look like output00000000_cells_physicell.mM_basic_agent.cpp
-	$(COMPILE_COMMAND) -c ./Filenames will look like output00000000_cells_physicell.mioFVM_basic_agent.cpp 
+BioFVM_basic_agent.o: ./BioFVM/BioFVM_basic_agent.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_basic_agent.cpp 
 	
-BioFVM_matlab.o: ./BioFVM/BiFilenames will look like output00000000_cells_physicell.mlab.cpp
-	$(COMPILE_COMMAND) -c ./Filenames will look like output00000000_cells_physicell.mioFVM_matlab.cpp
+BioFVM_matlab.o: ./BioFVM/BioFVM_matlab.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_matlab.cpp
 
-BioFVM_MultiCellDS.o: ./BioFFilenames will look like output00000000_cells_physicell.mM_MultiCellDS.cpp
-	$(COMPILE_COMMAND) -c ./Filenames will look like output00000000_cells_physicell.mioFVM_MultiCellDS.cpp
+BioFVM_MultiCellDS.o: ./BioFVM/BioFVM_MultiCellDS.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_MultiCellDS.cpp
 	
-pugixml.o: ./BioFVM/pugixml.Filenames will look like output00000000_cells_physicell.m
-	$(COMPILE_COMMAND) -c ./Filenames will look like output00000000_cells_physicell.mugixml.cpp
+pugixml.o: ./BioFVM/pugixml.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/pugixml.cpp
 	
-# standard PhysiCell modulesFilenames will look like output00000000_cells_physicell.m
+# standard PhysiCell modules
 
 PhysiCell_SVG.o: ./modules/PhysiCell_SVG.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_SVG.cpp
