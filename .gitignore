@@ -46,3 +46,10 @@ Makefile-backup
 rsync_life
 update_modules
 .ipynb_checkpoints/*
+
+output/*
+!output/empty.txt
+custom_modules/*
+!custom_modules/empty.txt
+config/*
+!config/PhysiCell_settings.xml
