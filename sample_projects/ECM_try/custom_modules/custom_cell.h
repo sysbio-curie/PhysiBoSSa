@@ -102,7 +102,9 @@ public:
 	/** \brief Set the value of freezed */
 	inline void freezing( int frozen )
 	{ freezed = frozen; };
-
+	/** \brief Return amount of contact with ECM */
+	inline double contact_ecm()
+	{ return ecm_contact / phenotype.geometry.radius ; };
 	/** \brief Update cell cycle state */
 	void update_cycle( double cycle_dt, double time_since_last, double t );
 };

@@ -290,7 +290,7 @@ int ind;
 	// // If has enough contact with ecm or not
 	ind = pCell->boolean_network.get_node_index( "ECMicroenv" );
 	if ( ind >= 0 )
-		nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
+		nodes[ind] = ( touch_ECM(pCell) );
 	
 	// If nucleus is deformed, probability of damage
 	// Change to increase proba with deformation ? + put as parameter
@@ -447,4 +447,9 @@ double sphere_volume_from_radius(double rad)
 {
 	double PI4_3 = 4.0 / 3.0 * M_PI;
 return PI4_3 * rad * rad * rad;
+}
+
+bool touch_ECM(Custom_cell* pCell)
+{ 
+	return pCell->contact_ecm() > parameters.doubles("contact_cell_ECM_threshold"); 
 }
