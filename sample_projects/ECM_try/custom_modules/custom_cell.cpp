@@ -1,8 +1,6 @@
 #include "custom_cell.h"
 
 Custom_cell::Custom_cell() {
-	ecm_contact = 0;
-	nucleus_deform = 0;
 	freezed = 0;
     pintegrin = 0.5;
 	pmotility = 0.5;
@@ -258,6 +256,9 @@ void Custom_cell::check_passive(Cell* cell, Phenotype& phenotype, double dt) {
 void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt)
 {
 	Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
+
+	pCustomCell->ecm_contact = 0;
+	pCustomCell->nucleus_deform = 0;
 
 	if( pCell->functions.add_cell_basement_membrane_interactions )
 	{

@@ -222,7 +222,11 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
 	std::vector< std::string > output( 4 , "black" );
 	double ecm_value = pCustomCell->ecm_contact;
-	int color = (int) round( ecm_value * 255.0 / (pCell->phenotype.geometry.radius)  );
+	int color = (int) round( (ecm_value * 255)/ (pCell->phenotype.geometry.radius) );
+	if (color > 255)
+	{
+		color = 255;
+	}
 	char szTempString [128];
 	sprintf( szTempString , "rgb(%u,0,%u)", color, 255-color );
 	output[0].assign( szTempString );
