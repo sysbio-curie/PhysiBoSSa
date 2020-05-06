@@ -11,7 +11,8 @@ Custom_cell::Custom_cell() {
 	functions.custom_cell_rule = Custom_cell::check_passive;
 	functions.update_velocity = Custom_cell::custom_update_velocity;
 	functions.custom_adhesion = Custom_cell::custom_adhesion_function;
-	//functions.add_cell_basement_membrane_interactions = Custom_cell::add_cell_basement_membrane_interactions;	
+	cell_defaults.functions.add_cell_basement_membrane_interactions = Custom_cell::add_cell_basement_membrane_interactions;	
+	cell_defaults.functions.calculate_distance_to_membrane = Custom_cell::distance_to_membrane;
 }
 
 /* Calculate repulsion/adhesion between agent and ecm according to its local density */
@@ -20,7 +21,6 @@ void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 	// Check if there is ECM material in given voxel
 	double dens2 = get_microenvironment()->density_vector(index_voxel)[index_ecm];
 	double dens = get_microenvironment()->nearest_density_vector(index_voxel)[index_ecm];
-	//if (dens > PhysiCell::EPSILON || dens2 > PhysiCell::EPSILON) { std::cout << dens << "    " << dens2 << std::endl;};
 	// if voxel is "full", density is 1
 	dens = std::min( dens, 1.0 ); 
 	if ( dens > EPSILON )
@@ -260,6 +260,8 @@ void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, dou
 
 	pCustomCell->ecm_contact = 0;
 	pCustomCell->nucleus_deform = 0;
+	pCustomCell->cell_contact = 0;
+	
 	if( pCell->functions.add_cell_basement_membrane_interactions )
 	{
 		pCell->functions.add_cell_basement_membrane_interactions(pCell, phenotype,dt);
@@ -358,21 +360,23 @@ bool Custom_cell::waiting_to_remove(Cell* cell, Phenotype& phenotype, double dt)
 
 	return true;
 }
-/*
+
 void Custom_cell::add_cell_basement_membrane_interactions( Cell* pCell, Phenotype& phenotype, double dt ) 
 {
 	Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
 
 	//Note that the distance_to_membrane function must set displacement values (as a normal vector)
-	double max_interactive_distance = cell_line->max_interaction_distance_factor * phenotype.geometry.radius;
+	double max_interactive_distance = PhysiCell::parameters.doubles("max_interaction_factor") * phenotype.geometry.radius;
 		
 	double temp_a=0;
+	double membrane_length = PhysiCell::parameters.doubles("membrane_length");
+	double distance = pCustomCell->distance_to_membrane(pCell, phenotype, membrane_length);
 	// Adhesion to basement membrane
 	if(distance< max_interactive_distance)
 	{
 		temp_a= (1- distance/max_interactive_distance);
 		temp_a*=temp_a;
-		temp_a*=- cell_line->Ccba;
+		temp_a*=- PhysiCell::parameters.doubles("cell_basement_membrane_adhesion");
 	}
 	// Repulsion from basement membrane
 	double temp_r=0;
@@ -380,7 +384,7 @@ void Custom_cell::add_cell_basement_membrane_interactions( Cell* pCell, Phenotyp
 	{
 		temp_r= (1- distance/phenotype.geometry.radius);
 		temp_r*=temp_r;
-		temp_r*= cell_line->Ccbr;
+		temp_r*= PhysiCell::parameters.doubles("cell_basement_membrane_repulsion");
 	}
 	temp_r+=temp_a;
 	if(temp_r==0)
@@ -389,4 +393,72 @@ void Custom_cell::add_cell_basement_membrane_interactions( Cell* pCell, Phenotyp
 	pCell->velocity += temp_r * pCell->displacement;	
 	return;	
 }
-*/
+
+/* Calculate agent distance to BM if defined */
+double Custom_cell::distance_to_membrane(Cell* pCell, Phenotype& phenotype, double l)
+{
+	Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
+	std::string shape = pCustomCell->get_shape();
+	if ( l > 0 )
+	{
+		if ( shape == "duct" )
+			return pCustomCell->distance_to_membrane_duct(l);
+		else if ( shape == "sphere" )
+			return pCustomCell->distance_to_membrane_sphere(l);
+		else if ( shape == "sheet" )
+			return pCustomCell->distance_to_membrane_sheet(l);
+	}
+	return 0;
+}
+
+
+/* Distance to membrane Sphere 
+ * Basement membrane is a sphere of radius BM_radius 
+ * Sphere center is (0,0,0)
+ * */
+double Custom_cell::distance_to_membrane_sphere(double length)
+{
+	double distance_to_origin = sqrt( position[0]*position[0] + position[1]*position[1] + position[2]*position[2]);  // distance to the origin 
+	distance_to_origin = std::max(distance_to_origin, EPSILON);	  // prevents division by zero
+	displacement = -1 / distance_to_origin * position;
+	if ( (length - distance_to_origin) < 0 )
+		displacement *= 2.0; // penalize more outside of the sphere cells, stronger rappel
+	return fabs(length - distance_to_origin);
+}
+
+/* Distance to membrane Sheet
+ * Basement membrane is a sheet of height 2*BM_radius 
+ * Z value is in between -BM_radius and +BM_radius
+ * */
+double Custom_cell::distance_to_membrane_sheet(double length)
+{
+	double distance = fabs(position[2]);  // |z| position
+	distance = std::max(distance, EPSILON);	  // prevents division by zero
+	displacement[0] = 0;
+	displacement[1] = 0;
+	displacement[2] = -1 / distance * position[2];
+	if ( (length - distance) < 0 )
+		displacement *= 2.0; // penalize more outside of the sphere cells, stronger rappel
+	return fabs(length - distance);
+}
+
+/// Distance to membrane functions
+double Custom_cell::distance_to_membrane_duct(double length)
+{
+	//Note that this function assumes that duct cap center is located at <0, 0, 0>
+	if ( position[0] >= 0 ) // Cell is within the cylinder part of the duct
+	{
+		double distance_to_x_axis= sqrt( position[1]*position[1] + position[2]*position[2]);
+		distance_to_x_axis = std::max(distance_to_x_axis, EPSILON);		// prevents division by zero
+		displacement[0]=0; 
+		displacement[1]= -position[1]/ distance_to_x_axis; 
+		displacement[2]= -position[2]/ distance_to_x_axis; 
+		return fabs(length - distance_to_x_axis);
+	}
+
+	// Cell is inside the cap of the duct
+	double distance_to_origin= sqrt( position[0]*position[0] + position[1]*position[1] + position[2]*position[2]);  // distance to the origin 
+	distance_to_origin = std::max(distance_to_origin, EPSILON);			  // prevents division by zero
+	displacement = -1 / distance_to_origin * position;
+	return fabs(length - distance_to_origin);
+}

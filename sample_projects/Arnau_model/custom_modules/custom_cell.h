@@ -112,7 +112,19 @@ public:
 	{ return ecm_contact / phenotype.geometry.radius ; };
 	/** \brief Update cell cycle state */
 	void update_cycle( double cycle_dt, double time_since_last, double t );
-	//static void add_cell_basement_membrane_interactions( Cell* pCell, Phenotype& phenotype, double dt );
+	inline std::string get_shape()
+	{return PhysiCell::parameters.strings("membrane_shape");}
+	static void add_cell_basement_membrane_interactions( Cell* pCell, Phenotype& phenotype, double dt );
+	/** \brief Calculate agent distance to BM if defined */
+	static double distance_to_membrane( Cell* pCell, Phenotype& phenotype, double l);
+	double distance_to_membrane_duct( double l);
+	/** \brief Distance of agent to BA for sphere geometry */
+	double distance_to_membrane_sphere( double l);
+	/** \brief Distance to membrane Sheet
+	 * Basement membrane is a sheet of height 2*BM_radius 
+	 * Z value is in between -BM_radius and +BM_radius
+	 */
+	double distance_to_membrane_sheet(double length);
 	
 };
 
