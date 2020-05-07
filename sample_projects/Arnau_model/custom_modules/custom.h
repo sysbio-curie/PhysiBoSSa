@@ -112,5 +112,5 @@ void do_proliferation(Cell* pCell, Phenotype& phenotype, double dt);
 inline float sphere_volume_from_radius(float radius) {return 4.0/3.0 * PhysiCell_constants::pi * std::pow(radius, 3);}
 
 bool touch_ECM(Custom_cell* pCell);
-
+void enough_to_node( Custom_cell* pCell, std::string nody, std::string field );
 #endif

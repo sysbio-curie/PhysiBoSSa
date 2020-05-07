@@ -32,3 +32,9 @@ void evolve_coef( int up, double* coef, double dt )
 	(*coef) = (*coef) > 1 ? (1-EPSILON) : (*coef);
 	(*coef) = (*coef) < 0 ? (EPSILON) : (*coef);
 }
+
+double get_threshold( std::string field)
+{
+	double pth = PhysiCell::parameters.doubles(field+"_threshold");
+	return pth;
+}

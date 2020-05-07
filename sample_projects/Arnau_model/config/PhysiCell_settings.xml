@@ -172,29 +172,18 @@
 		<cell_ecm_repulsion type="double" units=""> 10.0 </cell_ecm_repulsion>
 		<ecm_degradation type="int" units=""> 5 </ecm_degradation>
 		<max_interaction_factor type="double" units=""> 1.3 </max_interaction_factor>
-		<cell_cell_repulsion type="int" units=""> 10 </cell_cell_repulsion>
-		<oxygen_necrotic type="int" units=""> 4 </oxygen_necrotic>
-		<oxygen_critical type="int" units=""> 3 </oxygen_critical>
-		<oxygen_no_proliferation type="double" units=""> 6.5 </oxygen_no_proliferation>
-		<oxygen_hypoxic type="int" units=""> 15 </oxygen_hypoxic>
-		<oxygen_reference type="double" units=""> 0.7 </oxygen_reference>
-		<oxygen_saturation type="int" units=""> 38 </oxygen_saturation>
 		<cell_radius type="double" units=""> 8.413 </cell_radius>
 		<nucleus_radius type="double" units=""> 5.052 </nucleus_radius>
 		<fluid_fraction type="double" units=""> 0.75 </fluid_fraction>
 		<solid_nuclear type="int" units=""> 135 </solid_nuclear>
 		<solid_cytoplasmic type="int" units=""> 486 </solid_cytoplasmic>
-		<cytoplasmic_nuclear_fraction type="double" units=""> 3.6 </cytoplasmic_nuclear_fraction>
-		<initial_uptake_rate type="int" units=""> 20 </initial_uptake_rate>
 		<protein_threshold type="int" units=""> 1 </protein_threshold>
-		<phenotype_number type="int" units=""> 0 </phenotype_number>
-		<secretion_rate type="int" units=""> 0 </secretion_rate>
 		<bnd_file type="string" units="">./config/boolean_network/Arnau_nodes.bnd</bnd_file>
 		<cfg_file type="string" units="">./config/boolean_network/Arnau_nodes.bnd.cfg</cfg_file>
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
 		<init_ecm_filename type="string" units="">./config/ecm.txt</init_ecm_filename>
-		<x_threshold type="double" units="dimensionless">1.</x_threshold>
-		<membrane_shape type="string" units="">sheet</membrane_shape>	
+		<tgfb_threshold type="double" units="dimensionless">1.</tgfb_threshold>
+		<membrane_shape type="string" units="">sphere</membrane_shape>	
 		<membrane_length type="double" units=""> 10 </membrane_length>
 	</user_parameters>
 	

@@ -19,7 +19,7 @@ Custom_cell::Custom_cell() {
 void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 {
 	// Check if there is ECM material in given voxel
-	double dens2 = get_microenvironment()->density_vector(index_voxel)[index_ecm];
+	//double dens2 = get_microenvironment()->density_vector(index_voxel)[index_ecm];
 	double dens = get_microenvironment()->nearest_density_vector(index_voxel)[index_ecm];
 	// if voxel is "full", density is 1
 	dens = std::min( dens, 1.0 ); 
@@ -461,4 +461,15 @@ double Custom_cell::distance_to_membrane_duct(double length)
 	distance_to_origin = std::max(distance_to_origin, EPSILON);			  // prevents division by zero
 	displacement = -1 / distance_to_origin * position;
 	return fabs(length - distance_to_origin);
+}
+
+/* Return if level of protein given by index around the cell is high enough (compared to given threshold) */
+int Custom_cell::feel_enough(std::string field, Custom_cell pCell)
+{	
+	int voxel_index = get_current_mechanics_voxel_index();
+	//return local_density(field) > cell_line->prot_threshold; 
+	int ind = BioFVM::microenvironment.find_density_index( field );
+	if ( ind >= 0 )	
+		return BioFVM::microenvironment.density_vector(voxel_index)[ind] > get_threshold(field); 
+	return -1;
 }

@@ -15,5 +15,5 @@ inline double relative_diff( double a, double b )
 
 /* Change the current value of the input coefficient, increase or decrease according to up value */
 void evolve_coef( int up, double* coef, double dt );
-
+double get_threshold( std::string field);
 #endif

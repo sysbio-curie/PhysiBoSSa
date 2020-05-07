@@ -109,6 +109,7 @@ void create_cell_types( void )
 
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
+	cell_defaults.custom_data.add_variable("ecm_contact", "dimensionless", 0.0);
 	
 	load_ecm_file();
 
@@ -211,6 +212,7 @@ void setup_tissue( void )
 		pC->boolean_network = ecm_network;
 		pC->boolean_network.restart_nodes();
 		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
+		pC->custom_data["ecm_contact"] = pC->ecm_contact;
 	}
 	std::cout << "tissue created" << std::endl;
 
@@ -272,7 +274,8 @@ int ind;
 	// 	ind = pCell->boolean_network.get_node_index( "O2" );
 	// if ( ind >= 0 )
 	// 	nodes[ind] = ( !pCell->necrotic_oxygen() );
-	
+
+	enough_to_node( pCell, "TGFbR", "tgfb" );
 
 	ind = pCell->boolean_network.get_node_index( "Neighbours" );
 	if ( ind >= 0 )
@@ -478,4 +481,16 @@ return PI4_3 * rad * rad * rad;
 bool touch_ECM(Custom_cell* pCell)
 { 
 	return pCell->contact_ecm() > parameters.doubles("contact_cell_ECM_threshold"); 
+}
+
+void enough_to_node( Custom_cell* pCell, std::string nody, std::string field )
+{
+	int bn_index;
+	bn_index = pCell->boolean_network.get_node_index( nody );;
+	if ( bn_index >= 0 )
+	{
+		int felt = pCell->feel_enough(field, *pCell);
+		if ( felt != -1 )
+			nodes[bn_index] = felt;
+	}
 }

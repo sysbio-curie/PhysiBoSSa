@@ -125,6 +125,7 @@ public:
 	 * Z value is in between -BM_radius and +BM_radius
 	 */
 	double distance_to_membrane_sheet(double length);
+	int feel_enough(std::string field, Custom_cell pCell);
 	
 };
 
