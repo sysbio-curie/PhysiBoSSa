@@ -178,13 +178,14 @@
 		<solid_nuclear type="int" units=""> 135 </solid_nuclear>
 		<solid_cytoplasmic type="int" units=""> 486 </solid_cytoplasmic>
 		<protein_threshold type="int" units=""> 1 </protein_threshold>
-		<bnd_file type="string" units="">./config/boolean_network/Arnau_nodes.bnd</bnd_file>
-		<cfg_file type="string" units="">./config/boolean_network/Arnau_nodes.bnd.cfg</cfg_file>
+		<bnd_file type="string" units="">./config/boolean_network/CCM_mod4_1.bnd</bnd_file>
+		<cfg_file type="string" units="">./config/boolean_network/CCM_mod4_1.cfg</cfg_file>
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
 		<init_ecm_filename type="string" units="">./config/ecm.txt</init_ecm_filename>
 		<tgfb_threshold type="double" units="dimensionless">1.</tgfb_threshold>
 		<membrane_shape type="string" units="">sphere</membrane_shape>	
 		<membrane_length type="double" units=""> 10 </membrane_length>
+		<color_function type="int" units="">0</color_function> <!-- 0 for ECM based color, 1 for pMotility based color, 2 for migration node based color-->
 	</user_parameters>
 	
 	

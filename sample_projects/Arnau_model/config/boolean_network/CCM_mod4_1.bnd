@@ -1,0 +1,343 @@
+Node Integrins {
+  logic = (ECM_sensing);
+  rate_up  = ( $Integrins_ko ? 0.0 : ( $Integrins_up ? @max_rate : ( @logic ? $u_Integrins : 0)));
+  rate_down  = ( $Integrins_ko ? @max_rate : ( $Integrins_up ? 0.0 : ( @logic ? 0 : $d_Integrins)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node DNAdamage {
+  logic = (DNAdamage);
+  rate_up  = ( $DNAdamage_ko ? 0.0 : ( $DNAdamage_up ? @max_rate : ( @logic ? $u_DNAdamage : 0)));
+  rate_down  = ( $DNAdamage_ko ? @max_rate : ( $DNAdamage_up ? 0.0 : ( @logic ? 0 : $d_DNAdamage)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node EGFR {
+  logic = (GF);
+  rate_up  = ( $EGFR_ko ? 0.0 : ( $EGFR_up ? @max_rate : ( @logic ? $u_EGFR : 0)));
+  rate_down  = ( $EGFR_ko ? @max_rate : ( $EGFR_up ? 0.0 : ( @logic ? 0 : $d_EGFR)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Migration {
+  logic = (EMTreg & !p63_73 & AKT2 & !miRNA);
+  rate_up = @logic ? $u_Migration : 0;
+  rate_down = @logic ? 0 : $d_Migration;
+}
+
+Node actin_mobil {
+  logic = (EMTreg & !Ecadh & !Mat_Adh_jun);
+  rate_up  = ( $actin_mobil_ko ? 0.0 : ( $actin_mobil_up ? @max_rate : ( @logic ? $u_actin_mobil : 0)));
+  rate_down  = ( $actin_mobil_ko ? @max_rate : ( $actin_mobil_up ? 0.0 : ( @logic ? 0 : $d_actin_mobil)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Apoptosis {
+  logic = (!EMTreg & !p63_73 & miRNA & !Mat_Adh_jun & !Ulk1_2 & !HIF) | (!EMTreg & p63_73 & !Mat_Adh_jun & !Ulk1_2 & !HIF);
+  rate_up = @logic ? $u_Apoptosis : 0;
+  rate_down = @logic ? 0 : $d_Apoptosis;
+}
+
+Node TGFbR {
+  logic = (!WNT_pthw & TGFbeta);
+  rate_up  = ( $TGFbR_ko ? 0.0 : ( $TGFbR_up ? @max_rate : ( @logic ? $u_TGFbR : 0)));
+  rate_down  = ( $TGFbR_ko ? @max_rate : ( $TGFbR_up ? 0.0 : ( @logic ? 0 : $d_TGFbR)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Notch_pthw {
+  logic = (Integrins & !p53 & !p63_73 & !miRNA);
+  rate_up  = ( $Notch_pthw_ko ? 0.0 : ( $Notch_pthw_up ? @max_rate : ( @logic ? $u_Notch_pthw : 0)));
+  rate_down  = ( $Notch_pthw_ko ? @max_rate : ( $Notch_pthw_up ? 0.0 : ( @logic ? 0 : $d_Notch_pthw)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node WNT_pthw {
+  logic = (!Notch_pthw & !p53 & !EMTreg & !p63_73 & !AKT1 & !miRNA & !Ecadh & !Mat_Adh_jun & !Ncadh & Wnt);
+  rate_up  = ( $WNT_pthw_ko ? 0.0 : ( $WNT_pthw_up ? @max_rate : ( @logic ? $u_WNT_pthw : 0)));
+  rate_down  = ( $WNT_pthw_ko ? @max_rate : ( $WNT_pthw_up ? 0.0 : ( @logic ? 0 : $d_WNT_pthw)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node p53 {
+  logic = (!DNAdamage & !Notch_pthw & WNT_pthw & !EMTreg & !p63_73 & !AKT1 & !AKT2) | (!DNAdamage & Notch_pthw & !EMTreg & !p63_73 & !AKT1 & !AKT2) | (DNAdamage & !EMTreg & !p63_73 & !AKT1 & !AKT2);
+  rate_up  = ( $p53_ko ? 0.0 : ( $p53_up ? @max_rate : ( @logic ? $u_p53 : 0)));
+  rate_down  = ( $p53_ko ? @max_rate : ( $p53_up ? 0.0 : ( @logic ? 0 : $d_p53)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node EMTreg {
+  logic = (!Notch_pthw & !WNT_pthw & !p53 & EMTreg & !p63_73 & !miRNA) | (!Notch_pthw & WNT_pthw & !p53 & !p63_73 & !miRNA) | (Notch_pthw & !p53 & !p63_73 & !miRNA);
+  rate_up  = ( $EMTreg_ko ? 0.0 : ( $EMTreg_up ? @max_rate : ( @logic ? $u_EMTreg : 0)));
+  rate_down  = ( $EMTreg_ko ? @max_rate : ( $EMTreg_up ? 0.0 : ( @logic ? 0 : $d_EMTreg)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node p63_73 {
+  logic = (DNAdamage & !Notch_pthw & !p53 & !EMTreg & !AKT1 & !AKT2);
+  rate_up  = ( $p63_73_ko ? 0.0 : ( $p63_73_up ? @max_rate : ( @logic ? $u_p63_73 : 0)));
+  rate_down  = ( $p63_73_ko ? @max_rate : ( $p63_73_up ? 0.0 : ( @logic ? 0 : $d_p63_73)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node AKT1 {
+  logic = (!WNT_pthw & !p53 & !p63_73 & !miRNA & PI3K & !Mat_Adh_jun) | (WNT_pthw & !p53 & !p63_73 & !miRNA & !Mat_Adh_jun);
+  rate_up  = ( $AKT1_ko ? 0.0 : ( $AKT1_up ? @max_rate : ( @logic ? $u_AKT1 : 0)));
+  rate_down  = ( $AKT1_ko ? @max_rate : ( $AKT1_up ? 0.0 : ( @logic ? 0 : $d_AKT1)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node AKT2 {
+  logic = (Notch_pthw & !p53 & EMTreg & !miRNA & !Mat_Adh_jun);
+  rate_up  = ( $AKT2_ko ? 0.0 : ( $AKT2_up ? @max_rate : ( @logic ? $u_AKT2 : 0)));
+  rate_down  = ( $AKT2_ko ? @max_rate : ( $AKT2_up ? 0.0 : ( @logic ? 0 : $d_AKT2)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node ERK_pthw {
+  logic = (!EGFR & Notch_pthw & !p53 & !p63_73 & !AKT2 & !Mat_Adh_jun & !HIF) | (EGFR & !p53 & !p63_73 & !AKT2 & !Mat_Adh_jun & !HIF);
+  rate_up  = ( $ERK_pthw_ko ? 0.0 : ( $ERK_pthw_up ? @max_rate : ( @logic ? $u_ERK_pthw : 0)));
+  rate_down  = ( $ERK_pthw_ko ? @max_rate : ( $ERK_pthw_up ? 0.0 : ( @logic ? 0 : $d_ERK_pthw)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node miRNA {
+  logic = (!p53 & !EMTreg & p63_73 & !AKT1 & !AKT2) | (p53 & !EMTreg & !AKT1 & !AKT2);
+  rate_up  = ( $miRNA_ko ? 0.0 : ( $miRNA_up ? @max_rate : ( @logic ? $u_miRNA : 0)));
+  rate_down  = ( $miRNA_ko ? @max_rate : ( $miRNA_up ? 0.0 : ( @logic ? 0 : $d_miRNA)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Ecadh {
+  logic = (!p53 & !EMTreg & !p63_73 & !SMAD_pthw & Neighbours) | (!p53 & EMTreg & !p63_73 & !AKT2 & !SMAD_pthw & Neighbours);
+  rate_up  = ( $Ecadh_ko ? 0.0 : ( $Ecadh_up ? @max_rate : ( @logic ? $u_Ecadh : 0)));
+  rate_down  = ( $Ecadh_ko ? @max_rate : ( $Ecadh_up ? 0.0 : ( @logic ? 0 : $d_Ecadh)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node GF {
+  logic = (GF);
+  rate_up = @logic ? $u_GF : 0;
+  rate_down = @logic ? 0 : $d_GF;
+}
+
+Node ECM_sensing {
+  logic = (ECM_sensing);
+  rate_up  = ( $ECM_sensing_ko ? 0.0 : ( $ECM_sensing_up ? @max_rate : ( @logic ? $u_ECM_sensing : 0)));
+  rate_down  = ( $ECM_sensing_ko ? @max_rate : ( $ECM_sensing_up ? 0.0 : ( @logic ? 0 : $d_ECM_sensing)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Cell_growth {
+  logic = (!ERK_pthw & AKT_CC_TFs & !Canonic_metab & LowATP_metab) | (!ERK_pthw & AKT_CC_TFs & Canonic_metab) | (ERK_pthw & !Canonic_metab & LowATP_metab) | (ERK_pthw & Canonic_metab);
+  rate_up = @logic ? $u_Cell_growth : 0;
+  rate_down = @logic ? 0 : $d_Cell_growth;
+}
+
+Node Cell_cell {
+  logic = (!Ecadh & Ncadh) | (Ecadh);
+  rate_up = @logic ? $u_Cell_cell : 0;
+  rate_down = @logic ? 0 : $d_Cell_cell;
+}
+
+Node MMPs {
+  logic = (Notch_pthw & EMTreg & !p63_73 & SMAD_pthw);
+  rate_up  = ( $MMPs_ko ? 0.0 : ( $MMPs_up ? @max_rate : ( @logic ? $u_MMPs : 0)));
+  rate_down  = ( $MMPs_ko ? @max_rate : ( $MMPs_up ? 0.0 : ( @logic ? 0 : $d_MMPs)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Matrix_modif {
+  logic = (MMPs);
+  rate_up = @logic ? $u_Matrix_modif : 0;
+  rate_down = @logic ? 0 : $d_Matrix_modif;
+}
+
+Node TGFbeta {
+  logic = (TGFbeta);
+  rate_up  = ( $TGFbeta_ko ? 0.0 : ( $TGFbeta_up ? @max_rate : ( @logic ? $u_TGFbeta : 0)));
+  rate_down  = ( $TGFbeta_ko ? @max_rate : ( $TGFbeta_up ? 0.0 : ( @logic ? 0 : $d_TGFbeta)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Cell_polarization {
+  logic = (actin_mobil);
+  rate_up = @logic ? $u_Cell_polarization : 0;
+  rate_down = @logic ? 0 : $d_Cell_polarization;
+}
+
+Node AKT_CC_TFs {
+  logic = (AKT1 & AKT2 & PI3K & !HIF);
+  rate_up  = ( $AKT_CC_TFs_ko ? 0.0 : ( $AKT_CC_TFs_up ? @max_rate : ( @logic ? $u_AKT_CC_TFs : 0)));
+  rate_down  = ( $AKT_CC_TFs_ko ? @max_rate : ( $AKT_CC_TFs_up ? 0.0 : ( @logic ? 0 : $d_AKT_CC_TFs)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node PI3K {
+  logic = (!EGFR & GF) | (EGFR);
+  rate_up  = ( $PI3K_ko ? 0.0 : ( $PI3K_up ? @max_rate : ( @logic ? $u_PI3K : 0)));
+  rate_down  = ( $PI3K_ko ? @max_rate : ( $PI3K_up ? 0.0 : ( @logic ? 0 : $d_PI3K)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Matrix_adhesion {
+  logic = (Integrins & actin_mobil);
+  rate_up = @logic ? $u_Matrix_adhesion : 0;
+  rate_down = @logic ? 0 : $d_Matrix_adhesion;
+}
+
+Node SMAD_pthw {
+  logic = (TGFbR & !miRNA);
+  rate_up  = ( $SMAD_pthw_ko ? 0.0 : ( $SMAD_pthw_up ? @max_rate : ( @logic ? $u_SMAD_pthw : 0)));
+  rate_down  = ( $SMAD_pthw_ko ? @max_rate : ( $SMAD_pthw_up ? 0.0 : ( @logic ? 0 : $d_SMAD_pthw)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Neighbours {
+  logic = (Neighbours);
+  rate_up  = ( $Neighbours_ko ? 0.0 : ( $Neighbours_up ? @max_rate : ( @logic ? $u_Neighbours : 0)));
+  rate_down  = ( $Neighbours_ko ? @max_rate : ( $Neighbours_up ? 0.0 : ( @logic ? 0 : $d_Neighbours)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Nei2 {
+  logic = (Nei2);
+  rate_up  = ( $Nei2_ko ? 0.0 : ( $Nei2_up ? @max_rate : ( @logic ? $u_Nei2 : 0)));
+  rate_down  = ( $Nei2_ko ? @max_rate : ( $Nei2_up ? 0.0 : ( @logic ? 0 : $d_Nei2)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Mat_Adh_jun {
+  logic = (!Ecadh & !SMAD_pthw & Nei2 & Ncadh) | (Ecadh & !SMAD_pthw & Nei2);
+  rate_up  = ( $Mat_Adh_jun_ko ? 0.0 : ( $Mat_Adh_jun_up ? @max_rate : ( @logic ? $u_Mat_Adh_jun : 0)));
+  rate_down  = ( $Mat_Adh_jun_ko ? @max_rate : ( $Mat_Adh_jun_up ? 0.0 : ( @logic ? 0 : $d_Mat_Adh_jun)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Cell_freeze {
+  logic = (Mat_Adh_jun);
+  rate_up = @logic ? $u_Cell_freeze : 0;
+  rate_down = @logic ? 0 : $d_Cell_freeze;
+}
+
+Node Ncadh {
+  logic = (!Notch_pthw & SMAD_pthw & Neighbours & !Mat_Adh_jun & !Single) | (Notch_pthw & !WNT_pthw & !EMTreg & SMAD_pthw & Neighbours & !Mat_Adh_jun & !Single) | (Notch_pthw & !WNT_pthw & EMTreg & Neighbours & !Mat_Adh_jun) | (Notch_pthw & WNT_pthw & Neighbours & !Mat_Adh_jun);
+  rate_up  = ( $Ncadh_ko ? 0.0 : ( $Ncadh_up ? @max_rate : ( @logic ? $u_Ncadh : 0)));
+  rate_down  = ( $Ncadh_ko ? @max_rate : ( $Ncadh_up ? 0.0 : ( @logic ? 0 : $d_Ncadh)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node GLUT {
+  logic = (Glucose);
+  rate_up  = ( $GLUT_ko ? 0.0 : ( $GLUT_up ? @max_rate : ( @logic ? $u_GLUT : 0)));
+  rate_down  = ( $GLUT_ko ? @max_rate : ( $GLUT_up ? 0.0 : ( @logic ? 0 : $d_GLUT)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Oxy {
+  logic = (Oxy);
+  rate_up  = ( $Oxy_ko ? 0.0 : ( $Oxy_up ? @max_rate : ( @logic ? $u_Oxy : 0)));
+  rate_down  = ( $Oxy_ko ? @max_rate : ( $Oxy_up ? 0.0 : ( @logic ? 0 : $d_Oxy)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Canonic_metab {
+  logic = (!AKT1 & GLUT & Oxy);
+  rate_up  = ( $Canonic_metab_ko ? 0.0 : ( $Canonic_metab_up ? @max_rate : ( @logic ? $u_Canonic_metab : 0)));
+  rate_down  = ( $Canonic_metab_ko ? @max_rate : ( $Canonic_metab_up ? 0.0 : ( @logic ? 0 : $d_Canonic_metab)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node LowATP_metab {
+  logic = (AKT1 & GLUT);
+  rate_up  = ( $LowATP_metab_ko ? 0.0 : ( $LowATP_metab_up ? @max_rate : ( @logic ? $u_LowATP_metab : 0)));
+  rate_down  = ( $LowATP_metab_ko ? @max_rate : ( $LowATP_metab_up ? 0.0 : ( @logic ? 0 : $d_LowATP_metab)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Quiescence {
+  logic = (!Apoptosis & !Cell_growth & !Ulk1_2 & !LossSignals & !HIF);
+  rate_up = @logic ? $u_Quiescence : 0;
+  rate_down = @logic ? 0 : $d_Quiescence;
+}
+
+Node Ulk1_2 {
+  logic = (!mTORC1 & !HIF);
+  rate_up  = ( $Ulk1_2_ko ? 0.0 : ( $Ulk1_2_up ? @max_rate : ( @logic ? $u_Ulk1_2 : 0)));
+  rate_down  = ( $Ulk1_2_ko ? @max_rate : ( $Ulk1_2_up ? 0.0 : ( @logic ? 0 : $d_Ulk1_2)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node LossSignals {
+  logic = (!p63_73 & !AKT1 & !AKT2 & !ERK_pthw & !miRNA & !Ecadh & !SMAD_pthw & !Ncadh & !Ulk1_2 & !HIF);
+  rate_up  = ( $LossSignals_ko ? 0.0 : ( $LossSignals_up ? @max_rate : ( @logic ? $u_LossSignals : 0)));
+  rate_down  = ( $LossSignals_ko ? @max_rate : ( $LossSignals_up ? 0.0 : ( @logic ? 0 : $d_LossSignals)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node mTORC1 {
+  logic = (!Canonic_metab & LowATP_metab) | (Canonic_metab);
+  rate_up  = ( $mTORC1_ko ? 0.0 : ( $mTORC1_up ? @max_rate : ( @logic ? $u_mTORC1 : 0)));
+  rate_down  = ( $mTORC1_ko ? @max_rate : ( $mTORC1_up ? 0.0 : ( @logic ? 0 : $d_mTORC1)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node HIF {
+  logic = (!Oxy & !LowATP_metab);
+  rate_up  = ( $HIF_ko ? 0.0 : ( $HIF_up ? @max_rate : ( @logic ? $u_HIF : 0)));
+  rate_down  = ( $HIF_ko ? @max_rate : ( $HIF_up ? 0.0 : ( @logic ? 0 : $d_HIF)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Glucose {
+  logic = (Glucose);
+  rate_up  = ( $Glucose_ko ? 0.0 : ( $Glucose_up ? @max_rate : ( @logic ? $u_Glucose : 0)));
+  rate_down  = ( $Glucose_ko ? @max_rate : ( $Glucose_up ? 0.0 : ( @logic ? 0 : $d_Glucose)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Wnt {
+  logic = (Wnt);
+  rate_up  = ( $Wnt_ko ? 0.0 : ( $Wnt_up ? @max_rate : ( @logic ? $u_Wnt : 0)));
+  rate_down  = ( $Wnt_ko ? @max_rate : ( $Wnt_up ? 0.0 : ( @logic ? 0 : $d_Wnt)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Hypoxia {
+  logic = (HIF);
+  rate_up = @logic ? $u_Hypoxia : 0;
+  rate_down = @logic ? 0 : $d_Hypoxia;
+}
+
+Node Autophagy {
+  logic = (Ulk1_2);
+  rate_up = @logic ? $u_Autophagy : 0;
+  rate_down = @logic ? 0 : $d_Autophagy;
+}
+
+Node Anoikis {
+  logic = (LossSignals);
+  rate_up = @logic ? $u_Anoikis : 0;
+  rate_down = @logic ? 0 : $d_Anoikis;
+}
+
+Node GF_prod {
+  logic = (!AKT2 & AKT_CC_TFs & !Canonic_metab & LowATP_metab & GF_strains) | (!AKT2 & AKT_CC_TFs & Canonic_metab & GF_strains) | (AKT2 & !Canonic_metab & LowATP_metab & GF_strains) | (AKT2 & Canonic_metab & GF_strains);
+  rate_up = @logic ? $u_GF_prod : 0;
+  rate_down = @logic ? 0 : $d_GF_prod;
+}
+
+Node GF_strains {
+  logic = (GF_strains);
+  rate_up  = ( $GF_strains_ko ? 0.0 : ( $GF_strains_up ? @max_rate : ( @logic ? $u_GF_strains : 0)));
+  rate_down  = ( $GF_strains_ko ? @max_rate : ( $GF_strains_up ? 0.0 : ( @logic ? 0 : $d_GF_strains)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
+Node Single {
+  logic = (Single);
+  rate_up  = ( $Single_ko ? 0.0 : ( $Single_up ? @max_rate : ( @logic ? $u_Single : 0)));
+  rate_down  = ( $Single_ko ? @max_rate : ( $Single_up ? 0.0 : ( @logic ? 0 : $d_Single)));
+ 	 max_rate = 1.7976931348623157E+308/1;
+}
+
