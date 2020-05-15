@@ -151,12 +151,80 @@
 		</options>
 	</microenvironment_setup>		
 	
+	<cell_definitions>
+		<cell_definition name="default" ID="0">
+			<phenotype>
+				<cycle code="5" name="live_cells_cycle_model">  
+					<!-- using higher than normal significant digits to match divisions in default code -->
+					<transition_rates units="1/min"> 
+						<!-- Cycle duration -->
+						<rate start_index="0" end_index="0" fixed_duration="false">0.0075</rate>
+					</transition_rates>
+				</cycle>
+				
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<rate units="1/min">5.31667e-05</rate>
+						<transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="true">0.00193798</rate>
+						</transition_rates>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+
+					<model code="101" name="necrosis">
+						<rate units="1/min">0.0</rate>
+						<transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+							<rate start_index="1" end_index="2" fixed_duration="true">1.15741e-5</rate>
+						</transition_rates>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+				</death>					
+
+				<secretion>
+					<substrate name="oxygen">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">38</secretion_target>
+						<uptake_rate units="1/min">10</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+						
+					<substrate name="tnf">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0.6109</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 	
+				</secretion>
+
+				<molecular />
+			</phenotype>
+			<custom_data>
+				<next_physibossa_run units="dimensionless">10.</next_physibossa_run>
+				<tnf_concentration units="dimensionless">0</tnf_concentration>
+				<tnf_node units="dimensionless">0</tnf_node>
+				<fadd_node units="dimensionless">0</fadd_node>
+			</custom_data>
+		</cell_definition>
+	</cell_definitions>
+
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 
-		
-		<!-- cell cycle custom duration -->
-		<live_phase_duration type="double" units="1/min">0.0075</live_phase_duration> <!-- 300 min -->
 
 		<!-- init file --> 
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
@@ -165,7 +233,6 @@
 		<cfg_file type="string" units="">./config/boolean_network/TNF_conf.cfg</cfg_file>
 		<maboss_time_step type="double" units="dimensionless">10.</maboss_time_step>
 
-		<tnf_uptake_rate type="double" units="">0.6109</tnf_uptake_rate>
 		<tnf_secretion_rate type="double" units="fg/cell/min">0.76032</tnf_secretion_rate> <!-- 0.1 -->
 
 		<duration_add_tnf type="int" units="min">10</duration_add_tnf> <!-- 10 -->
