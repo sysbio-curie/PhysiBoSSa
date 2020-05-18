@@ -170,6 +170,16 @@ ecm-try:
 	mkdir ./scripts/
 	cp ./sample_projects/ECM_try/scripts/* ./scripts/
 
+arnau-model: 	
+	cp -r ./sample_projects/Arnau_model/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/Arnau_model/main_arnau_model.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/Arnau_model/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/Arnau_model/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/Arnau_model/scripts/* ./scripts/
 
 drug-AGS: 	
 	cp ./sample_projects/drug_AGS/custom_modules/* ./custom_modules/
