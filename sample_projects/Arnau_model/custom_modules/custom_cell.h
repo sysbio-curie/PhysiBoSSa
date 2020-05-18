@@ -19,7 +19,6 @@ protected:
 	
 public:
 	inline bool passive() { return type == PhysiCell_constants::PASSIVE_TYPE; };
-	
     std::vector<double> motility;
 	double pintegrin;
 	double pmotility;
@@ -68,7 +67,6 @@ public:
 	/** \brief Get the current value of motility coefficient */
 	inline double get_motility_amplitude( double percent )
 	{ return current_value( motility_magnitude[0], motility_magnitude[1], percent ); };
-    
     bool has_neighbor(int);
 	double adhesion(Cell* other_cell);
 	double get_adhesion();

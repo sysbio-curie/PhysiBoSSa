@@ -115,10 +115,14 @@ double Custom_cell::integrinStrength()
 /* Return if cell has enough contact with other cells (compared to given threshold determined by the given level) */	
 bool Custom_cell::has_neighbor(int level)
 { 
-	if ( level == 0 )
+	if ( level == 0 ){
+		//std::cout << contact_cell() << " - " << PhysiCell::parameters.doubles("contact_cell_cell_threshold") << std::endl;
 		return contact_cell() > PhysiCell::parameters.doubles("contact_cell_cell_threshold"); 
-	else
+		}
+	else{
+		//std::cout << contact_cell() << " - " << PhysiCell::parameters.doubles("contact_cell_cell_threshold") << std::endl;
 		return contact_cell() > (2 * PhysiCell::parameters.doubles("contact_cell_cell_threshold")); 
+	}
 }
 
 /* Calculate adhesion coefficient with other cell */

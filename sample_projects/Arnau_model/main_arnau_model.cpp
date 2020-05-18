@@ -200,7 +200,14 @@ int main( int argc, char* argv[] )
 				{	
 					sprintf( filename , "%s/snapshot%08u.svg" , PhysiCell_settings.folder.c_str() , PhysiCell_globals.SVG_output_index ); 
 					SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
-					
+					int node_counter = 0;
+					for (int i=0; i < (*all_cells).size(); i++){
+						//int node_index = (*all_cells)[i]->boolean_network.get_node_index( "Neighbours" );
+						if( !(*all_cells)[i]->boolean_network.get_node_value("Nei2")){
+							node_counter++;
+						}
+					}
+					std::cout << node_counter << std::endl;
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
