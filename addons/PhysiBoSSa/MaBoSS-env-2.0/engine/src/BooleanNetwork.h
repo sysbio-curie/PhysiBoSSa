@@ -489,6 +489,13 @@ public:
   void display(std::ostream& os, bool check = true) const;
   void checkSymbols() const;
 
+  std::vector<std::string> getSymbolsNames() const {
+    std::vector<std::string> result;
+    for (auto& symb : symb_map) {
+      result.push_back(symb.first);
+    }
+    return result;
+  }
   void reset();
 
   void addSymbolExpression(SymbolExpression * exp) {
@@ -529,6 +536,8 @@ public:
   std::vector<IStateGroup*>* getIStateGroup() {
     return istate_group_list;
   }
+
+  void cloneIStateGroup(std::vector<IStateGroup*>* _istate_group_list);
 
   SymbolTable* getSymbolTable() { 
     return symbol_table;
@@ -1427,6 +1436,11 @@ public:
       state_value_list = new std::vector<double>();
       state_value_list->push_back(istate_value);
     }
+    
+    ProbaIState(ProbaIState* obj) {
+      this->proba_value = obj->getProbaValue();
+      this->state_value_list = new std::vector<double>(*(obj->getStateValueList()));
+    }
 
     ~ProbaIState() {
       delete state_value_list;
@@ -1471,7 +1485,20 @@ public:
     proba_istates->push_back(new ProbaIState(1., expr));
     epilogue(network);
   }
-
+  
+  IStateGroup(IStateGroup* obj, Network* network) {
+    this->is_random = obj->isRandom();
+    this->nodes = new std::vector<const Node*>();
+    for (const auto node: *(obj->getNodes())) {
+      this->nodes->push_back(node);
+    }
+    this->proba_istates = new std::vector<ProbaIState*>();
+    for(auto proba_istate: *(obj->getProbaIStates())) {
+      this->proba_istates->push_back(new ProbaIState(proba_istate));
+    }
+    epilogue(network);
+  }
+  
   ~IStateGroup() {
     delete nodes;
     for (std::vector<IStateGroup::ProbaIState*>::iterator it = proba_istates->begin(); it != proba_istates->end(); ++it) {

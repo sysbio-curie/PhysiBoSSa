@@ -29,6 +29,7 @@
      January-March 2011
 */
 
+#include <ctime>
 #include "RunConfig.h"
 #include "BooleanNetwork.h"
 #include "MaBEstEngine.h"
@@ -212,15 +213,30 @@ int RunConfig::parse(Network* network, const char* file)
     }
   }
   RC_set_file(file);
-  int res = RCparse();
-  runconfig_setNetwork(NULL);
-  runconfig_setConfig(NULL);
 
-  if (NULL != file)
-    fclose(RCin);
-  RClex_destroy();
+  try
+  {
+    int res = RCparse();
+    runconfig_setNetwork(NULL);
+    runconfig_setConfig(NULL);
 
-  return res;
+    if (NULL != file)
+      fclose(RCin);
+    RClex_destroy();
+
+    return res;
+  }
+  catch(const BNException& e)
+  {
+    runconfig_setNetwork(NULL);
+    runconfig_setConfig(NULL);
+
+    if (NULL != file)
+      fclose(RCin);
+    RClex_destroy();
+    
+    throw;
+  } 
 }
 
 int RunConfig::parseExpression(Network* network, const char* expr)
@@ -229,13 +245,24 @@ int RunConfig::parseExpression(Network* network, const char* expr)
   runconfig_setConfig(this);
   RC_scan_expression(expr);
 
-  int res = RCparse();
-  runconfig_setNetwork(NULL);
-  runconfig_setConfig(NULL);
-  
-  RClex_destroy();
-  
-  return res;
+  try
+  {
+    int res = RCparse();
+    runconfig_setNetwork(NULL);
+    runconfig_setConfig(NULL);
+    
+    RClex_destroy();
+    
+    return res;
+  }
+  catch(const BNException& e)
+  {
+    runconfig_setNetwork(NULL);
+    runconfig_setConfig(NULL);
+    RClex_destroy();
+    
+    throw;
+  }
 }
 
 void RunConfig::generateTemplate(Network* network, std::ostream& os) const
@@ -264,8 +291,6 @@ void RunConfig::dump_perform(Network* network, std::ostream& os, bool is_templat
   os << "sample_count = " << sample_count << ";\n";
   os << "discrete_time = " << discrete_time << ";\n";
   os << "use_physrandgen = " << use_physrandgen << ";\n";
-  os << "use_glibcrandgen = " << use_glibcrandgen << ";\n";
-  os << "use_mtrandgen = " << use_mtrandgen << ";\n";
   os << "seed_pseudorandom = " << seed_pseudorand << ";\n";
   os << "display_traj = " << display_traj << ";\n";
   os << "statdist_traj_count = " << statdist_traj_count << ";\n";

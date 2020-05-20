@@ -1,19 +1,30 @@
 import cmaboss
+import numpy as np
 from unittest import TestCase
 
 class TestCMaBoSS(TestCase):
 
     def test_load_model(self):
+        net = cmaboss.MaBoSSNet(network="../examples/metastasis.bnd")
+        cfg = cmaboss.MaBoSSCfg(net, "../examples/metastasis.cfg")
+        sim = cmaboss.MaBoSSSim(net=net, cfg=cfg)
+        res = sim.run()
+
+    def test_load_model_cellcycle(self):
+        net = cmaboss.MaBoSSNet(network="../tests/cellcycle/cellcycle.bnd")
+        cfg = cmaboss.MaBoSSCfg(net, "../tests/cellcycle/cellcycle_runcfg.cfg", "../tests/cellcycle/cellcycle_runcfg-thread_6.cfg")
+        sim = cmaboss.MaBoSSSim(net=net, cfg=cfg)
+        res = sim.run()
+
+    def test_simulate(self):
         sim = cmaboss.MaBoSSSim(network="../examples/metastasis.bnd", config="../examples/metastasis.cfg")
         res = sim.run()
-        res.get_states()
-        res.get_nodes()
-        res.get_last_states_probtraj()
-        res.get_raw_probtrajs()
+        res.get_probtraj()
+        res.get_last_probtraj()
+        res.get_nodes_probtraj()
         res.get_last_nodes_probtraj()
-        res.get_raw_nodes_probtrajs()
         res.get_fp_table()
-
+        
     def test_load_model_error(self):
         with self.assertRaises(cmaboss.BNException):
             cmaboss.MaBoSSSim(network="../examples/metastasis-error.bnd", config="../examples/metastasis.cfg")
@@ -31,31 +42,33 @@ class TestCMaBoSS(TestCase):
         sim = cmaboss.MaBoSSSim(network="../examples/metastasis.bnd", config="../examples/metastasis.cfg")
         res = sim.run(only_last_state=False)
 
-        for key, value in res.get_last_states_probtraj().items():
-            self.assertAlmostEqual(value, expected[key])
+        raw_res, states, _ = res.get_last_probtraj()
+        for i, value in enumerate(np.nditer(raw_res)):
+            self.assertAlmostEqual(value, expected[states[i]])
         
-        for key, value in res.get_last_nodes_probtraj().items():
-            self.assertAlmostEqual(value, expected_nodes[key])
+        raw_nodes_res, nodes, _ = res.get_last_nodes_probtraj()
+        for i, value in enumerate(np.nditer(raw_nodes_res)):
+            self.assertAlmostEqual(value, expected_nodes[nodes[i]])
         
         simfinal = cmaboss.MaBoSSSim(network="../examples/metastasis.bnd", config="../examples/metastasis.cfg")
         resfinal = simfinal.run(only_last_state=True)
     
-        for key, value in resfinal.get_last_states_probtraj().items():
-            self.assertAlmostEqual(value, expected[key])
-
-        for key, value in resfinal.get_last_nodes_probtraj().items():
-            self.assertAlmostEqual(value, expected_nodes[key])
+        raw_res, states, _ = res.get_last_probtraj()
+        for i, value in enumerate(np.nditer(raw_res)):
+            self.assertAlmostEqual(value, expected[states[i]])
+        
+        raw_nodes_res, nodes, _ = res.get_last_nodes_probtraj()
+        for i, value in enumerate(np.nditer(raw_nodes_res)):
+            self.assertAlmostEqual(value, expected_nodes[nodes[i]])
            
     def test_load_model_str(self):
         with open("../examples/metastasis.bnd", "r") as bnd, open("../examples/metastasis.cfg", "r") as cfg:    
             sim = cmaboss.MaBoSSSim(network_str=bnd.read(),config_str=cfg.read())
             res = sim.run()
-            res.get_states()
-            res.get_nodes()
-            res.get_last_states_probtraj()
-            res.get_raw_probtrajs()
+            res.get_probtraj()
+            res.get_last_probtraj()
+            res.get_nodes_probtraj()
             res.get_last_nodes_probtraj()
-            res.get_raw_nodes_probtrajs()
             res.get_fp_table()
 
     def test_load_model_str_error(self):

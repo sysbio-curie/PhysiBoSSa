@@ -1,5 +1,5 @@
 {% set name = "cMaBoSS" %}
-{% set version = "1.0.0b0" %}
+{% set version = "1.0.0b5" %}
 
 package:
   name: '{{ name|lower }}'
@@ -20,9 +20,18 @@ requirements:
     - bison
     - make
     - python {{ python }}
+    - numpy
+    - setuptools
 
+  host: 
+    - python
+    - numpy
+    - setuptools
+  
   run: 
-    - python {{ python }}
+    - python
+    - numpy
+    - setuptools
 
 about:
   home:  https://maboss.curie.fr

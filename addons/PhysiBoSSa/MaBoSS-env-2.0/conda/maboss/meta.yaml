@@ -1,5 +1,5 @@
 {% set name = "MaBoSS" %}
-{% set version = "2.3.1" %}
+{% set version = "2.3.3" %}
 
 package:
   name: '{{ name|lower }}'
@@ -11,6 +11,7 @@ source:
 
 build:
   number: 0
+  binary_relocation: False
 
 requirements:
   build:
