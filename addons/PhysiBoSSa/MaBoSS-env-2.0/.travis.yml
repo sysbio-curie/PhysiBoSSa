@@ -70,7 +70,7 @@ jobs:
 
       install:
         - docker-compose up -d maboss-server
-        - bash -c "cd engine/src; make"
+        - bash -c "cd engine/src; make client"
 
       script:
         - bash -c "cd engine/tests; bash ./test-container.sh"
@@ -93,7 +93,7 @@ jobs:
       install:
         - sudo singularity build maboss-server.simg containers/singularity/Singularity
         - singularity run maboss-server.simg & 
-        - bash -c "cd engine/src; make"
+        - bash -c "cd engine/src; make client"
 
       script:
         - bash -c "cd engine/tests; bash ./test-container.sh"
@@ -105,6 +105,11 @@ jobs:
       os: linux
       dist: xenial
       python: 3.8
+
+      before_install:
+        - sudo apt-get -qq update
+        - sudo apt-get install -yq python3-pip python3-setuptools
+        - sudo pip3 install numpy
 
       install:
         - bash -c "cd engine/src; make;"
@@ -124,6 +129,7 @@ jobs:
         - brew install flex bison
         - FULL_PYTHON_VERSION=`pyenv install -l | sed 's/ *//' | grep -e "^3.8\.[0-9]*$" | tail -n 1`
         - CONFIGURE_OPTS="--with-openssl=$(brew --prefix openssl)" pyenv install $FULL_PYTHON_VERSION
+        - /Users/travis/.pyenv/versions/$FULL_PYTHON_VERSION/bin/pip3 install numpy setuptools
       
       install:
         - bash -c "cd engine/src; make"
@@ -291,19 +297,19 @@ jobs:
         
         - FULL_PYTHON_VERSION=`pyenv install -l | sed 's/ *//' | grep -e "^3.5\.[0-9]*$" | tail -n 1` 
         - CONFIGURE_OPTS="--with-openssl=$(brew --prefix openssl)" pyenv install $FULL_PYTHON_VERSION
-        - /Users/travis/.pyenv/versions/$FULL_PYTHON_VERSION/bin/pip install wheel twine
+        - /Users/travis/.pyenv/versions/$FULL_PYTHON_VERSION/bin/pip install numpy wheel twine
         
         - FULL_PYTHON_VERSION=`pyenv install -l | sed 's/ *//' | grep -e "^3.6\.[0-9]*$" | tail -n 1` 
         - CONFIGURE_OPTS="--with-openssl=$(brew --prefix openssl)" pyenv install $FULL_PYTHON_VERSION
-        - /Users/travis/.pyenv/versions/$FULL_PYTHON_VERSION/bin/pip install wheel twine
+        - /Users/travis/.pyenv/versions/$FULL_PYTHON_VERSION/bin/pip install numpy wheel twine
         
         - FULL_PYTHON_VERSION=`pyenv install -l | sed 's/ *//' | grep -e "^3.7\.[0-9]*$" | tail -n 1` 
         - CONFIGURE_OPTS="--with-openssl=$(brew --prefix openssl)" pyenv install $FULL_PYTHON_VERSION
-        - /Users/travis/.pyenv/versions/$FULL_PYTHON_VERSION/bin/pip install wheel twine
+        - /Users/travis/.pyenv/versions/$FULL_PYTHON_VERSION/bin/pip install numpy wheel twine
         
         - FULL_PYTHON_VERSION=`pyenv install -l | sed 's/ *//' | grep -e "^3.8\.[0-9]*$" | tail -n 1` 
         - CONFIGURE_OPTS="--with-openssl=$(brew --prefix openssl)" pyenv install $FULL_PYTHON_VERSION
-        - /Users/travis/.pyenv/versions/$FULL_PYTHON_VERSION/bin/pip install wheel twine
+        - /Users/travis/.pyenv/versions/$FULL_PYTHON_VERSION/bin/pip install numpy wheel twine
 
       script:
         - cd engine/python

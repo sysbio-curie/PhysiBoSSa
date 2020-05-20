@@ -97,6 +97,14 @@ public:
   const STATE_MAP<NetworkState_Impl, double> getNthStateDist(int nn) const;
   const STATE_MAP<NetworkState_Impl, double> getAsymptoticStateDist() const;
 
+
+#ifdef PYTHON_API
+  PyObject* getNumpyStatesDists() const;
+  PyObject* getNumpyLastStatesDists() const;
+  PyObject* getNumpyNodesDists() const;
+  PyObject* getNumpyLastNodesDists() const;
+
+#endif
   const std::map<double, std::map<Node *, double> > getNodesDists() const;
   const std::map<Node*, double> getNthNodesDist(int nn) const;
   const std::map<Node*, double> getAsymptoticNodesDist() const;
