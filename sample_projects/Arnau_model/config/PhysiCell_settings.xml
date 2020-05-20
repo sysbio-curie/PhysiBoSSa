@@ -97,7 +97,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>1</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -159,8 +159,8 @@
     	<motility_amplitude_min type="double" units=""> 0.1 </motility_amplitude_min>
     	<motility_amplitude_max type="double" units=""> 0.5 </motility_amplitude_max>
     	<mode_motility type="int" units=""> 1 </mode_motility>
-		<contact_cell_ECM_threshold type="double" units=""> 0.1 </contact_cell_ECM_threshold>
-		<contact_cell_cell_threshold type="double" units=""> 0.5 </contact_cell_cell_threshold> <!-- minimal contact necessary to activate ECM pathway-->
+		<contact_cell_ECM_threshold type="double" units=""> 0.5 </contact_cell_ECM_threshold>
+		<contact_cell_cell_threshold type="double" units=""> 0.9 </contact_cell_cell_threshold> <!-- minimal contact necessary to activate ECM pathway-->
 		<homotypic_adhesion_min type="double" units=""> 0.2 </homotypic_adhesion_min>
 		<homotypic_adhesion_max type="double" units=""> 0.8 </homotypic_adhesion_max>
 		<heterotypic_adhesion_min type="double" units=""> 0.2 </heterotypic_adhesion_min>

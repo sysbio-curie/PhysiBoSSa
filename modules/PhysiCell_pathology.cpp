@@ -493,7 +493,7 @@ void SVG_plot( std::string filename , Microenvironment& M, double z_slice , doub
 	for( int i=0 ; i < total_cell_count ; i++ )
 	{
 		Cell* pC = (*all_cells)[i]; // global_cell_list[i]; 
-  
+		if (pC->boolean_network.get_node_value("Nei2") == 0) std::cout << 1;
 		static std::vector<std::string> Colors; 
 		if( fabs( (pC->position)[2] - z_slice ) < pC->phenotype.geometry.radius )
 		{
