@@ -190,6 +190,9 @@ reset:
 	rm -rf ./config/boolean_network/
 	rm -rf ./scripts
 
+animate:
+	ffmpeg -i output/snapshot%8d.svg animation.mp4; vlc animation.mp4
+
 MaBoSS-clean:
 	cd $(MABOSS_DIR)/src && make clean
 	
