@@ -74,7 +74,7 @@ using namespace BioFVM;
 // declare cell definitions here 
 
 // std::string ecm_file;
-std::vector<bool> nodes;
+std::vector<bool>* nodes;
 
 void create_cell_types( void )
 {
@@ -109,7 +109,8 @@ void create_cell_types( void )
 
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
-	cell_defaults.custom_data.add_variable("ecm_contact", "dimensionless", 0.0);
+	cell_defaults.custom_data.add_variable("ecm_contact", "dimensionless", 0.0); //for paraview visualization
+	cell_defaults.custom_data.add_variable(parameters.strings("node_to_visualize"), "dimensionless", 0.0 ); //for paraview visualization
 	
 	load_ecm_file();
 
@@ -213,17 +214,19 @@ void setup_tissue( void )
 		pC->boolean_network.restart_nodes();
 		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
 		pC->custom_data["ecm_contact"] = pC->ecm_contact;
+		color_node(pC);
 	}
 	std::cout << "tissue created" << std::endl;
 
 	return; 
 }
 
-std::vector<std::string> ECM_coloring_function( Custom_cell* pCustomCell )
+std::vector<std::string> ECM_coloring_function( Cell* pCell )
 {
 	std::vector< std::string > output( 4 , "black" );
+	Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
 	double ecm_value = pCustomCell->ecm_contact;
-	int color = (int) round( ecm_value * 255.0 / (pCustomCell->phenotype.geometry.radius)  );
+	int color = (int) round( ecm_value * 255.0 / (pCell->phenotype.geometry.radius)  );
 	if(color > 255){
 		color = 255;
 	}
@@ -234,51 +237,53 @@ std::vector<std::string> ECM_coloring_function( Custom_cell* pCustomCell )
 
 }
 
-std::vector<std::string> pMotility_coloring_function( Custom_cell* pCustomCell )
+std::vector<std::string> pMotility_coloring_function( Cell* pCell )
 {
-	std::vector< std::string > output( 4 , "black" );
+	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
 	char szTempString [128];
+	Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
 	int color = (int) round(pCustomCell->pmotility * 255);
 	sprintf( szTempString , "rgb(%u,0,%u)", color, 255-color );
 	output[0].assign( szTempString );
 	return output;
 }
 
-std::vector<std::string> migration_coloring_function( Custom_cell* pCustomCell )
+std::vector<std::string> migration_coloring_function( Cell* pCell )
 {
-	std::vector<bool>* nodi = pCustomCell->boolean_network.get_nodes();
-	std::vector< std::string > output( 4 , "black" );
-	int bn_index;
-	bn_index = pCustomCell->boolean_network.get_node_index( "Nei2" );
-	if ( (*nodi)[bn_index] )
+	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
+	if ( pCell->boolean_network.get_node_value( parameters.strings("node_to_visualize") ) == 0 )
 	{
-		output[0].assign( "red" );
+		output[0] = "rgb(0,0,255)";
+		output[2] = "rgb(0,0,125)";
+		
 	}
 	else{
-		output[0].assign( "blue" );
+		output[0] = "rgb(255,0,0)";
+		output[2] = "rgb(125,0,0)";
 	}
+	
 	return output;
 }
 
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
-	 Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
+	 //Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
 	 int color_number = parameters.ints("color_function");
 
 	 if (color_number == 0)
-	 	return ECM_coloring_function(pCustomCell);
+	 	return ECM_coloring_function(pCell);
 	 if (color_number == 1)
-	 	return pMotility_coloring_function(pCustomCell);
+	 	return pMotility_coloring_function(pCell);
 	 else 
-	 	return migration_coloring_function( pCustomCell );
+	 	return migration_coloring_function( pCell );
 }
 
 void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	static int o2_index = microenvironment.find_density_index( "oxygen" );
 	double o2 = pCell->nearest_density_vector()[o2_index];
-
+	Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
 	// update_cell_and_death_parameters_O2_based(pCell, phenotype, dt);
 
 	if( phenotype.death.dead == true )
@@ -289,7 +294,7 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 
 	if (PhysiCell_globals.current_time >= pCell->custom_data["next_physibossa_run"])
 	{
-		Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
+		
 		set_input_nodes(pCustomCell);
 
 		pCustomCell->boolean_network.run_maboss();
@@ -298,12 +303,15 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 		pCustomCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
 		
 		from_nodes_to_cell(pCustomCell, phenotype, dt);
+		color_node(pCustomCell);
 	}
+	pCustomCell->custom_data["ecm_contact"] = pCustomCell->ecm_contact;
+	
 }
 
 void set_input_nodes(Custom_cell* pCell) {
 int ind;
-	nodes = *(pCell->boolean_network.get_nodes());
+	//nodes = pCell->boolean_network.get_nodes();
 	// Oxygen input node O2; Oxygen or Oxy
 	// ind = pCell->boolean_network.get_node_index( "Oxygen" );
 	// if ( ind < 0 )
@@ -313,36 +321,29 @@ int ind;
 	// if ( ind >= 0 )
 	// 	nodes[ind] = ( !pCell->necrotic_oxygen() );
 
-	enough_to_node( pCell, "TGFbR", "tgfb" );
+	//enough_to_node( pCell, "TGFbR", "tgfb" );
 
 	ind = pCell->boolean_network.get_node_index( "Neighbours" );
 	if ( ind >= 0 ){
-		nodes[ind] = ( pCell->has_neighbor(0) );
+		pCell->boolean_network.set_node_value("Neighbours", pCell->has_neighbor(0));	
 	}
 	
 	ind = pCell->boolean_network.get_node_index( "Nei2" );
 	if ( ind >= 0 ){
-		nodes[ind] = ( pCell->has_neighbor(1) );
-		if (!nodes[ind]) std::cout << nodes[ind];
+		pCell->boolean_network.set_node_value("Nei2", pCell->has_neighbor(1));
+		//if (pCell->boolean_network.get_node_value("Nei2") == 0) std::cout << pCell->boolean_network.get_node_value("Nei2");
 	}
 	// // If has enough contact with ecm or not
 	ind = pCell->boolean_network.get_node_index( "ECM_sensing" );
 	if ( ind >= 0 )
-	 	nodes[ind] = ( touch_ECM(pCell) );
-	// // If has enough contact with ecm or not
-	// ind = pCell->boolean_network.get_node_index( "ECM" );
-	// if ( ind >= 0 )
-	// 	nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
-	// // If has enough contact with ecm or not
-	//ind = pCell->boolean_network.get_node_index( "ECMicroenv" );
-	//if ( ind >= 0 )
-	//	nodes[ind] = ( touch_ECM(pCell) );
+		pCell->boolean_network.set_node_value("ECM_sensing", touch_ECM(pCell));
 	
 	// If nucleus is deformed, probability of damage
 	// Change to increase proba with deformation ? + put as parameter
 	ind = pCell->boolean_network.get_node_index( "DNAdamage" );
 	if ( ind >= 0 )
-		nodes[ind] = ( pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0;
+		pCell->boolean_network.set_node_value("DNAdamage", ( pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0);
+		
 	/// example
 }
 
@@ -351,7 +352,7 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 	std::vector<bool>* point_to_nodes = pCell->boolean_network.get_nodes();
 	int bn_index;
 	bn_index = pCell->boolean_network.get_node_index( "Apoptosis" );
-	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
+	if ( bn_index != -1 && pCell->boolean_network.get_node_value( "Apoptosis" ) )
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
@@ -361,7 +362,7 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 	bn_index = pCell->boolean_network.get_node_index( "Migration" );
 	if ( bn_index >= 0 )
 	{
-		pCell->evolve_motility_coef( (*point_to_nodes)[bn_index], dt );
+		pCell->evolve_motility_coef( pCell->boolean_network.get_node_value( "Migration" ), dt );
 	}
 
 	bn_index = pCell->boolean_network.get_node_index( "Cell_growth" );
@@ -383,32 +384,32 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 
 	bn_index = pCell->boolean_network.get_node_index( "Cell_cell" );
 	if ( bn_index >= 0 )
-		pCell->evolve_cellcell_coef( (*point_to_nodes)[bn_index], dt );
+		pCell->evolve_cellcell_coef( pCell->boolean_network.get_node_value( "Cell_cell" ), dt );
 
 	bn_index = pCell->boolean_network.get_node_index( "Matrix_adhesion" );
 	if ( bn_index >= 0 )
-		pCell->evolve_integrin_coef( (*point_to_nodes)[bn_index], dt );
+		pCell->evolve_integrin_coef( pCell->boolean_network.get_node_value( "Matrix_adhesion" ), dt );
 
 	bn_index = pCell->boolean_network.get_node_index("Matrix_modif");
 	if ( bn_index >= 0 )
 	 {
-	 	pCell->set_mmp( (*point_to_nodes)[bn_index] );
+	 	pCell->set_mmp( pCell->boolean_network.get_node_value("Matrix_modif") );
 	 }
 
 	bn_index = pCell->boolean_network.get_node_index("EMTreg");
 	if ( bn_index != -1 )
 	{
-		pCell->set_mmp( (*point_to_nodes)[bn_index] );
+		pCell->set_mmp( pCell->boolean_network.get_node_value("EMTreg") );
 	}
 
 	pCell->freezing( 0 );
 	bn_index = pCell->boolean_network.get_node_index( "Quiescence" );
-	if ( bn_index >= 0 && (*point_to_nodes)[bn_index] )
+	if ( bn_index >= 0 && pCell->boolean_network.get_node_value( "Quiescence" ) )
 		pCell->freezing(1);
 
 	bn_index = pCell->boolean_network.get_node_index( "Cell_freeze" );
 	if ( bn_index >= 0 ){
-		pCell->freezer(3 * (*point_to_nodes)[bn_index]);
+		pCell->freezer(3 * pCell->boolean_network.get_node_value( "Cell_freeze" ));
 	}
 
 	/// example
@@ -529,6 +530,11 @@ void enough_to_node( Custom_cell* pCell, std::string nody, std::string field )
 	{
 		int felt = pCell->feel_enough(field, *pCell);
 		if ( felt != -1 )
-			nodes[bn_index] = felt;
+			(*nodes)[bn_index] = felt;
 	}
+}
+
+void color_node(Custom_cell* pCell){
+	std::string node_name = parameters.strings("node_to_visualize");
+	pCell->custom_data[node_name] = pCell->boolean_network.get_node_value(node_name);
 }
