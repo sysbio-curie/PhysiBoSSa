@@ -8,6 +8,9 @@ Custom_cell::Custom_cell() {
 	mmped = 0;
 	ecmrad = sqrt(3.0) * get_microenvironment()->mesh.dx / 2.0;
 	motility.resize(3, 0.0);
+	ecm_contact = 0;
+	cell_contact = 0;
+	nucleus_deform = 0;
 	functions.custom_cell_rule = Custom_cell::check_passive;
 	functions.update_velocity = Custom_cell::custom_update_velocity;
 	functions.custom_adhesion = Custom_cell::custom_adhesion_function;
