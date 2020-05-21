@@ -9,10 +9,7 @@ Custom_cell::Custom_cell() {
 	padhesion = 0.5;
 	mmped = 0;
 	ecmrad = sqrt(3.0) * get_microenvironment()->mesh.dx / 2.0;
-	motility.resize(3, 0.0);
-	functions.custom_cell_rule = Custom_cell::check_passive;
-	functions.update_velocity = Custom_cell::custom_update_velocity;
-	functions.custom_adhesion = Custom_cell::custom_adhesion_function;	
+	motility.resize(3, 0.0);	
 }
 
 /* Calculate repulsion/adhesion between agent and ecm according to its local density */
