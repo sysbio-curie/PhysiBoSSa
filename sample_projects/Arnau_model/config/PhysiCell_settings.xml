@@ -185,6 +185,7 @@
 		<tgfb_threshold type="double" units="dimensionless">1.</tgfb_threshold>
 		<membrane_shape type="string" units="">sphere</membrane_shape>	
 		<membrane_length type="double" units=""> 10 </membrane_length>
+		<node_to_visualize type="string" units="">Cell_cell</node_to_visualize> <!-- insert the name of the node you want to visualize in paraview-->
 		<color_function type="int" units="">2</color_function> <!-- 0 for ECM based color, 1 for pMotility based color, 2 for migration node based color-->
 	</user_parameters>
 	
