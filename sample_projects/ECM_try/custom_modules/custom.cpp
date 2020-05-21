@@ -153,8 +153,10 @@ void create_cell_types( void )
 	microenvironment.decay_rates[ecm_substrate_index] = 0;
 
 	//Setting the custom_create_cell pointer to our create_custom_cell
-	instantiate_cell = Custom_cell::create_custom_cell;
-
+	cell_defaults.functions.instantiate_cell = Custom_cell::create_custom_cell;
+	cell_defaults.functions.custom_cell_rule = Custom_cell::check_passive;
+	cell_defaults.functions.update_velocity = Custom_cell::custom_update_velocity;
+	cell_defaults.functions.custom_adhesion = Custom_cell::custom_adhesion_function;
 	return; 
 }
 
@@ -195,7 +197,7 @@ void setup_tissue( void )
 		int phase = cells[i].phase;
 		double elapsed_time = cells[i].elapsed_time;
 
-		pC = static_cast<Custom_cell*>(create_cell());
+		pC = static_cast<Custom_cell*>(create_cell(cell_defaults));
 		pC->assign_position( x, y, z );
 		double volume = sphere_volume_from_radius(radius);
 		pC->set_total_volume(volume);
