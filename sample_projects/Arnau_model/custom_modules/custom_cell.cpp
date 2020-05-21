@@ -210,6 +210,7 @@ void Custom_cell::set_motility( double dt )
     // Cell frozen, cannot actively move
     if ( freezed > 2 )
         return;
+	
     switch( PhysiCell::parameters.ints("mode_motility") )
     {
         case 0:
