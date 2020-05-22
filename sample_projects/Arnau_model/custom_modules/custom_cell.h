@@ -4,6 +4,8 @@
 /* custom class for simulation that use cells that interact with extra cellular matrix
 */
 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include "../core/PhysiCell_cell.h" 
 #include "../core/PhysiCell_constants.h"
 #include "custom_main.h"
