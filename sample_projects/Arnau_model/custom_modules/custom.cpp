@@ -138,8 +138,6 @@ void create_cell_types( void )
 	load_ecm_file();
 
 	return; 
-
-	return; 
 }
 
 void setup_microenvironment( void )
