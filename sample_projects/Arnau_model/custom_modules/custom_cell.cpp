@@ -481,3 +481,14 @@ int Custom_cell::feel_enough(std::string field, Custom_cell pCell)
 		return BioFVM::microenvironment.density_vector(voxel_index)[ind] > get_threshold(field); 
 	return -1;
 }
+
+/* Return true if level of oxygen is lower than necrosis critical level */
+bool Custom_cell::necrotic_oxygen()
+{	
+	int oxygen_substrate_index = BioFVM::microenvironment.find_density_index( "oxygen" );
+	double ox = this->nearest_density_vector()[oxygen_substrate_index];
+	//std::cout << ox << " " << (this->parameters.o2_necrosis_threshold) - ox << std::endl;
+	if ( ox >= 0 )	
+		return ( UniformRandom() * 5 < (this->parameters.o2_necrosis_threshold - ox) );
+   return false;	
+}
