@@ -145,11 +145,7 @@ void create_cell_types( void )
 	// set oxygen uptake / secretion parameters for the default cell type 
 	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
 	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38; 
-
-	//cell_defaults.phenotype.secretion.uptake_rates[ecm_substrate_index] = 10; 
-	//cell_defaults.phenotype.secretion.secretion_rates[ecm_substrate_index] = 0; 
-	//cell_defaults.phenotype.secretion.saturation_densities[ecm_substrate_index] = 38; 
+	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38;  
 	
 	microenvironment.diffusion_coefficients[ecm_substrate_index] = 1e-85;
 	microenvironment.decay_rates[ecm_substrate_index] = 0;
@@ -312,13 +308,11 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 void set_input_nodes(Custom_cell* pCell) {
 int ind;
 	//nodes = pCell->boolean_network.get_nodes();
-	// Oxygen input node O2; Oxygen or Oxy
-	// ind = pCell->boolean_network.get_node_index( "Oxygen" );
-	// if ( ind < 0 )
-	// 	ind = pCell->boolean_network.get_node_index( "Oxy" );
-	// if ( ind < 0 )
-	// 	ind = pCell->boolean_network.get_node_index( "O2" );
-	// if ( ind >= 0 )
+	ind = pCell->boolean_network.get_node_index( "Oxy" );
+	if ( ind >= 0 ){
+		pCell->boolean_network.set_node_value("Oxy", pCell->necrotic_oxygen());
+	}
+
 	// 	nodes[ind] = ( !pCell->necrotic_oxygen() );
 
 	//enough_to_node( pCell, "TGFbR", "tgfb" );
@@ -331,7 +325,6 @@ int ind;
 	ind = pCell->boolean_network.get_node_index( "Nei2" );
 	if ( ind >= 0 ){
 		pCell->boolean_network.set_node_value("Nei2", pCell->has_neighbor(1));
-		//if (pCell->boolean_network.get_node_value("Nei2") == 0) std::cout << pCell->boolean_network.get_node_value("Nei2");
 	}
 	// // If has enough contact with ecm or not
 	ind = pCell->boolean_network.get_node_index( "ECM_sensing" );

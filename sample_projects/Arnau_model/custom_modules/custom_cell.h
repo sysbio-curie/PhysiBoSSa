@@ -124,6 +124,7 @@ public:
 	 */
 	double distance_to_membrane_sheet(double length);
 	int feel_enough(std::string field, Custom_cell pCell);
+	bool necrotic_oxygen();
 	
 };
 
