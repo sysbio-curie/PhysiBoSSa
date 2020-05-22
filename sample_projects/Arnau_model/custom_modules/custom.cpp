@@ -65,6 +65,8 @@
 ###############################################################################
 */
 
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include "./custom.h"
 #include "../BioFVM/BioFVM.h"  
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
