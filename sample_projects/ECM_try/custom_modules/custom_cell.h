@@ -108,6 +108,7 @@ public:
 	{ return ecm_contact / phenotype.geometry.radius ; };
 	/** \brief Update cell cycle state */
 	void update_cycle( double cycle_dt, double time_since_last, double t );
+	void set_initial_volume(Cell_Definition cell_def, float radius);
 };
 
 #endif
