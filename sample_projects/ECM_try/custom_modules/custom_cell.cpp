@@ -357,3 +357,11 @@ bool Custom_cell::waiting_to_remove(Cell* cell, Phenotype& phenotype, double dt)
 
 	return true;
 }
+
+void Custom_cell::set_initial_volume(Cell_Definition cell_def, float radius) {
+
+	set_total_volume((4.0 / 3.0 * M_PI)*radius*radius*radius); 
+	phenotype.volume.target_solid_nuclear = cell_def.phenotype.volume.target_solid_nuclear;
+	phenotype.volume.target_solid_cytoplasmic = cell_def.phenotype.volume.target_solid_cytoplasmic;
+	phenotype.volume.rupture_volume = cell_def.phenotype.volume.rupture_volume;
+}

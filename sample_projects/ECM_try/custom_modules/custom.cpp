@@ -172,12 +172,7 @@ void setup_tissue( void )
 
 		pC = static_cast<Custom_cell*>(create_cell(cell_defaults));
 		pC->assign_position( x, y, z );
-		double volume = sphere_volume_from_radius(radius);
-		pC->set_total_volume(volume);
-		pC->phenotype.volume.target_solid_nuclear = cell_defaults.phenotype.volume.target_solid_nuclear;
-		pC->phenotype.volume.target_solid_cytoplasmic = cell_defaults.phenotype.volume.target_solid_cytoplasmic;
-		pC->phenotype.volume.rupture_volume = cell_defaults.phenotype.volume.rupture_volume;
-		
+		pC->set_initial_volume(cell_defaults, radius);
 		pC->phenotype.cycle.data.current_phase_index = phase+1;
 		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
 		if ((phase+1) == 1)
@@ -420,12 +415,6 @@ void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
 	// If cells is in G0 (quiescent) switch to pre-mitotic phase
 	if ( pCell->phenotype.cycle.current_phase_index() == PhysiCell_constants::Ki67_negative )
 		pCell->phenotype.cycle.advance_cycle(pCell, phenotype, dt);
-}
-
-double sphere_volume_from_radius(double rad)
-{
-	double PI4_3 = 4.0 / 3.0 * M_PI;
-return PI4_3 * rad * rad * rad;
 }
 
 bool touch_ECM(Custom_cell* pCell)
