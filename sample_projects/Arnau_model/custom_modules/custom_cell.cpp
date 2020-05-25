@@ -11,11 +11,6 @@ Custom_cell::Custom_cell() {
 	ecm_contact = 0;
 	cell_contact = 0;
 	nucleus_deform = 0;
-	functions.custom_cell_rule = Custom_cell::check_passive;
-	functions.update_velocity = Custom_cell::custom_update_velocity;
-	functions.custom_adhesion = Custom_cell::custom_adhesion_function;
-	cell_defaults.functions.add_cell_basement_membrane_interactions = Custom_cell::add_cell_basement_membrane_interactions;	
-	cell_defaults.functions.calculate_distance_to_membrane = Custom_cell::distance_to_membrane;
 }
 
 /* Calculate repulsion/adhesion between agent and ecm according to its local density */
