@@ -171,6 +171,7 @@ class Cell : public Basic_Agent
 	BooleanNetwork boolean_network;
 #endif
 
+
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 
 	
