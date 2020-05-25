@@ -97,7 +97,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>6</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -149,7 +149,56 @@
 				<filename>./config/dirichlet.mat</filename>
 			</dirichlet_nodes>
 		</options>
-	</microenvironment_setup>		
+	</microenvironment_setup>	
+	
+	<cell_definitions>
+		<cell_definition name="default" ID="0">
+			<phenotype>
+				<cycle code="0" name="advanced_Ki67_cycle_model">  
+					<!-- using higher than normal significant digits to match divisions in default code -->
+					<transition_rates units="1/min"> 
+						<!-- - to + -->
+						<rate start_index="0" end_index="1" fixed_duration="true">0.016666667</rate>
+						<!-- + (pre-mitotic) to + (post-mitotic)  -->
+						<rate start_index="1" end_index="2" fixed_duration="true">Infinity</rate>
+						<!-- + (post-mitotic) to - -->
+						<rate start_index="2" end_index="0" fixed_duration="true">0.006666667</rate>
+					</transition_rates>
+				</cycle>
+				
+				<death>  
+					<model code="100" name="apoptosis"> 
+						<rate units="1/min">5.31667e-05</rate>
+						<transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="true">Infinity</rate>
+						</transition_rates>
+					</model> 
+
+					<model code="101" name="necrosis">
+						<rate units="1/min">0.0</rate>
+						<transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+							<rate start_index="1" end_index="2" fixed_duration="true">1.15741e-5</rate>
+						</transition_rates>
+					</model> 
+				</death>					
+
+				<motility>  
+					<speed units="micron/min">1</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">0</migration_bias>
+					
+					<options>
+						<enabled>false</enabled>
+						<use_2D>false</use_2D>
+					</options>
+				</motility>
+
+				<molecular />
+			</phenotype>
+			<custom_data/>
+		</cell_definition>
+	</cell_definitions>	
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
@@ -186,7 +235,7 @@
 		<membrane_shape type="string" units="">sphere</membrane_shape>	
 		<membrane_length type="double" units=""> 10 </membrane_length>
 		<node_to_visualize type="string" units="">Cell_cell</node_to_visualize> <!-- insert the name of the node you want to visualize in paraview-->
-		<color_function type="int" units="">2</color_function> <!-- 0 for ECM based color, 1 for pMotility based color, 2 for node based color-->
+		<color_function type="int" units="">0</color_function> <!-- 0 for ECM based color, 1 for pMotility based color, 2 for node based color-->
 	</user_parameters>
 	
 	
