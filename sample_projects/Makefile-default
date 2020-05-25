@@ -181,6 +181,17 @@ arnau-model:
 	mkdir ./scripts/
 	cp ./sample_projects/Arnau_model/scripts/* ./scripts/
 
+sorting: 	
+	cp -r ./sample_projects/sorting/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/sorting/main_sorting.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/sorting/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/sorting/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/sorting/scripts/* ./scripts/
+
 drug-AGS: 	
 	cp ./sample_projects/drug_AGS/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
