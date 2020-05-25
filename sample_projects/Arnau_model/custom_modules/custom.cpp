@@ -78,80 +78,64 @@ std::vector<bool>* nodes;
 
 void create_cell_types( void )
 {
-	// use the same random seed so that future experiments have the 
-	// same initial histogram of oncoprotein, even if threading means 
-	// that future division and other events are still not identical 
-	// for all runs 
+		// set the random seed 
+	SeedRandom( parameters.ints("random_seed") );  
 	
-	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here 
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
 	
-	// housekeeping 
-	
-	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
-	
-	// Name the default cell type 
-	
-	cell_defaults.type = 0; 
-	cell_defaults.name = "tumor cell"; 
-	
-	// set default cell cycle model 
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;
 
-	cell_defaults.functions.cycle_model = Ki67_advanced; 
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_phenotype = NULL; // update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
 	
-	// set default_cell_functions; 
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
+	
+	initialize_cell_definitions_from_pugixml(); 
+	
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
+
 	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; 
-	
-	// make sure the defaults are self-consistent. 
-	
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	cell_defaults.functions.instantiate_cell = Custom_cell::create_custom_cell;
 
+	cell_defaults.functions.custom_cell_rule = Custom_cell::check_passive;
+	cell_defaults.functions.update_velocity = Custom_cell::custom_update_velocity;
+	cell_defaults.functions.custom_adhesion = Custom_cell::custom_adhesion_function;
+
+	cell_defaults.functions.cycle_model.phase_link(1,2).arrest_function = Custom_cell::wait_for_nucleus_growth;
+
+	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
+	cell_defaults.phenotype.death.models[apoptosis_model_index]->phase_link(0,1).arrest_function = Custom_cell::waiting_to_remove; 
+	
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
+	build_cell_definitions_maps(); 
+	display_cell_definitions( std::cout ); 
+	
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
 	cell_defaults.custom_data.add_variable("ecm_contact", "dimensionless", 0.0); //for paraview visualization
 	cell_defaults.custom_data.add_variable(parameters.strings("node_to_visualize"), "dimensionless", 0.0 ); //for paraview visualization
-	
 	load_ecm_file();
 
-	// set the rate terms in the default phenotype 
-	// first find index for a few key variables. 
-	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
-	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
-	int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
-	int ecm_substrate_index = microenvironment.find_density_index("ecm");
-
-
-	// initially no necrosis 
-	// cell_defaults.phenotype.death.rates[apoptosis_model_index] = 0.0; 
-	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
-	cell_defaults.functions.cycle_model.phase_link(0,1).fixed_duration = true; 
-	cell_defaults.functions.cycle_model.phase_link(1,2).arrest_function = Custom_cell::wait_for_nucleus_growth;
-	cell_defaults.functions.cycle_model.transition_rate(0,1) = 1.0/(1*60.0); 
-	cell_defaults.functions.cycle_model.transition_rate(1,2) = std::numeric_limits<double>::infinity();
-	cell_defaults.phenotype.cycle.data.transition_rate(0,1) = 1.0/(1*60.0); 
-	cell_defaults.phenotype.cycle.data.transition_rate(1,2) = std::numeric_limits<double>::infinity();
-
-	cell_defaults.phenotype.death.models[apoptosis_model_index]->phase_link(0,1).fixed_duration = true;
-
-		// Use the deterministic model, where this phase has fixed duration
-
-	// Use an arrest function to put the transition condition to duration OR small cell size
-	cell_defaults.phenotype.death.models[apoptosis_model_index]->transition_rate( 0, 1) = std::numeric_limits<double>::infinity();//1.0 / (8.6 * 60.0); 
-	cell_defaults.phenotype.death.models[apoptosis_model_index]->phase_link(0,1).arrest_function = Custom_cell::waiting_to_remove; 
-	
-
-
-	// set oxygen uptake / secretion parameters for the default cell type 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 10; 
-	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 38;  
-	
-	microenvironment.diffusion_coefficients[ecm_substrate_index] = 1e-85;
-	microenvironment.decay_rates[ecm_substrate_index] = 0;
-
-	//Setting the custom_create_cell pointer to our create_custom_cell
-	cell_defaults.functions.instantiate_cell = Custom_cell::create_custom_cell;
+	return; 
 
 	return; 
 }
