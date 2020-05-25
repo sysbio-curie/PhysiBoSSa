@@ -167,8 +167,9 @@ class Cell : public Basic_Agent
 	Cell_State state; 
 	Phenotype phenotype; 
 	
-
+#ifdef ADDON_PHYSIBOSS
 	BooleanNetwork boolean_network;
+#endif
 
 
 	void update_motility_vector( double dt_ );
