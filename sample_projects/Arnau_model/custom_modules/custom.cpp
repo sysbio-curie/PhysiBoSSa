@@ -113,13 +113,6 @@ void create_cell_types( void )
 	*/ 
 
 	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; 
-	cell_defaults.functions.instantiate_cell = Custom_cell::create_custom_cell;
-
-	functions.custom_cell_rule = Custom_cell::check_passive;
-	functions.update_velocity = Custom_cell::custom_update_velocity;
-	functions.custom_adhesion = Custom_cell::custom_adhesion_function;
-	cell_defaults.functions.add_cell_basement_membrane_interactions = Custom_cell::add_cell_basement_membrane_interactions;	
-	cell_defaults.functions.calculate_distance_to_membrane = Custom_cell::distance_to_membrane;
 
 	cell_defaults.functions.cycle_model.phase_link(1,2).arrest_function = Custom_cell::wait_for_nucleus_growth;
 
@@ -139,10 +132,6 @@ void create_cell_types( void )
 	cell_defaults.custom_data.add_variable(parameters.strings("node_to_visualize"), "dimensionless", 0.0 ); //for paraview visualization
 	load_ecm_file();
 
-<<<<<<< HEAD
-	return; 
-
-=======
 	//Setting the custom_create_cell pointer to our create_custom_cell
 	cell_defaults.functions.instantiate_cell = Custom_cell::create_custom_cell;
 	cell_defaults.functions.custom_cell_rule = Custom_cell::check_passive;
@@ -150,7 +139,6 @@ void create_cell_types( void )
 	cell_defaults.functions.custom_adhesion = Custom_cell::custom_adhesion_function;
 	cell_defaults.functions.add_cell_basement_membrane_interactions = Custom_cell::add_cell_basement_membrane_interactions;	
 	cell_defaults.functions.calculate_distance_to_membrane = Custom_cell::distance_to_membrane;
->>>>>>> 8ea28d6844f7dae6007395a22de8aee1a9484ed6
 	return; 
 }
 
