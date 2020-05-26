@@ -63,7 +63,8 @@ all:
 # sample projects 	
 list-projects:
 	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
-	@echo "                 cancer-immune-sample virus-macrophage-sample template spheroid-TNF drug-AGS"
+	@echo "                 cancer-immune-sample virus-macrophage-sample template spheroid-TNF drug-AGS ecm-try"
+	@echo "                 arnau-model sorting"
 	
 template2D: 
 	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
