@@ -456,6 +456,277 @@ const std::map<double, STATE_MAP<NetworkState_Impl, double> > Cumulator::getStat
   return result;
 }
 
+
+#ifdef PYTHON_API
+
+std::set<NetworkState_Impl> Cumulator::getStates() const
+{
+  std::set<NetworkState_Impl> result_states;
+
+  for (int nn=0; nn < getMaxTickIndex(); nn++) {
+    const CumulMap& mp = get_map(nn);
+    CumulMap::Iterator iter = mp.iterator();
+
+    while (iter.hasNext()) {
+      NetworkState_Impl state;
+      TickValue tick_value;
+      iter.next(state, tick_value);
+      result_states.insert(state);
+    }
+  }
+
+  return result_states;
+}
+
+std::vector<NetworkState_Impl> Cumulator::getLastStates() const
+{
+  std::vector<NetworkState_Impl> result_states;
+
+    const CumulMap& mp = get_map(getMaxTickIndex()-1);
+    CumulMap::Iterator iter = mp.iterator();
+
+    while (iter.hasNext()) {
+      NetworkState_Impl state;
+      TickValue tick_value;
+      iter.next(state, tick_value);
+      result_states.push_back(state);
+    }
+
+  return result_states;
+}
+
+
+PyObject* Cumulator::getNumpyStatesDists(Network* network) const 
+{
+  std::set<NetworkState_Impl> result_states = getStates();
+  
+  npy_intp dims[2] = {(npy_intp) getMaxTickIndex(), (npy_intp) result_states.size()};
+  PyArrayObject* result = (PyArrayObject *) PyArray_ZEROS(2,dims,NPY_DOUBLE, 0); 
+
+  std::vector<NetworkState_Impl> list_states(result_states.begin(), result_states.end());
+  std::map<NetworkState_Impl, unsigned int> pos_states;
+  for(unsigned int i=0; i < list_states.size(); i++) {
+    pos_states[list_states[i]] = i;
+  }
+
+  double ratio = time_tick*sample_count;
+
+  for (int nn=0; nn < getMaxTickIndex(); nn++) {
+    const CumulMap& mp = get_map(nn);
+    CumulMap::Iterator iter = mp.iterator();
+
+    while (iter.hasNext()) {
+      NetworkState_Impl state;
+      TickValue tick_value;
+      iter.next(state, tick_value);
+      
+      void* ptr = PyArray_GETPTR2(result, nn, pos_states[state]);
+      PyArray_SETITEM(
+        result, 
+        (char*) ptr,
+        PyFloat_FromDouble(tick_value.tm_slice / ratio)
+      );
+    }
+  }
+  PyObject* pylist_state = PyList_New(list_states.size());
+  for (unsigned int i=0; i < list_states.size(); i++) {
+    PyList_SetItem(
+      pylist_state, i, 
+      PyUnicode_FromString(NetworkState(list_states[i]).getName(network).c_str())
+    );
+  }
+
+  PyObject* timepoints = PyList_New(getMaxTickIndex());
+  for (int i=0; i < getMaxTickIndex(); i++) {
+    PyList_SetItem(timepoints, i, PyFloat_FromDouble(((double) i) * time_tick));
+  }
+
+  return PyTuple_Pack(3, PyArray_Return(result), pylist_state, timepoints);
+}
+
+
+PyObject* Cumulator::getNumpyLastStatesDists(Network* network) const 
+{
+  std::vector<NetworkState_Impl> result_last_states = getLastStates();
+  
+  npy_intp dims[2] = {(npy_intp) 1, (npy_intp) result_last_states.size()};
+  PyArrayObject* result = (PyArrayObject *) PyArray_ZEROS(2,dims,NPY_DOUBLE, 0); 
+
+  std::map<NetworkState_Impl, unsigned int> pos_states;
+  for(unsigned int i=0; i < result_last_states.size(); i++) {
+    pos_states[result_last_states[i]] = i;
+  }
+
+  double ratio = time_tick*sample_count;
+
+  const CumulMap& mp = get_map(getMaxTickIndex()-1);
+  CumulMap::Iterator iter = mp.iterator();
+
+  while (iter.hasNext()) {
+    NetworkState_Impl state;
+    TickValue tick_value;
+    iter.next(state, tick_value);
+    
+    void* ptr = PyArray_GETPTR2(result, 0, pos_states[state]);
+    PyArray_SETITEM(
+      result, 
+      (char*) ptr,
+      PyFloat_FromDouble(tick_value.tm_slice / ratio)
+    );
+  }
+
+  PyObject* pylist_state = PyList_New(result_last_states.size());
+  for (unsigned int i=0; i < result_last_states.size(); i++) {
+    PyList_SetItem(
+      pylist_state, i, 
+      PyUnicode_FromString(NetworkState(result_last_states[i]).getName(network).c_str())
+    );
+  }
+
+  PyObject* timepoints = PyList_New(1);
+  PyList_SetItem(
+    timepoints, 0, 
+    PyFloat_FromDouble(
+      (
+        (double) (getMaxTickIndex()-1)
+      )*time_tick
+    )
+  );
+
+  return PyTuple_Pack(3, PyArray_Return(result), pylist_state, timepoints);
+}
+
+
+
+
+std::vector<Node*> Cumulator::getNodes(Network* network) const {
+  std::vector<Node*> result_nodes;
+
+  for (auto node: network->getNodes()) {
+    if (!node->isInternal())
+      result_nodes.push_back(node);
+  }
+  return result_nodes;
+}
+
+PyObject* Cumulator::getNumpyNodesDists(Network* network) const 
+{
+  std::vector<Node*> output_nodes = getNodes(network);
+  
+  npy_intp dims[2] = {(npy_intp) getMaxTickIndex(), (npy_intp) output_nodes.size()};
+  PyArrayObject* result = (PyArrayObject *) PyArray_ZEROS(2,dims,NPY_DOUBLE, 0); 
+
+  std::map<Node*, unsigned int> pos_nodes;
+  for(unsigned int i=0; i < output_nodes.size(); i++) {
+    pos_nodes[output_nodes[i]] = i;
+  }
+
+  double ratio = time_tick*sample_count;
+
+  for (int nn=0; nn < getMaxTickIndex(); nn++) {
+    const CumulMap& mp = get_map(nn);
+    CumulMap::Iterator iter = mp.iterator();
+
+    while (iter.hasNext()) {
+      NetworkState_Impl state;
+      TickValue tick_value;
+      iter.next(state, tick_value);
+      
+      for (auto node: output_nodes) {
+        
+        if (((NetworkState) state).getNodeState(node)){
+          void* ptr_val = PyArray_GETPTR2(result, nn, pos_nodes[node]);
+
+          PyArray_SETITEM(
+            result, 
+            (char*) ptr_val,
+            PyFloat_FromDouble(
+              PyFloat_AsDouble(PyArray_GETITEM(result, (char*) ptr_val))
+              + (tick_value.tm_slice / ratio)
+            )
+          );
+        }
+      }
+    }
+  }
+  PyObject* pylist_nodes = PyList_New(output_nodes.size());
+  for (unsigned int i=0; i < output_nodes.size(); i++) {
+    PyList_SetItem(
+      pylist_nodes, i, 
+      PyUnicode_FromString(output_nodes[i]->getLabel().c_str())
+    );
+  }
+
+  PyObject* timepoints = PyList_New(getMaxTickIndex());
+  for (int i=0; i < getMaxTickIndex(); i++) {
+    PyList_SetItem(timepoints, i, PyFloat_FromDouble(((double) i) * time_tick));
+  }
+
+  return PyTuple_Pack(3, PyArray_Return(result), pylist_nodes, timepoints);
+}
+
+
+PyObject* Cumulator::getNumpyLastNodesDists(Network* network) const 
+{
+  std::vector<Node*> output_nodes = getNodes(network);
+  
+  npy_intp dims[2] = {(npy_intp) 1, (npy_intp) output_nodes.size()};
+  PyArrayObject* result = (PyArrayObject *) PyArray_ZEROS(2,dims,NPY_DOUBLE, 0); 
+
+  std::map<Node*, unsigned int> pos_nodes;
+  for(unsigned int i=0; i < output_nodes.size(); i++) {
+    pos_nodes[output_nodes[i]] = i;
+  }
+
+  double ratio = time_tick*sample_count;
+
+  const CumulMap& mp = get_map(getMaxTickIndex()-1);
+  CumulMap::Iterator iter = mp.iterator();
+
+  while (iter.hasNext()) {
+    NetworkState_Impl state;
+    TickValue tick_value;
+    iter.next(state, tick_value);
+    
+    for (auto node: output_nodes) {
+      
+      if (((NetworkState) state).getNodeState(node)){
+        void* ptr_val = PyArray_GETPTR2(result, 0, pos_nodes[node]);
+
+        PyArray_SETITEM(
+          result, 
+          (char*) ptr_val,
+          PyFloat_FromDouble(
+            PyFloat_AsDouble(PyArray_GETITEM(result, (char*) ptr_val))
+            + (tick_value.tm_slice / ratio)
+          )
+        );
+      }
+    }
+  }
+  PyObject* pylist_nodes = PyList_New(output_nodes.size());
+  for (unsigned int i=0; i < output_nodes.size(); i++) {
+    PyList_SetItem(
+      pylist_nodes, i, 
+      PyUnicode_FromString(output_nodes[i]->getLabel().c_str())
+    );
+  }
+  PyObject* timepoints = PyList_New(1);
+  PyList_SetItem(
+    timepoints, 0, 
+    PyFloat_FromDouble(
+      (
+        (double) (getMaxTickIndex()-1)
+      )*time_tick
+    )
+  );
+  
+  return PyTuple_Pack(3, PyArray_Return(result), pylist_nodes, timepoints);
+}
+
+
+#endif
+
 const STATE_MAP<NetworkState_Impl, double> Cumulator::getNthStateDist(int nn) const
 {
   double ratio = time_tick*sample_count;

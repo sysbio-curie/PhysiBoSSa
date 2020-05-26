@@ -34,10 +34,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <iomanip>
-#include <dlfcn.h>
 #include <iostream>
 
-const std::string MaBEstEngine::VERSION = "2.3.1";
+const std::string MaBEstEngine::VERSION = "2.3.4";
 size_t RandomGenerator::generated_number_count = 0;
 
 MaBEstEngine::MaBEstEngine(Network* network, RunConfig* runconfig) :
