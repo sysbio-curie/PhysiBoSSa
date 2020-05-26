@@ -19,7 +19,12 @@ private:
 protected:
 	
 public:
-	inline bool passive() { return type == PhysiCell_constants::PASSIVE_TYPE; };
+	inline bool passive() { 
+		return (
+			custom_data.find_variable_index("passive_cell") >= 0 
+			&& ((int) custom_data["passive_cell"]) == 1
+		); 
+	};
 	
     std::vector<double> motility;
 	double pintegrin;
@@ -27,10 +32,6 @@ public:
 	double padhesion;
 	double nucleus_deform;
 	double ecm_contact;
-	double Cecm[2];
-	double motility_magnitude[2];
-	double Ccca_homotypic[2];
-	double Ccca_heterotypic[2];
 	int mmped;
 	Custom_cell();
 
@@ -49,21 +50,25 @@ public:
     /** \brief Return amount of contact with other cells */
 	inline double contact_cell()
 	{ return cell_contact / phenotype.geometry.radius ; };
+	
 	/** \brief Return value of adhesion strength with ECM according to integrin level */
 	double integrinStrength();
+	
 	/** \brief Get the current value of heterotypic adhesion strength */
 	inline double get_heterotypic_strength( double percent )
-	{ return current_value( Ccca_heterotypic[0], Ccca_heterotypic[1], percent ); };
+	{ return current_value( PhysiCell::parameters.doubles("heterotypic_adhesion_min"), PhysiCell::parameters.doubles("heterotypic_adhesion_max"), percent ); };
+	
 	/** \brief Get the current value of homotypic adhesion strength */
 	inline double get_homotypic_strength( double percent )
-	{ return current_value( Ccca_homotypic[0], Ccca_homotypic[1], percent ); };
+	{ return current_value( PhysiCell::parameters.doubles("homotypic_adhesion_min"), PhysiCell::parameters.doubles("homotypic_adhesion_max"), percent ); };
 
     /** \brief Get the current value of integrin strength */
 	inline double get_integrin_strength( double percent )
-	{ return current_value( Cecm[0], Cecm[1], percent ); };
+	{ return current_value( PhysiCell::parameters.doubles("ecm_adhesion_min"), PhysiCell::parameters.doubles("ecm_adhesion_min"), percent ); };
+	
 	/** \brief Get the current value of motility coefficient */
 	inline double get_motility_amplitude( double percent )
-	{ return current_value( motility_magnitude[0], motility_magnitude[1], percent ); };
+	{ return current_value(PhysiCell::parameters.doubles("motility_amplitude_min"), PhysiCell::parameters.doubles("motility_amplitude_max"), percent ); };
     
     bool has_neighbor(int);
 	double adhesion(Cell* other_cell);
@@ -89,11 +94,10 @@ public:
 
 	static Cell* create_custom_cell();
 
-	// Here I'm hoping that the argument used, time_since_last_mechanics, has the same value
-	// as mechanics_dt_. I should probably check later...
 	static void check_passive(Cell* cell, Phenotype& phenotype, double dt);
 
 	static void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt);
+	static double custom_repulsion_function(Cell* pCell, Cell* otherCell);
 	static double custom_adhesion_function(Cell* pCell, Cell* otherCell, double distance);
 	static bool wait_for_nucleus_growth(Cell* cell, Phenotype& phenotype, double dt);
 	static bool waiting_to_remove(Cell* cell, Phenotype& phenotype, double dt);
@@ -106,8 +110,6 @@ public:
 	/** \brief Return amount of contact with ECM */
 	inline double contact_ecm()
 	{ return ecm_contact / phenotype.geometry.radius ; };
-	/** \brief Update cell cycle state */
-	void update_cycle( double cycle_dt, double time_since_last, double t );
 	void set_initial_volume(Cell_Definition cell_def, float radius);
 };
 
