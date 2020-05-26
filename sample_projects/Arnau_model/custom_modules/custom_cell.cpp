@@ -105,8 +105,6 @@ void Custom_cell::degrade_ecm( double dt )
 /* Return value of adhesion strength with ECM according to integrin level */
 double Custom_cell::integrinStrength()
 { 
-	Cecm[0] = PhysiCell::parameters.ints("ecm_adhesion_min");
-	Cecm[1] = PhysiCell::parameters.ints("ecm_adhesion_min");
 	return get_integrin_strength( pintegrin ); 
 }
 
@@ -127,12 +125,9 @@ bool Custom_cell::has_neighbor(int level)
 double Custom_cell::adhesion( Cell* other_cell )
 {
     Custom_cell* custom_other_cell = static_cast<Custom_cell*>(other_cell);
-	Ccca_heterotypic[0] = PhysiCell::parameters.doubles("heterotypic_adhesion_min");
-	Ccca_heterotypic[1] = PhysiCell::parameters.doubles("heterotypic_adhesion_max");
-	Ccca_homotypic[0] = PhysiCell::parameters.doubles("homotypic_adhesion_min");
-	Ccca_homotypic[1] = PhysiCell::parameters.doubles("homotypic_adhesion_max");
+	
 	double adh = 0;
-	if ( &(Cell::phenotype) == &(other_cell->Cell::phenotype) )
+	if ( this->type == other_cell->type )
 		adh = std::min( get_homotypic_strength(padhesion), custom_other_cell->get_homotypic_strength(padhesion) );
 	else
 		adh = std::min( get_heterotypic_strength(padhesion), custom_other_cell->get_heterotypic_strength(padhesion) );
@@ -143,7 +138,10 @@ double Custom_cell::adhesion( Cell* other_cell )
 
 double Custom_cell::get_adhesion()
 {
-	return 1;
+	if (passive())
+		return 0;
+	else
+		return 1;
 }
 
 
@@ -151,8 +149,7 @@ double Custom_cell::get_adhesion()
 void Custom_cell::set_3D_random_motility( double dt )
 {
     double probability = UniformRandom();
-    motility_magnitude[0] = PhysiCell::parameters.doubles("motility_amplitude_min");
-    motility_magnitude[1] = PhysiCell::parameters.doubles("motility_amplitude_max");
+	
     if ( probability < dt / PhysiCell::parameters.doubles("persistence") )
     {
         std::vector<double> tmp;
@@ -230,17 +227,6 @@ void Custom_cell::freezer( int frozen )
     freezed = freezed | frozen;
 }
 
-/*
-void Custom_cell::update_cycle( double cycle_dt, double time_since_last, double t )
-{
-	if ( is_out_of_domain )
-		return;
-	ccycle->do_one_cycle_step( time_since_last, t );
-	if ( freezed == 0 )
-		update_volume( time_since_last );
-}
-*/
-
 Cell* Custom_cell::create_custom_cell()
 {
 	Custom_cell* pNew; 
@@ -287,10 +273,8 @@ void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, dou
 		if(!is_neighbor_voxel(pCell, pCell->get_container()->underlying_mesh.voxels[pCell->get_current_mechanics_voxel_index()].center, pCell->get_container()->underlying_mesh.voxels[neighbor_voxel_index].center, neighbor_voxel_index))
 			continue;
 
-		if ( ecm_index >= 0 ){
+		if ( ecm_index >= 0 )
 			pCustomCell->add_ecm_interaction( ecm_index, neighbor_voxel_index );
-			
-		}
 	
 		for( auto other_neighbor : pCell->get_container()->agent_grid[neighbor_voxel_index] )
 		{
@@ -305,6 +289,14 @@ void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, dou
 	return; 
 }
 
+double Custom_cell::custom_repulsion_function(Cell* pCell, Cell* otherCell) 
+{
+	if ((static_cast<Custom_cell*>(pCell))->passive())
+		return 0; // Sphere are not affected by repulsion
+	else
+		return sqrt( pCell->phenotype.mechanics.cell_cell_repulsion_strength * otherCell->phenotype.mechanics.cell_cell_repulsion_strength ); 
+}	
+	
 double Custom_cell::custom_adhesion_function(Cell* pCell, Cell* otherCell, double distance) 
 {
 
@@ -362,6 +354,14 @@ bool Custom_cell::waiting_to_remove(Cell* cell, Phenotype& phenotype, double dt)
 		return false;
 
 	return true;
+}
+
+void Custom_cell::set_initial_volume(Cell_Definition cell_def, float radius) {
+
+	set_total_volume((4.0 / 3.0 * M_PI)*radius*radius*radius); 
+	phenotype.volume.target_solid_nuclear = cell_def.phenotype.volume.target_solid_nuclear;
+	phenotype.volume.target_solid_cytoplasmic = cell_def.phenotype.volume.target_solid_cytoplasmic;
+	phenotype.volume.rupture_volume = cell_def.phenotype.volume.rupture_volume;
 }
 
 void Custom_cell::add_cell_basement_membrane_interactions( Cell* pCell, Phenotype& phenotype, double dt ) 
