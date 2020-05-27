@@ -1,7 +1,7 @@
 #include "boolean_network.h"
 
-void BooleanNetwork::initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step){
-	this->maboss.init_maboss(bnd_file, cfg_file);
+void BooleanNetwork::initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step, std::map<std::string, double> initial_values){
+	this->maboss.init_maboss(bnd_file, cfg_file, initial_values);
 	this->maboss.set_update_time_step(time_step);
 }
 

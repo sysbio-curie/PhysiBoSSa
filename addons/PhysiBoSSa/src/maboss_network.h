@@ -27,6 +27,8 @@ class MaBoSSNetwork
 		/** \brief Time step to update the cycle */
 		double update_time_step = 12;
 
+		std::map< std::string, double > initial_states;
+
 		/** \brief Names and indices of network nodes */
 		std::map< std::string, int > node_names;
 
@@ -38,7 +40,7 @@ class MaBoSSNetwork
 
 	public:
 		/** \brief Initialize network */
-		void init_maboss( std::string networkFile, std::string configFile);
+		void init_maboss( std::string networkFile, std::string configFile, std::map<std::string, double> initial_values);
 
 		/** \brief Destructor */
 		void delete_maboss();
