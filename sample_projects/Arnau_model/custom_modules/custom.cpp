@@ -164,12 +164,7 @@ void setup_tissue( void )
 {
 	Custom_cell* pC;
 	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
-	MaBoSSNetwork* maboss;
-	std::string bnd_file = parameters.strings("bnd_file");
-	std::string cfg_file = parameters.strings("cfg_file");
-	BooleanNetwork ecm_network;
-	ecm_network.initialize_boolean_network(bnd_file, cfg_file, 12);
-
+	
 	for (int i = 0; i < cells.size(); i++)
 	{
 		float x = cells[i].x;
@@ -191,10 +186,9 @@ void setup_tissue( void )
 		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
 		if ((phase+1) == 1)
 			pC->phenotype.cycle.pCycle_Model->phases[1].entry_function(pC, pC->phenotype, 0);
-		
-		pC->boolean_network = ecm_network;
-		pC->boolean_network.restart_nodes();
-		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
+
+		pC->phenotype.intracellular.network.restart_nodes();
+		pC->custom_data["next_physibossa_run"] = pC->phenotype.intracellular.network.get_time_to_update();
 		pC->custom_data["ecm_contact"] = pC->ecm_contact;
 		color_node(pC);
 	}
@@ -233,7 +227,7 @@ std::vector<std::string> pMotility_coloring_function( Cell* pCell )
 std::vector<std::string> migration_coloring_function( Cell* pCell )
 {
 	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
-	if ( pCell->boolean_network.get_node_value( parameters.strings("node_to_visualize") ) == 0 )
+	if ( pCell->phenotype.intracellular.network.get_node_value( parameters.strings("node_to_visualize") ) == 0 )
 	{
 		output[0] = "rgb(0,0,255)";
 		output[2] = "rgb(0,0,125)";
@@ -279,9 +273,9 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 		
 		set_input_nodes(pCustomCell);
 
-		pCustomCell->boolean_network.run_maboss();
+		pCustomCell->phenotype.intracellular.network.run_maboss();
 		// Get noisy step size
-		double next_run_in = pCustomCell->boolean_network.get_time_to_update();
+		double next_run_in = pCustomCell->phenotype.intracellular.network.get_time_to_update();
 		pCustomCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
 		
 		from_nodes_to_cell(pCustomCell, phenotype, dt);
@@ -293,102 +287,102 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 
 void set_input_nodes(Custom_cell* pCell) {
 int ind;
-	//nodes = pCell->boolean_network.get_nodes();
-	ind = pCell->boolean_network.get_node_index( "Oxy" );
+	//nodes = pCell->phenotype.intracellular.network.get_nodes();
+	ind = pCell->phenotype.intracellular.network.get_node_index( "Oxy" );
 	if ( ind >= 0 ){
-		pCell->boolean_network.set_node_value("Oxy", pCell->necrotic_oxygen());
+		pCell->phenotype.intracellular.network.set_node_value("Oxy", pCell->necrotic_oxygen());
 	}
 
 	// 	nodes[ind] = ( !pCell->necrotic_oxygen() );
 
 	//enough_to_node( pCell, "TGFbR", "tgfb" );
 
-	ind = pCell->boolean_network.get_node_index( "Neighbours" );
+	ind = pCell->phenotype.intracellular.network.get_node_index( "Neighbours" );
 	if ( ind >= 0 ){
-		pCell->boolean_network.set_node_value("Neighbours", pCell->has_neighbor(0));	
+		pCell->phenotype.intracellular.network.set_node_value("Neighbours", pCell->has_neighbor(0));	
 	}
 	
-	ind = pCell->boolean_network.get_node_index( "Nei2" );
+	ind = pCell->phenotype.intracellular.network.get_node_index( "Nei2" );
 	if ( ind >= 0 ){
-		pCell->boolean_network.set_node_value("Nei2", pCell->has_neighbor(1));
+		pCell->phenotype.intracellular.network.set_node_value("Nei2", pCell->has_neighbor(1));
 	}
 	// // If has enough contact with ecm or not
-	ind = pCell->boolean_network.get_node_index( "ECM_sensing" );
+	ind = pCell->phenotype.intracellular.network.get_node_index( "ECM_sensing" );
 	if ( ind >= 0 )
-		pCell->boolean_network.set_node_value("ECM_sensing", touch_ECM(pCell));
+		pCell->phenotype.intracellular.network.set_node_value("ECM_sensing", touch_ECM(pCell));
 	
 	// If nucleus is deformed, probability of damage
 	// Change to increase proba with deformation ? + put as parameter
-	ind = pCell->boolean_network.get_node_index( "DNAdamage" );
+	ind = pCell->phenotype.intracellular.network.get_node_index( "DNAdamage" );
 	if ( ind >= 0 )
-		pCell->boolean_network.set_node_value("DNAdamage", ( pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0);
+		pCell->phenotype.intracellular.network.set_node_value("DNAdamage", ( pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0);
 		
 	/// example
 }
 
 void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 {
-	std::vector<bool>* point_to_nodes = pCell->boolean_network.get_nodes();
+	std::vector<bool>* point_to_nodes = pCell->phenotype.intracellular.network.get_nodes();
 	int bn_index;
-	bn_index = pCell->boolean_network.get_node_index( "Apoptosis" );
-	if ( bn_index != -1 && pCell->boolean_network.get_node_value( "Apoptosis" ) )
+	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Apoptosis" );
+	if ( bn_index != -1 && pCell->phenotype.intracellular.network.get_node_value( "Apoptosis" ) )
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
 		return;
 	}
 
-	bn_index = pCell->boolean_network.get_node_index( "Migration" );
+	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Migration" );
 	if ( bn_index >= 0 )
 	{
-		pCell->evolve_motility_coef( pCell->boolean_network.get_node_value( "Migration" ), dt );
+		pCell->evolve_motility_coef( pCell->phenotype.intracellular.network.get_node_value( "Migration" ), dt );
 	}
 
-	bn_index = pCell->boolean_network.get_node_index( "Cell_growth" );
+	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Cell_growth" );
 	 if ( bn_index >= 0 )
 	 {
 	 	do_proliferation( pCell, phenotype, dt );
 	 }
 /*
-	bn_index = pCell->boolean_network.get_node_index("CCA");
+	bn_index = pCell->phenotype.intracellular.network.get_node_index("CCA");
 	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
 	{
 		pCell->freezing(1);
 	}	
 */
-	/*bn_index = pCell->boolean_network.get_node_index( "Polarization" );
+	/*bn_index = pCell->phenotype.intracellular.network.get_node_index( "Polarization" );
 	if ( bn_index >= 0 )
 		pCell->evolve_polarity_coef( (*point_to_nodes)[bn_index], dt );
 	*/
 
-	bn_index = pCell->boolean_network.get_node_index( "Cell_cell" );
+	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Cell_cell" );
 	if ( bn_index >= 0 )
-		pCell->evolve_cellcell_coef( pCell->boolean_network.get_node_value( "Cell_cell" ), dt );
+		pCell->evolve_cellcell_coef( pCell->phenotype.intracellular.network.get_node_value( "Cell_cell" ), dt );
 
-	bn_index = pCell->boolean_network.get_node_index( "Matrix_adhesion" );
+	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Matrix_adhesion" );
 	if ( bn_index >= 0 )
-		pCell->evolve_integrin_coef( pCell->boolean_network.get_node_value( "Matrix_adhesion" ), dt );
+		pCell->evolve_integrin_coef( pCell->phenotype.intracellular.network.get_node_value( "Matrix_adhesion" ), dt );
 
-	bn_index = pCell->boolean_network.get_node_index("Matrix_modif");
+	bn_index = pCell->phenotype.intracellular.network.get_node_index("Matrix_modif");
 	if ( bn_index >= 0 )
 	 {
-	 	pCell->set_mmp( pCell->boolean_network.get_node_value("Matrix_modif") );
+	 	pCell->set_mmp( pCell->phenotype.intracellular.network.get_node_value("Matrix_modif") );
 	 }
 
-	bn_index = pCell->boolean_network.get_node_index("EMTreg");
+	bn_index = pCell->phenotype.intracellular.network.get_node_index("EMTreg");
 	if ( bn_index != -1 )
 	{
-		pCell->set_mmp( pCell->boolean_network.get_node_value("EMTreg") );
+		pCell->set_mmp( pCell->phenotype.intracellular.network.get_node_value("EMTreg") );
 	}
 
 	pCell->freezing( 0 );
-	bn_index = pCell->boolean_network.get_node_index( "Quiescence" );
-	if ( bn_index >= 0 && pCell->boolean_network.get_node_value( "Quiescence" ) )
+	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Quiescence" );
+	if ( bn_index >= 0 && pCell->phenotype.intracellular.network.get_node_value( "Quiescence" ) )
 		pCell->freezing(1);
 
-	bn_index = pCell->boolean_network.get_node_index( "Cell_freeze" );
+	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Cell_freeze" );
 	if ( bn_index >= 0 ){
-		pCell->freezer(3 * pCell->boolean_network.get_node_value( "Cell_freeze" ));
+		pCell->freezer(3 * pCell->phenotype.intracellular.network.get_node_value( "Cell_freeze" ));
 	}
 
 	/// example
@@ -504,7 +498,7 @@ bool touch_ECM(Custom_cell* pCell)
 void enough_to_node( Custom_cell* pCell, std::string nody, std::string field )
 {
 	int bn_index;
-	bn_index = pCell->boolean_network.get_node_index( nody );;
+	bn_index = pCell->phenotype.intracellular.network.get_node_index( nody );;
 	if ( bn_index >= 0 )
 	{
 		int felt = pCell->feel_enough(field, *pCell);
@@ -515,5 +509,5 @@ void enough_to_node( Custom_cell* pCell, std::string nody, std::string field )
 
 void color_node(Custom_cell* pCell){
 	std::string node_name = parameters.strings("node_to_visualize");
-	pCell->custom_data[node_name] = pCell->boolean_network.get_node_value(node_name);
+	pCell->custom_data[node_name] = pCell->phenotype.intracellular.network.get_node_value(node_name);
 }
