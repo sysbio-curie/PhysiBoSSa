@@ -476,10 +476,6 @@ Cell* Cell::divide( )
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
 
-#ifdef ADDON_PHYSIBOSS
-	child->boolean_network = this->boolean_network;
-#endif
-
 	return child;
 }
 
@@ -1916,7 +1912,42 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		}
 	}	
 
+	// intracellular
 	
+	node = cd_node.child( "phenotype" );
+	node = node.child( "intracellular" ); 
+	if( node )
+	{
+		Intracellular* pIntra = &(pCD->phenotype.intracellular);
+		
+		std::string model_type = node.attribute( "type" ).value(); 
+		pIntra->type = model_type;
+		
+#ifdef ADDON_PHYSIBOSS
+		if (model_type == "maboss") {
+			
+			pugi::xml_node node_bnd = node.child( "bnd_filename" );
+			if ( node_bnd )
+			{ pIntra->bnd_filename = xml_get_my_string_value (node_bnd); }
+			
+			pugi::xml_node node_cfg = node.child( "cfg_filename" );
+			if ( node_cfg )
+			{ pIntra->cfg_filename = xml_get_my_string_value (node_cfg); }
+			
+			pugi::xml_node node_timestep = node.child( "time_step" ); 
+			if( node_timestep )
+			{ pIntra->time_step = xml_get_my_double_value( node_timestep ); }
+	
+			pIntra->network.initialize_boolean_network(
+				pIntra->bnd_filename, 
+				pIntra->cfg_filename,
+				pIntra->time_step
+			);
+		}
+#endif
+	}	
+	
+
 	// set up custom data 
 	node = cd_node.child( "custom_data" );
 	pugi::xml_node node1 = node.first_child(); 
