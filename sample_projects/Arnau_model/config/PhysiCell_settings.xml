@@ -198,6 +198,12 @@
 					<bnd_filename>./config/boolean_network/CCM_mod4_1.bnd</bnd_filename>
 					<cfg_filename>./config/boolean_network/CCM_mod4_1.cfg</cfg_filename>
 					<time_step>12</time_step>
+					<initial_values>
+						<initial_value node="ECM_sensing">0.5</initial_value>
+						<initial_value node="Apoptosis">0.01</initial_value>
+					</initial_values>
+					<mutations/>
+					
 				</intracellular>			
 			</phenotype>
 			<custom_data/>
