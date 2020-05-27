@@ -553,6 +553,7 @@ class Intracellular
 	std::string bnd_filename;
 	std::string cfg_filename;
 	double time_step;
+	std::map<std::string, double> initial_values;
 	
 	BooleanNetwork network;
 #endif

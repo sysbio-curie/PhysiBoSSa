@@ -27,6 +27,8 @@ class MaBoSSNetwork
 		/** \brief Time step between each MaBoSS simulation */
 		double update_time_step = 10;
 
+		std::map< std::string, double > initial_states;
+
 		/** \brief Names and indices of network nodes */
 		std::map< std::string, int > node_names;
 
@@ -49,7 +51,7 @@ class MaBoSSNetwork
 		 * \brief Class initializer 
 		 * \param networkFile,configFile MaBoSS configutation files
 		 */
-		void init_maboss( std::string networkFile, std::string configFile);
+		void init_maboss( std::string networkFile, std::string configFile, std::map<std::string, double> initial_values);
 
 		/** \brief Class destructor */
 		void delete_maboss();

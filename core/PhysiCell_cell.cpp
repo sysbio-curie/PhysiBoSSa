@@ -2092,10 +2092,30 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			if( node_timestep )
 			{ pIntra->time_step = xml_get_my_double_value( node_timestep ); }
 	
+			std::map<std::string, double> initial_values;
+			initial_values.clear();
+			
+			pugi::xml_node node_init_values = node.child( "initial_values" );
+			if( node_init_values )
+			{
+				pugi::xml_node node_init_value = node_init_values.child( "initial_value" );
+				while( node_init_value )
+				{
+					std::string node_name = node_init_value.attribute( "node" ).value(); 
+					double node_value = xml_get_my_double_value( node_init_value );
+					
+					initial_values[node_name] = node_value;
+					
+					node_init_value = node_init_value.next_sibling( "initial_value" ); 
+				}
+			}
+			pIntra->initial_values = initial_values;
+			
 			pIntra->network.initialize_boolean_network(
 				pIntra->bnd_filename, 
 				pIntra->cfg_filename,
-				pIntra->time_step
+				pIntra->time_step,
+				pIntra->initial_values
 			);
 		}
 #endif
