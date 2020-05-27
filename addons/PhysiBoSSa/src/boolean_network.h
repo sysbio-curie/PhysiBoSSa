@@ -33,7 +33,7 @@ class BooleanNetwork
 
 	public:
 		/** \brief Initialize a maboos network */
-		void initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step);
+		void initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step, std::map<std::string, double> initial_values);
 
 		/** \brief Reset nodes and time to update */
 		void restart_nodes();
