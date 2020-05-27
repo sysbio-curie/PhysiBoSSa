@@ -194,7 +194,11 @@
 					</options>
 				</motility>
 
-				<molecular />
+				<intracellular type="maboss">
+					<bnd_filename>./config/boolean_network/CCM_mod4_1.bnd</bnd_filename>
+					<cfg_filename>./config/boolean_network/CCM_mod4_1.cfg</cfg_filename>
+					<time_step>12</time_step>
+				</intracellular>			
 			</phenotype>
 			<custom_data/>
 		</cell_definition>
@@ -227,8 +231,6 @@
 		<solid_nuclear type="int" units=""> 135 </solid_nuclear>
 		<solid_cytoplasmic type="int" units=""> 486 </solid_cytoplasmic>
 		<protein_threshold type="int" units=""> 1 </protein_threshold>
-		<bnd_file type="string" units="">./config/boolean_network/CCM_mod4_1.bnd</bnd_file>
-		<cfg_file type="string" units="">./config/boolean_network/CCM_mod4_1.cfg</cfg_file>
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
 		<init_ecm_filename type="string" units="">./config/ecm.txt</init_ecm_filename>
 		<tgfb_threshold type="double" units="dimensionless">1.</tgfb_threshold>
