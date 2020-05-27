@@ -539,6 +539,22 @@ class Molecular
 		
 };
 
+class Intracellular
+{
+ private:
+ public:
+    std::string type;
+	
+#ifdef ADDON_PHYSIBOSS
+	std::string bnd_filename;
+	std::string cfg_filename;
+	double time_step;
+	std::map<std::string, double> initial_values;
+	
+	BooleanNetwork network;
+#endif
+};
+
 class Phenotype
 {
  private:
