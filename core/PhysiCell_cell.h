@@ -79,10 +79,6 @@
 
 #include "./PhysiCell_standard_models.h" 
 
-#ifdef ADDON_PHYSIBOSS
-#include "../addons/PhysiBoSSa/src/boolean_network.h"
-#endif
-
 using namespace BioFVM; 
 
 namespace PhysiCell{
@@ -166,10 +162,6 @@ class Cell : public Basic_Agent
 
 	Cell_State state; 
 	Phenotype phenotype; 
-	
-#ifdef ADDON_PHYSIBOSS
-	BooleanNetwork boolean_network;
-#endif
 
 
 	void update_motility_vector( double dt_ );

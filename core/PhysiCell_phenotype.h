@@ -77,6 +77,10 @@
 
 #include "../modules/PhysiCell_settings.h"
 
+#ifdef ADDON_PHYSIBOSS
+#include "../addons/PhysiBoSSa/src/boolean_network.h"
+#endif
+
 using namespace BioFVM; 
 
 namespace PhysiCell{
@@ -539,6 +543,21 @@ class Molecular
 		
 };
 
+class Intracellular
+{
+ private:
+ public:
+    std::string type;
+	
+#ifdef ADDON_PHYSIBOSS
+	std::string bnd_filename;
+	std::string cfg_filename;
+	double time_step;
+	
+	BooleanNetwork network;
+#endif
+};
+
 class Phenotype
 {
  private:
@@ -555,6 +574,8 @@ class Phenotype
 	Secretion secretion; 
 	
 	Molecular molecular; 
+	
+	Intracellular intracellular;
 	
 	Phenotype(); // done 
 	
