@@ -2150,12 +2150,32 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			}
 			pIntra->mutations = mutations;
 			
+			std::map<std::string, double> parameters;
+			parameters.clear();
+			
+			pugi::xml_node node_parameters = node.child( "parameters" );
+			if( node_parameters )
+			{
+				pugi::xml_node node_parameter = node_parameters.child( "parameter" );
+				while( node_parameter )
+				{
+					std::string param_name = node_parameter.attribute( "name" ).value(); 
+					double param_value = xml_get_my_double_value( node_parameter );
+					
+					parameters[param_name] = param_value;
+					
+					node_parameter = node_parameter.next_sibling( "parameter" ); 
+				}
+			}
+			pIntra->parameters = parameters;
+			
 			pIntra->network.initialize_boolean_network(
 				pIntra->bnd_filename, 
 				pIntra->cfg_filename,
 				pIntra->time_step,
 				pIntra->initial_values,
-				pIntra->mutations
+				pIntra->mutations,
+				pIntra->parameters
 			);
 		}
 #endif

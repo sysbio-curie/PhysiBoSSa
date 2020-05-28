@@ -41,7 +41,7 @@ class BooleanNetwork
 		void initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step);
 
 		/** \brief Initialize a maboos network, with initial values and mutants */
-		void initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step, std::map<std::string, double> initial_values, std::map<std::string, double> mutations);
+		void initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step, std::map<std::string, double> initial_values, std::map<std::string, double> mutations, std::map<std::string, double> parameters);
 		
 		/** \brief Reset nodes and time to update */
 		void restart_nodes();
