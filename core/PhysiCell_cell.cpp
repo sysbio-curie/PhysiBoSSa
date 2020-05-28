@@ -2111,11 +2111,31 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			}
 			pIntra->initial_values = initial_values;
 			
+			std::map<std::string, double> mutations;
+			mutations.clear();
+			
+			pugi::xml_node node_mutations = node.child( "mutations" );
+			if( node_mutations )
+			{
+				pugi::xml_node node_mutation = node_mutation.child( "mutation" );
+				while( node_mutation )
+				{
+					std::string node_name = node_mutation.attribute( "node" ).value(); 
+					double node_value = xml_get_my_double_value( node_mutation );
+					
+					mutations[node_name] = node_value;
+					
+					node_mutation = node_mutation.next_sibling( "mutation" ); 
+				}
+			}
+			pIntra->mutations = mutations;
+			
 			pIntra->network.initialize_boolean_network(
 				pIntra->bnd_filename, 
 				pIntra->cfg_filename,
 				pIntra->time_step,
-				pIntra->initial_values
+				pIntra->initial_values,
+				pIntra->mutations
 			);
 		}
 #endif
