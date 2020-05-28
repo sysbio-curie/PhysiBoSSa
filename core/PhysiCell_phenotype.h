@@ -563,6 +563,8 @@ class Intracellular
 	
 	BooleanNetwork network;
 #endif
+
+	Intracellular();
 };
 
 class Phenotype
