@@ -2,7 +2,7 @@
 #include "../../../core/PhysiCell_utilities.h"
 
 /* Default constructor */
-void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile, std::map<std::string, double> initial_values)
+void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile)
 {
 	// Initialize MaBoSS Objects for a model
 	this->network = new Network();
@@ -11,7 +11,6 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 	this->config = new RunConfig();
 	this->config->parse(this->network, configFile.c_str());
 
-	this->initial_states = initial_values;
 	IStateGroup::checkAndComplete(this->network);
 
 	// Initialize the map relation between node name and index positions
@@ -31,6 +30,14 @@ void MaBoSSNetwork::delete_maboss()
 	this->network = NULL;
 	delete this->config;
 	this->config = NULL;
+}
+
+void MaBoSSNetwork::mutate(std::map<std::string, double> mutations) 
+{
+	for (auto mutation : mutations) {
+		Node * node = this->network->getNode(mutation.first);
+		node->mutate(mutation.second);
+	}
 }
 
 /* Creates a NetworkState_Impl from the input vector */
