@@ -27,7 +27,11 @@ class MaBoSSNetwork
 		/** \brief Time step between each MaBoSS simulation */
 		double update_time_step = 10;
 
-		std::map< std::string, double > initial_states;
+		/** \brief Initial value probabilities, by node */
+		std::map< std::string, double > initial_values;
+		
+		/** \brief Mutations to apply to the network */
+		std::map< std::string, double > mutations;
 
 		/** \brief Names and indices of network nodes */
 		std::map< std::string, int > node_names;
@@ -51,7 +55,12 @@ class MaBoSSNetwork
 		 * \brief Class initializer 
 		 * \param networkFile,configFile MaBoSS configutation files
 		 */
-		void init_maboss( std::string networkFile, std::string configFile, std::map<std::string, double> initial_values);
+		void init_maboss( std::string networkFile, std::string configFile);
+
+		void mutate(std::map<std::string, double> mutations);
+
+		void set_initial_values(std::map<std::string, double> initial_values)
+		{ this->initial_values = initial_values; }
 
 		/** \brief Class destructor */
 		void delete_maboss();

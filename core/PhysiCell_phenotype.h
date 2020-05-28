@@ -550,6 +550,7 @@ class Intracellular
 	std::string cfg_filename;
 	double time_step;
 	std::map<std::string, double> initial_values;
+	std::map<std::string, double> mutations;
 	
 	BooleanNetwork network;
 #endif
