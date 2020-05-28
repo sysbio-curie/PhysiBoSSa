@@ -87,6 +87,10 @@ void MaBoSSNetwork::restart_node_values(std::vector<bool>* output)
 		(*output)[i] =  network_state.getNodeState( node );
 		i++;
 	}
+	
+	for (auto initial_value : initial_values) {
+		(*node_values)[node_names[initial_value.first]] = PhysiCell::UniformRandom() < initial_value.second;
+	}
 }
 
 /* Run a MaBoSS simulation with the input values*/
