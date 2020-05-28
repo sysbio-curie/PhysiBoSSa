@@ -2137,7 +2137,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			pugi::xml_node node_mutations = node.child( "mutations" );
 			if( node_mutations )
 			{
-				pugi::xml_node node_mutation = node_mutation.child( "mutation" );
+				pugi::xml_node node_mutation = node_mutations.child( "mutation" );
 				while( node_mutation )
 				{
 					std::string node_name = node_mutation.attribute( "node" ).value(); 
