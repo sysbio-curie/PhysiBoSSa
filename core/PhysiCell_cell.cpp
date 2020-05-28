@@ -472,8 +472,10 @@ Cell* Cell::divide( )
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
 
+#ifdef ADDON_PHYSIBOSS
 	child->boolean_network = this->boolean_network;
-	
+#endif
+
 	return child;
 }
 

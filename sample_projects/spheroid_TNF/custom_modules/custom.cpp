@@ -96,15 +96,18 @@ void create_cell_types( void )
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
 	cell_defaults.functions.set_orientation = NULL;
-		
-	// set molecular properties 
-	int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
-	cell_defaults.phenotype.molecular.fraction_released_at_death[tnf_substrate_index] = 0.0;
+
 	/*
 	   This parses the cell definitions in the XML config file. 
 	*/
 	initialize_cell_definitions_from_pugixml();
 
+	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	
+	// set molecular properties 
+	int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
+	cell_defaults.phenotype.molecular.fraction_released_at_death[tnf_substrate_index] = 0.0;
+	
 	build_cell_definitions_maps(); 
 	display_cell_definitions( std::cout ); 
 

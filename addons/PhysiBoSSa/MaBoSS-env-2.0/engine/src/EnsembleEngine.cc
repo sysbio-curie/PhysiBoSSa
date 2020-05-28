@@ -34,7 +34,11 @@
 #include <stdlib.h>
 #include <math.h>
 #include <iomanip>
-#include <dlfcn.h>
+#ifndef WINDOWS
+  #include <dlfcn.h>
+#else
+  #include <windows.h>
+#endif
 #include <iostream>
 
 const std::string EnsembleEngine::VERSION = "1.2.0";
@@ -598,12 +602,17 @@ void EnsembleEngine::epilogue()
       std::vector<Cumulator*> model_cumulator = cumulators_thread_v[i];
       if (model_cumulator.size() > 0) {
         
-        Cumulator* t_cumulator = Cumulator::mergeCumulators(runconfig, model_cumulator);
-        t_cumulator->epilogue(networks[i], reference_state);
-        cumulators_per_model[i] = t_cumulator;
-        
-        for (auto t_cumulator: model_cumulator) {
-          delete t_cumulator;
+        if (model_cumulator.size() == 1) {
+          cumulators_per_model[i] = model_cumulator[0];
+          cumulators_per_model[i]->epilogue(networks[i], reference_state);
+        } else {
+          Cumulator* t_cumulator = Cumulator::mergeCumulators(runconfig, model_cumulator);
+          t_cumulator->epilogue(networks[i], reference_state);
+          cumulators_per_model[i] = t_cumulator;
+          
+          for (auto t_cumulator: model_cumulator) {
+            delete t_cumulator;
+          }
         }
       }
     }
