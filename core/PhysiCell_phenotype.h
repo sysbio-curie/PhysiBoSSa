@@ -555,6 +555,7 @@ class Intracellular
 	double time_step;
 	std::map<std::string, double> initial_values;
 	std::map<std::string, double> mutations;
+	std::map<std::string, double> parameters;
 	
 	BooleanNetwork network;
 #endif

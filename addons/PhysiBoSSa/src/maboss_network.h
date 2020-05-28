@@ -62,7 +62,9 @@ class MaBoSSNetwork
 		void set_initial_values(std::map<std::string, double> initial_values)
 		{ this->initial_values = initial_values; }
 
-		/** \brief Class destructor */
+		void set_parameters(std::map<std::string, double> parameters);
+
+		/** \brief Destructor */
 		void delete_maboss();
 
 		/** 

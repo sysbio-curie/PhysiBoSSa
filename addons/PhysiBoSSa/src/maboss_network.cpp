@@ -40,6 +40,16 @@ void MaBoSSNetwork::mutate(std::map<std::string, double> mutations)
 	}
 }
 
+void MaBoSSNetwork::set_parameters(std::map<std::string, double> parameters) 
+{	
+	SymbolTable* symbol_table = this->network->getSymbolTable();
+	
+	for (auto parameter: parameters) {
+		const Symbol* symbol_paraneter = symbol_table->getSymbol(parameter.first);
+		symbol_table->setSymbolValue(symbol_paraneter, parameter.second);
+	}
+}
+
 /* Creates a NetworkState_Impl from the input vector */
 NetworkState_Impl MaBoSSNetwork::create_networkstate(std::vector<bool>* input)
 {
