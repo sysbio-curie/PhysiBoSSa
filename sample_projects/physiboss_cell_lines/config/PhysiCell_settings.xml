@@ -183,7 +183,7 @@
 			<phenotype>
 				<intracellular type="maboss">
 					<bnd_filename>./config/boolean_network/model_0.bnd</bnd_filename>
-					<cfg_filename>./config/boolean_network/model_0.cfg</cfg_filename>
+					<cfg_filename>./config/boolean_network/model.cfg</cfg_filename>
 					<time_step>12</time_step>
 					<initial_values>
 						<initial_value node="A">1</initial_value>
@@ -199,7 +199,7 @@
 			<phenotype>
 				<intracellular type="maboss">
 					<bnd_filename>./config/boolean_network/model_1.bnd</bnd_filename>
-					<cfg_filename>./config/boolean_network/model_1.cfg</cfg_filename>
+					<cfg_filename>./config/boolean_network/model.cfg</cfg_filename>
 					<time_step>12</time_step>
 					<initial_values>
 						<initial_value node="A">1</initial_value>
