@@ -208,9 +208,11 @@
 		</cell_definition>
 		<cell_definition name="yet_another" parent_type="default" ID="3">
 			<phenotype>
-				<parameters>
-					<parameter name="$time_scale">1.0</parameter>
-				</parameters>
+				<intracellular type="maboss">
+					<parameters>
+						<parameter name="$time_scale">0.5</parameter>
+					</parameters>
+				</intracellular>
 			</phenotype>
 			<custom_data/>
 		</cell_definition>
