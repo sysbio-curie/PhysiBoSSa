@@ -1938,9 +1938,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			if( node_timestep )
 			{ pIntra->time_step = xml_get_my_double_value( node_timestep ); }
 	
-			std::map<std::string, double> initial_values;
-			initial_values.clear();
-			
 			pugi::xml_node node_init_values = node.child( "initial_values" );
 			if( node_init_values )
 			{
@@ -1950,15 +1947,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					std::string node_name = node_init_value.attribute( "node" ).value(); 
 					double node_value = xml_get_my_double_value( node_init_value );
 					
-					initial_values[node_name] = node_value;
+					pIntra->initial_values[node_name] = node_value;
 					
 					node_init_value = node_init_value.next_sibling( "initial_value" ); 
 				}
 			}
-			pIntra->initial_values = initial_values;
-			
-			std::map<std::string, double> mutations;
-			mutations.clear();
 			
 			pugi::xml_node node_mutations = node.child( "mutations" );
 			if( node_mutations )
@@ -1969,15 +1962,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					std::string node_name = node_mutation.attribute( "node" ).value(); 
 					double node_value = xml_get_my_double_value( node_mutation );
 					
-					mutations[node_name] = node_value;
+					pIntra->mutations[node_name] = node_value;
 					
 					node_mutation = node_mutation.next_sibling( "mutation" ); 
 				}
 			}
-			pIntra->mutations = mutations;
-			
-			std::map<std::string, double> parameters;
-			parameters.clear();
 			
 			pugi::xml_node node_parameters = node.child( "parameters" );
 			if( node_parameters )
@@ -1988,12 +1977,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					std::string param_name = node_parameter.attribute( "name" ).value(); 
 					double param_value = xml_get_my_double_value( node_parameter );
 					
-					parameters[param_name] = param_value;
+					pIntra->parameters[param_name] = param_value;
 					
 					node_parameter = node_parameter.next_sibling( "parameter" ); 
 				}
 			}
-			pIntra->parameters = parameters;
 			
 			pIntra->network.initialize_boolean_network(
 				pIntra->bnd_filename, 
