@@ -176,38 +176,41 @@
 						<use_2D>false</use_2D>
 					</options>
 				</motility>
-			</phenotype>
-			<custom_data/>
-		</cell_definition>
-		<cell_definition name="type_0" parent_type="0" ID="1">
-			<phenotype>
 				<intracellular type="maboss">
 					<bnd_filename>./config/boolean_network/model_0.bnd</bnd_filename>
 					<cfg_filename>./config/boolean_network/model.cfg</cfg_filename>
 					<time_step>12</time_step>
 					<initial_values>
 						<initial_value node="A">1</initial_value>
-					</initial_values>
-					<parameters>
-						<parameter name="$time_scale">1</parameter>
-					</parameters>
+						<initial_value node="C">0</initial_value>
+					</initial_values>	
+				</intracellular>
+			</phenotype>
+			<custom_data/>
+		</cell_definition>
+		<cell_definition name="other" parent_type="0" ID="1">
+			<phenotype>
+				<intracellular type="maboss">
+					<bnd_filename>./config/boolean_network/model_1.bnd</bnd_filename>
 				</intracellular>			
 			</phenotype>
 			<custom_data/>
 		</cell_definition>
-		<cell_definition name="type_1" parent_type="0" ID="2">
+		<cell_definition name="another" parent_type="0" ID="2">
 			<phenotype>
 				<intracellular type="maboss">
-					<bnd_filename>./config/boolean_network/model_1.bnd</bnd_filename>
-					<cfg_filename>./config/boolean_network/model.cfg</cfg_filename>
-					<time_step>12</time_step>
-					<initial_values>
-						<initial_value node="A">1</initial_value>
-					</initial_values>
-					<parameters>
-						<parameter name="$time_scale">1</parameter>
-					</parameters>
+					<mutations>
+						<mutation node="C">0.0</mutation>
+					</mutations>
 				</intracellular>			
+			</phenotype>
+			<custom_data/>
+		</cell_definition>
+		<cell_definition name="yet_another" parent_type="0" ID="3">
+			<phenotype>
+				<parameters>
+					<parameter name="$time_scale">1.0</parameter>
+				</parameters>
 			</phenotype>
 			<custom_data/>
 		</cell_definition>

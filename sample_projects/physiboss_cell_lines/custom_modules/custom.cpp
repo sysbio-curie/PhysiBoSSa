@@ -140,18 +140,29 @@ void setup_tissue( void )
 	Cell* pC;
 	
 	for (int i=0; i < 90; i+= 10)
-		for (int j=-50; j < 50; j+= 10){
-			pC = create_cell(get_cell_definition("type_0")); 
-			pC->assign_position( ((double) -i-5), j, 0.0 );
+		for (int j=0; j < 90; j+= 10){
+			
+			// bottom left corner : default
+			pC = create_cell(get_cell_definition("default")); 
+			pC->assign_position(-i-10, -j-10, 0.0 );
+			pC->phenotype.intracellular.network.restart_nodes();
+			
+			// bottom right corner : other
+			pC = create_cell(get_cell_definition("other")); 
+			pC->assign_position(i+10, -j-10, 0.0 );
+			pC->phenotype.intracellular.network.restart_nodes();
+
+			// top left  corner : other
+			pC = create_cell(get_cell_definition("another")); 
+			pC->assign_position(-i-10, j+10, 0.0 );
+			pC->phenotype.intracellular.network.restart_nodes();
+			
+			// top right corner : other
+			pC = create_cell(get_cell_definition("yet_another")); 
+			pC->assign_position(i+10, j+10, 0.0 );
 			pC->phenotype.intracellular.network.restart_nodes();
 		}
 
-	for (int i=0; i < 90; i+= 10)
-		for (int j=-50; j < 50; j+= 10){
-			pC = create_cell(get_cell_definition("type_1")); 
-			pC->assign_position( ((double) i+5), j, 0.0 );
-			pC->phenotype.intracellular.network.restart_nodes();
-		}
 		
 	return; 
 }
