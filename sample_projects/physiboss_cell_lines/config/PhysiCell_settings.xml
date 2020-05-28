@@ -188,6 +188,9 @@
 					<initial_values>
 						<initial_value node="A">1</initial_value>
 					</initial_values>
+					<parameters>
+						<parameter name="$time_scale">1</parameter>
+					</parameters>
 				</intracellular>			
 			</phenotype>
 			<custom_data/>
@@ -201,6 +204,9 @@
 					<initial_values>
 						<initial_value node="A">1</initial_value>
 					</initial_values>
+					<parameters>
+						<parameter name="$time_scale">1</parameter>
+					</parameters>
 				</intracellular>			
 			</phenotype>
 			<custom_data/>
