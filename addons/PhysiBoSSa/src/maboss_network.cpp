@@ -4,6 +4,14 @@
 /* Default constructor */
 void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile)
 {
+	if (this->network != NULL) {
+		delete this->network;
+	}
+	
+	if (this->config != NULL) {
+		delete this->config;
+	}
+	
 	this->network = new Network();
 	this->network->parse(networkFile.c_str());
 

@@ -70,6 +70,11 @@
 #include "PhysiCell_utilities.h"
 #include "PhysiCell_constants.h"
 #include "../BioFVM/BioFVM_vector.h" 
+
+#ifdef ADDON_PHYSIBOSS
+#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
+#endif
+
 #include<limits.h>
 
 #include <signal.h>  // for segfault
@@ -907,6 +912,16 @@ Cell* create_cell( Cell_Definition& cd )
 	pNew->functions = cd.functions; 
 	
 	pNew->phenotype = cd.phenotype; 
+
+	if (cd.phenotype.intracellular != NULL) {	
+#ifdef ADDON_PHYSIBOSS
+		if (cd.phenotype.intracellular->type == "maboss") {
+			MaBoSSIntracellular* maboss_model = new MaBoSSIntracellular(getMaBoSSModel(cd.phenotype));
+			pNew->phenotype.intracellular = maboss_model->getIntracellularModel();
+		}	
+#endif
+	}
+	
 	pNew->is_movable = true;
 	pNew->is_out_of_domain = false;
 	pNew->displacement.resize(3,0.0); // state? 
@@ -1405,6 +1420,17 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		// but recover the name and ID (type)
 		pCD->name = cd_node.attribute("name").value();
 		pCD->type = cd_node.attribute("ID").as_int(); 
+		
+		if (pParent->phenotype.intracellular != NULL) {
+			
+		#ifdef ADDON_PHYSIBOSS
+			if (pParent->phenotype.intracellular->type == "maboss") {
+				MaBoSSIntracellular* maboss_model = new MaBoSSIntracellular(getMaBoSSModel(pParent->phenotype));
+				pCD->phenotype.intracellular = maboss_model->getIntracellularModel();
+			}
+		#endif
+			
+		}
 	} 
 	
 	// sync to microenvironment
@@ -1918,84 +1944,23 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	node = node.child( "intracellular" ); 
 	if( node )
 	{
-		Intracellular* pIntra = &(pCD->phenotype.intracellular);
-		
 		std::string model_type = node.attribute( "type" ).value(); 
-		pIntra->type = model_type;
 		
 #ifdef ADDON_PHYSIBOSS
 		if (model_type == "maboss") {
-			
-			pugi::xml_node node_bnd = node.child( "bnd_filename" );
-			if ( node_bnd )
-			{ pIntra->bnd_filename = xml_get_my_string_value (node_bnd); }
-			
-			pugi::xml_node node_cfg = node.child( "cfg_filename" );
-			if ( node_cfg )
-			{ pIntra->cfg_filename = xml_get_my_string_value (node_cfg); }
-			
-			pugi::xml_node node_timestep = node.child( "time_step" ); 
-			if( node_timestep )
-			{ pIntra->time_step = xml_get_my_double_value( node_timestep ); }
-	
-			pugi::xml_node node_init_values = node.child( "initial_values" );
-			if( node_init_values )
-			{
-				pugi::xml_node node_init_value = node_init_values.child( "initial_value" );
-				while( node_init_value )
-				{
-					std::string node_name = node_init_value.attribute( "node" ).value(); 
-					double node_value = xml_get_my_double_value( node_init_value );
-					
-					pIntra->initial_values[node_name] = node_value;
-					
-					node_init_value = node_init_value.next_sibling( "initial_value" ); 
-				}
+			// If it has already be copied
+			if (pParent != NULL) {
+				getMaBoSSModel(pCD->phenotype)->initialize_intracellular_from_pugixml(node);
+				
+			// Otherwise we need to create a new one
+			} else {
+				MaBoSSIntracellular* pIntra = new MaBoSSIntracellular(node);
+				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
 			}
-			
-			pugi::xml_node node_mutations = node.child( "mutations" );
-			if( node_mutations )
-			{
-				pugi::xml_node node_mutation = node_mutations.child( "mutation" );
-				while( node_mutation )
-				{
-					std::string node_name = node_mutation.attribute( "node" ).value(); 
-					double node_value = xml_get_my_double_value( node_mutation );
-					
-					pIntra->mutations[node_name] = node_value;
-					
-					node_mutation = node_mutation.next_sibling( "mutation" ); 
-				}
-			}
-			
-			pugi::xml_node node_parameters = node.child( "parameters" );
-			if( node_parameters )
-			{
-				pugi::xml_node node_parameter = node_parameters.child( "parameter" );
-				while( node_parameter )
-				{
-					std::string param_name = node_parameter.attribute( "name" ).value(); 
-					double param_value = xml_get_my_double_value( node_parameter );
-					
-					pIntra->parameters[param_name] = param_value;
-					
-					node_parameter = node_parameter.next_sibling( "parameter" ); 
-				}
-			}
-			
-			pIntra->network.initialize_boolean_network(
-				pIntra->bnd_filename, 
-				pIntra->cfg_filename,
-				pIntra->time_step,
-				pIntra->initial_values,
-				pIntra->mutations,
-				pIntra->parameters
-			);
 		}
 #endif
 	}	
 	
-
 	// set up custom data 
 	node = cd_node.child( "custom_data" );
 	pugi::xml_node node1 = node.first_child(); 

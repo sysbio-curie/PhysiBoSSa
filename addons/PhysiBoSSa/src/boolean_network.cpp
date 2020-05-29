@@ -12,7 +12,6 @@ void BooleanNetwork::initialize_boolean_network(std::string bnd_file, std::strin
 	this->maboss.set_parameters(parameters);
 }
 
-
 void BooleanNetwork::restart_nodes() 
 {
 	this->maboss.restart_node_values(&(this->nodes));
