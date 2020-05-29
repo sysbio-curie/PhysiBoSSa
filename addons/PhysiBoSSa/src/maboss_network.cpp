@@ -92,9 +92,7 @@ void MaBoSSNetwork::recover_state(NetworkState_Impl state, std::vector<bool>* ou
 void MaBoSSNetwork::restart_node_values(std::vector<bool>* node_values)
 {
 	NetworkState network_state;
-	RandomGeneratorFactory *randgen_factory = this->config->getRandomGeneratorFactory();
-  	RandomGenerator *random_generator = randgen_factory->generateRandomGenerator(PhysiCell::UniformInt());
-	this->network->initStates(network_state, random_generator);
+	this->network->initStates(network_state, engine->random_generator);
 
 	int i = 0;
 	std::vector<Node *> nodes = this->network->getNodes();
