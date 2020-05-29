@@ -67,7 +67,8 @@
 
 #include "./custom.h"
 #include "../BioFVM/BioFVM.h"  
-#include "../addons/PhysiBoSSa/src/boolean_network.h"
+#include <sstream>
+
 using namespace BioFVM;
 
 // declare cell definitions here 
