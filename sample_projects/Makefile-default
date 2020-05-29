@@ -215,6 +215,18 @@ physiboss-cell-lines:
 	mkdir ./scripts/
 	cp ./sample_projects/physiboss_cell_lines/scripts/* ./scripts/
 
+covid19:
+	cp -r ./sample_projects/covid19/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/covid19/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/covid19/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/covid19/config/* ./config/
+	mkdir -p ./scripts/
+	cp ./sample_projects/covid19/scripts/* ./scripts/
+
+
 drug-AGS: 	
 	cp ./sample_projects/drug_AGS/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
@@ -339,7 +351,7 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 reset:
 	rm -f *.cpp 
 	cp ./sample_projects/Makefile-default Makefile 
-	rm -f ./custom_modules/*
+	rm -fr ./custom_modules/*
 	touch ./custom_modules/empty.txt 
 	touch ALL_CITATIONS.txt 
 	rm ALL_CITATIONS.txt 
