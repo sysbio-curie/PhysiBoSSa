@@ -24,6 +24,8 @@ class MaBoSSNetwork
 		/** \brief MaBoSS instances: configurations */
 		RunConfig* config;
 
+		StochasticSimulationEngine* engine;
+		
 		/** \brief Time step to update the cycle */
 		double update_time_step = 12;
 
