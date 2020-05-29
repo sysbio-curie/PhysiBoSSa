@@ -51,12 +51,20 @@ class MaBoSSNetwork
 		void retrieve_networkstate_values(NetworkState_Impl state, std::vector<bool>* output);
 
 	public:
+	
+		/** Constructor */
+		MaBoSSNetwork() {
+			network = NULL;
+			config = NULL;
+		}
+		
 		/** 
 		 * \brief Class initializer 
 		 * \param networkFile,configFile MaBoSS configutation files
 		 */
 		void init_maboss( std::string networkFile, std::string configFile);
 
+		bool has_init() { return network != NULL && config != NULL; }
 		void mutate(std::map<std::string, double> mutations);
 
 		void set_initial_values(std::map<std::string, double> initial_values)
