@@ -21,6 +21,8 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 
 	IStateGroup::checkAndComplete(this->network);
 
+	engine = new StochasticSimulationEngine(this->network, this->config, PhysiCell::UniformInt());
+
 	// Initialize the map relation between node name and index positions
 	int i = 0;
 	std::vector<Node *> nodes = this->network->getNodes();
@@ -34,6 +36,8 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 /** Default estructor */
 void MaBoSSNetwork::delete_maboss()
 {
+	delete this->engine;
+	this->engine = NULL;
 	delete this->network;
 	this->network = NULL;
 	delete this->config;
@@ -117,11 +121,7 @@ void MaBoSSNetwork::run_simulation(std::vector<bool>* node_values)
 {	
 	NetworkState_Impl state = this->create_networkstate(node_values);
 
-	// Engine created for a single isolated simulation
-	StochasticSimulationEngine* engine = new StochasticSimulationEngine(this->network, this->config);
-	engine->setSeed(PhysiCell::UniformInt());
 	state = engine->run(&state, NULL);
-	delete engine;
 
 	this->retrieve_networkstate_values(state, node_values);
 }
