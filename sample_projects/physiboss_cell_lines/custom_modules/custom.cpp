@@ -65,9 +65,10 @@
 ###############################################################################
 */
 
-#include "./custom.h"
+#include "custom.h"
 #include "../BioFVM/BioFVM.h"  
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
+#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
 using namespace BioFVM;
 
 // declare cell definitions here 
@@ -150,25 +151,25 @@ void setup_tissue( void )
 			// the formula for C is A&B. Meaning that C will only activate for half the cells
 			pC = create_cell(get_cell_definition("default")); 
 			pC->assign_position(-i-10, -j-10, 0.0 );
-			pC->phenotype.intracellular.network.restart_nodes();
+			getMaBoSSModel(pC->phenotype)->network.restart_nodes();
 			
 			// bottom right corner : other
 			// the formula for C is A|B. C will activate in all cells
 			pC = create_cell(get_cell_definition("other")); 
 			pC->assign_position(i+10, -j-10, 0.0 );
-			pC->phenotype.intracellular.network.restart_nodes();
+			getMaBoSSModel(pC->phenotype)->network.restart_nodes();
 
 			// top left  corner : another
 			// Here we mutate the C node at zero, so it will stay there
 			pC = create_cell(get_cell_definition("another")); 
 			pC->assign_position(-i-10, j+10, 0.0 );
-			pC->phenotype.intracellular.network.restart_nodes();
+			getMaBoSSModel(pC->phenotype)->network.restart_nodes();
 			
 			// top right corner : yet_another
 			// Here we change the default value for the rates, so we slow down the activation of C
 			pC = create_cell(get_cell_definition("yet_another")); 
 			pC->assign_position(i+10, j+10, 0.0 );
-			pC->phenotype.intracellular.network.restart_nodes();
+			getMaBoSSModel(pC->phenotype)->network.restart_nodes();
 		}
 
 		
@@ -183,9 +184,10 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 	{	
 		set_input_nodes(pCell);
 
-		pCell->phenotype.intracellular.network.run_maboss();
+		MaBoSSIntracellular * maboss_model = getMaBoSSModel(pCell->phenotype);
+		maboss_model->network.run_maboss();
 		// Get noisy step size
-		double next_run_in = pCell->phenotype.intracellular.network.get_time_to_update();
+		double next_run_in = maboss_model->network.get_time_to_update();
 		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
 		
 		from_nodes_to_cell(pCell, phenotype, dt);
@@ -202,7 +204,8 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt) {}
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
-	if ( pCell->phenotype.intracellular.network.get_node_value( parameters.strings("node_to_visualize") ) == 0 )
+	
+	if ( getMaBoSSModel(pCell->phenotype)->network.get_node_value( parameters.strings("node_to_visualize") ) == 0 )
 	{
 		output[0] = "rgb(255,0,0)";
 		output[2] = "rgb(125,0,0)";
@@ -218,5 +221,5 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 
 void color_node(Cell* pCell){
 	std::string node_name = parameters.strings("node_to_visualize");
-	pCell->custom_data[node_name] = pCell->phenotype.intracellular.network.get_node_value(node_name);
+	pCell->custom_data[node_name] = getMaBoSSModel(pCell->phenotype)->network.get_node_value(node_name);
 }
