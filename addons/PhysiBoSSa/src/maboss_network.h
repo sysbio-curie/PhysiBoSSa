@@ -24,8 +24,10 @@ class MaBoSSNetwork
 		/** \brief MaBoSS instances: configurations */
 		RunConfig* config;
 
+		StochasticSimulationEngine* engine;
+		
 		/** \brief Time step between each MaBoSS simulation */
-		double update_time_step = 10;
+		double update_time_step = 12;
 
 		/** \brief Initial value probabilities, by node */
 		std::map< std::string, double > initial_values;
