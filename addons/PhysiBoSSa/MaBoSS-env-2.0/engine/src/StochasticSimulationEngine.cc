@@ -64,9 +64,6 @@ NetworkState_Impl StochasticSimulationEngine::run(NetworkState_Impl* initial_sta
   std::vector<Node *>::const_iterator begin = nodes.begin();
   std::vector<Node *>::const_iterator end = nodes.end();
   NetworkState network_state;
-
-  RandomGeneratorFactory *randgen_factory = runconfig->getRandomGeneratorFactory();
-  RandomGenerator *random_generator = randgen_factory->generateRandomGenerator(seed);
     
   if (initial_state != NULL) {
     network_state = *initial_state;
@@ -145,6 +142,5 @@ NetworkState_Impl StochasticSimulationEngine::run(NetworkState_Impl* initial_sta
     step++;
   }
   
-  delete random_generator;
   return network_state.getState();
 }
