@@ -212,6 +212,11 @@
 				</secretion>
 
 				<molecular />
+				<intracellular type="maboss">
+					<bnd_filename>./config/boolean_network/TNF_nodes.bnd</bnd_filename>
+					<cfg_filename>./config/boolean_network/TNF_conf.cfg</cfg_filename>
+					<time_step>12</time_step>
+				</intracellular>
 			</phenotype>
 			<custom_data>
 				<next_physibossa_run units="dimensionless">10.</next_physibossa_run>
@@ -228,11 +233,7 @@
 
 		<!-- init file --> 
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
-
-		<bnd_file type="string" units="">./config/boolean_network/TNF_nodes.bnd</bnd_file>
-		<cfg_file type="string" units="">./config/boolean_network/TNF_conf.cfg</cfg_file>
-		<maboss_time_step type="double" units="dimensionless">10.</maboss_time_step>
-
+		
 		<tnf_secretion_rate type="double" units="fg/cell/min">0.1</tnf_secretion_rate> <!-- 0.1 -->
 
 		<duration_add_tnf type="int" units="min">10</duration_add_tnf> <!-- 10 -->
