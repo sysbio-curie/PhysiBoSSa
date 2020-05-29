@@ -68,7 +68,7 @@
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 
-#include "../addons/PhysiBoSSa/src/boolean_network.h"
+#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
 
 using namespace BioFVM; 
 using namespace PhysiCell;
