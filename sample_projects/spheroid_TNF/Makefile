@@ -67,7 +67,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiBoSSa_OBJECTS := utils.o maboss_network.o boolean_network.o
+PhysiBoSSa_OBJECTS := utils.o maboss_network.o maboss_intracellular.o
 
 PhysiCell_custom_module_OBJECTS := custom.o custom_main.o
 
@@ -93,13 +93,13 @@ PhysiCell_cell.o: ./core/PhysiCell_cell.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_cell.cpp 
 
 PhysiCell_cell_container.o: ./core/PhysiCell_cell_container.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_cell_container.cpp 
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_cell_container.cpp 
 	
 PhysiCell_standard_models.o: ./core/PhysiCell_standard_models.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_standard_models.cpp 
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_standard_models.cpp 
 	
 PhysiCell_utilities.o: ./core/PhysiCell_utilities.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_utilities.cpp 
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_utilities.cpp 
 	
 PhysiCell_custom.o: ./core/PhysiCell_custom.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_custom.cpp 
@@ -145,13 +145,13 @@ PhysiCell_SVG.o: ./modules/PhysiCell_SVG.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_SVG.cpp
 
 PhysiCell_pathology.o: ./modules/PhysiCell_pathology.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./modules/PhysiCell_pathology.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pathology.cpp
 
 PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./modules/PhysiCell_MultiCellDS.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_MultiCellDS.cpp
 
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./modules/PhysiCell_various_outputs.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
 
 	
 PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
@@ -169,13 +169,11 @@ MaBoSS:
 maboss_network.o: ./addons/PhysiBoSSa/src/maboss_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/maboss_network.cpp
 
+maboss_intracellular.o: ./addons/PhysiBoSSa/src/maboss_intracellular.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/maboss_intracellular.cpp
+
 utils.o: ./addons/PhysiBoSSa/src/utils.cpp
 	$(COMPILE_COMMAND) -c ./addons/PhysiBoSSa/src/utils.cpp
-
-boolean_network.o: ./addons/PhysiBoSSa/src/boolean_network.cpp
-	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/boolean_network.cpp
-
-# user-defined PhysiCell modules
 
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom.cpp
