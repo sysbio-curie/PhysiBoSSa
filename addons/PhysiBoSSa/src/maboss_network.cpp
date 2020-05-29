@@ -93,11 +93,7 @@ void MaBoSSNetwork::restart_node_values(std::vector<bool>* output)
 {
 	// Create MaBoSS objects to get an initial state of the network
 	NetworkState network_state;
-	RandomGeneratorFactory *randgen_factory = this->config->getRandomGeneratorFactory();
-  	RandomGenerator *random_generator = randgen_factory->generateRandomGenerator(PhysiCell::UniformInt());
-
-	// Create MaBoSS initial states
-	this->network->initStates(network_state, random_generator);
+	this->network->initStates(network_state, engine->random_generator);
 
 	// Transfer network state to output vector
 	int i = 0;
