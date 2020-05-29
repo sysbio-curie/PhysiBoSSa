@@ -70,6 +70,11 @@
 #include "PhysiCell_utilities.h"
 #include "PhysiCell_constants.h"
 #include "../BioFVM/BioFVM_vector.h" 
+
+#ifdef ADDON_PHYSIBOSS
+#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
+#endif
+
 #include<limits.h>
 
 #include <signal.h>  // for segfault
@@ -909,6 +914,16 @@ Cell* create_cell( Cell_Definition& cd )
 	pNew->functions = cd.functions; 
 	
 	pNew->phenotype = cd.phenotype; 
+
+	if (cd.phenotype.intracellular != NULL) {	
+#ifdef ADDON_PHYSIBOSS
+		if (cd.phenotype.intracellular->type == "maboss") {
+			MaBoSSIntracellular* maboss_model = new MaBoSSIntracellular(getMaBoSSModel(cd.phenotype));
+			pNew->phenotype.intracellular = maboss_model->getIntracellularModel();
+		}	
+#endif
+	}
+	
 	pNew->is_movable = true;
 	pNew->is_out_of_domain = false;
 	pNew->displacement.resize(3,0.0); // state? 
@@ -1428,6 +1443,17 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		// but recover the name and ID (type)
 		pCD->name = cd_node.attribute("name").value();
 		pCD->type = cd_node.attribute("ID").as_int(); 
+		
+		if (pParent->phenotype.intracellular != NULL) {
+			
+		#ifdef ADDON_PHYSIBOSS
+			if (pParent->phenotype.intracellular->type == "maboss") {
+				MaBoSSIntracellular* maboss_model = new MaBoSSIntracellular(getMaBoSSModel(pParent->phenotype));
+				pCD->phenotype.intracellular = maboss_model->getIntracellularModel();
+			}
+		#endif
+			
+		}
 	} 
 	
 	// sync to microenvironment
@@ -2075,13 +2101,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	node = node.child( "intracellular" ); 
 	if( node )
 	{
-		Intracellular* pIntra = &(pCD->phenotype.intracellular);
-		
 		std::string model_type = node.attribute( "type" ).value(); 
-		pIntra->type = model_type;
 		
 #ifdef ADDON_PHYSIBOSS
 		if (model_type == "maboss") {
+<<<<<<< HEAD
 			
 			pugi::xml_node node_bnd = node.child( "bnd_filename" );
 			if ( node_bnd )
@@ -2160,11 +2184,21 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				pIntra->mutations,
 				pIntra->parameters
 			);
+=======
+			// If it has already be copied
+			if (pParent != NULL) {
+				getMaBoSSModel(pCD->phenotype)->initialize_intracellular_from_pugixml(node);
+				
+			// Otherwise we need to create a new one
+			} else {
+				MaBoSSIntracellular* pIntra = new MaBoSSIntracellular(node);
+				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+			}
+>>>>>>> 5131790... Introducing MaBoSSIntracellular, inheriting from Intracellular
 		}
 #endif
 	}	
 	
-
 	// set up custom data 
 	node = cd_node.child( "custom_data" );
 	pugi::xml_node node1 = node.first_child(); 

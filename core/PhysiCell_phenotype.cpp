@@ -1052,6 +1052,7 @@ Phenotype::Phenotype()
 	flagged_for_removal = false; 
 	
 	// sync the molecular stuff here automatically? 
+	intracellular = NULL;
 	
 	return; 
 }

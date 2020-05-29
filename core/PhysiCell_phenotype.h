@@ -544,17 +544,6 @@ class Intracellular
  private:
  public:
     std::string type;
-	
-#ifdef ADDON_PHYSIBOSS
-	std::string bnd_filename;
-	std::string cfg_filename;
-	double time_step;
-	std::map<std::string, double> initial_values;
-	std::map<std::string, double> mutations;
-	std::map<std::string, double> parameters;
-	
-	BooleanNetwork network;
-#endif
 };
 
 class Phenotype
@@ -573,6 +562,10 @@ class Phenotype
 	Secretion secretion; 
 	
 	Molecular molecular; 
+	
+	// We need it to be a pointer to allow polymorphism
+	// then this object could be a MaBoSSIntracellular, or a SBMLIntracellular
+	Intracellular* intracellular;
 	
 	Phenotype(); // done 
 	
