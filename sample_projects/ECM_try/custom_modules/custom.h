@@ -67,12 +67,11 @@
 #ifndef __Custom_h__
 #define __Custom_h__
 
-#include "custom_cell.h"
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
-#include "custom_main.h"
 #include "custom_cell.h"
-#include "../addons/PhysiBoSSa/src/boolean_network.h"
+#include "custom_main.h"
+#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
 
 
 
@@ -106,10 +105,6 @@ void set_input_nodes(Custom_cell* pCell);
 void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt);
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header);
 void load_ecm_file();
-/** \brief Go to proliferative phase if proliferation ON and in G0 phase */
-void do_proliferation(Cell* pCell, Phenotype& phenotype, double dt);
-
-inline float sphere_volume_from_radius(float radius) {return 4.0/3.0 * PhysiCell_constants::pi * std::pow(radius, 3);}
 
 bool touch_ECM(Custom_cell* pCell);
 

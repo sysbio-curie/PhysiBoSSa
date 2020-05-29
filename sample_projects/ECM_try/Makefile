@@ -69,14 +69,14 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)  
 
-PhysiBoSSa_OBJECTS := maboss_network.o boolean_network.o
+PhysiBoSSa_OBJECTS := maboss_network.o boolean_network.o maboss_intracellular.o
 
 PhysiCell_custom_module_OBJECTS := custom.o custom_main.o custom_cell.o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSSa_OBJECTS) $(PhysiBoSS_module_OBJECTS) 
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSSa_OBJECTS)
 
 # compile the project 
 
@@ -92,16 +92,16 @@ PhysiCell_digital_cell_line.o: ./core/PhysiCell_digital_cell_line.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_digital_cell_line.cpp
 
 PhysiCell_cell.o: ./core/PhysiCell_cell.cpp
-	$(COMPILE_COMMAND) $(INC)  -c ./core/PhysiCell_cell.cpp 
+	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_cell.cpp 
 
 PhysiCell_cell_container.o: ./core/PhysiCell_cell_container.cpp
-	$(COMPILE_COMMAND) $(INC)  -c ./core/PhysiCell_cell_container.cpp 
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_cell_container.cpp 
 	
 PhysiCell_standard_models.o: ./core/PhysiCell_standard_models.cpp
-	$(COMPILE_COMMAND) $(INC)  -c ./core/PhysiCell_standard_models.cpp 
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_standard_models.cpp 
 	
 PhysiCell_utilities.o: ./core/PhysiCell_utilities.cpp
-	$(COMPILE_COMMAND) $(INC)  -c ./core/PhysiCell_utilities.cpp 
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_utilities.cpp 
 	
 PhysiCell_custom.o: ./core/PhysiCell_custom.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_custom.cpp 
@@ -115,28 +115,28 @@ BioFVM_vector.o: ./BioFVM/BioFVM_vector.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_vector.cpp 
 
 BioFVM_agent_container.o: ./BioFVM/BioFVM_agent_container.cpp
-	$(COMPILE_COMMAND)  -c ./BioFVM/BioFVM_agent_container.cpp 
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_agent_container.cpp 
 	
 BioFVM_mesh.o: ./BioFVM/BioFVM_mesh.cpp
-	$(COMPILE_COMMAND)  -c ./BioFVM/BioFVM_mesh.cpp 
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_mesh.cpp 
 
 BioFVM_microenvironment.o: ./BioFVM/BioFVM_microenvironment.cpp
-	$(COMPILE_COMMAND) $(INC)  -c ./BioFVM/BioFVM_microenvironment.cpp 
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_microenvironment.cpp 
 
 BioFVM_solvers.o: ./BioFVM/BioFVM_solvers.cpp
-	$(COMPILE_COMMAND)  -c ./BioFVM/BioFVM_solvers.cpp 
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_solvers.cpp 
 
 BioFVM_utilities.o: ./BioFVM/BioFVM_utilities.cpp
-	$(COMPILE_COMMAND)  -c ./BioFVM/BioFVM_utilities.cpp 
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_utilities.cpp 
 	
 BioFVM_basic_agent.o: ./BioFVM/BioFVM_basic_agent.cpp
-	$(COMPILE_COMMAND)  -c ./BioFVM/BioFVM_basic_agent.cpp 
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_basic_agent.cpp 
 	
 BioFVM_matlab.o: ./BioFVM/BioFVM_matlab.cpp
-	$(COMPILE_COMMAND)  -c ./BioFVM/BioFVM_matlab.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_matlab.cpp
 
 BioFVM_MultiCellDS.o: ./BioFVM/BioFVM_MultiCellDS.cpp
-	$(COMPILE_COMMAND)  -c ./BioFVM/BioFVM_MultiCellDS.cpp
+	$(COMPILE_COMMAND) -c ./BioFVM/BioFVM_MultiCellDS.cpp
 	
 pugixml.o: ./BioFVM/pugixml.cpp
 	$(COMPILE_COMMAND) -c ./BioFVM/pugixml.cpp
@@ -147,13 +147,13 @@ PhysiCell_SVG.o: ./modules/PhysiCell_SVG.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_SVG.cpp
 
 PhysiCell_pathology.o: ./modules/PhysiCell_pathology.cpp
-	$(COMPILE_COMMAND) $(INC)  -c ./modules/PhysiCell_pathology.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pathology.cpp
 
 PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
-	$(COMPILE_COMMAND) $(INC)  -c ./modules/PhysiCell_MultiCellDS.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_MultiCellDS.cpp
 
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
-	$(COMPILE_COMMAND) $(INC)  -c ./modules/PhysiCell_various_outputs.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
 
 	
 PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
@@ -169,6 +169,9 @@ MaBoSS:
 
 maboss_network.o: ./addons/PhysiBoSSa/src/maboss_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/maboss_network.cpp
+
+maboss_intracellular.o: ./addons/PhysiBoSSa/src/maboss_intracellular.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/maboss_intracellular.cpp
 
 boolean_network.o: ./addons/PhysiBoSSa/src/boolean_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/boolean_network.cpp

@@ -74,7 +74,7 @@ using namespace BioFVM;
 
 // declare cell definitions here 
 
-std::vector<bool> nodes;
+std::vector<bool> * nodes;
 
 void create_cell_types( void )
 {
@@ -155,12 +155,7 @@ void setup_tissue( void )
 {
 	Custom_cell* pC;
 	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
-	MaBoSSNetwork* maboss;
-	std::string bnd_file = parameters.strings("bnd_file");
-	std::string cfg_file = parameters.strings("cfg_file");
-	BooleanNetwork ecm_network;
-	ecm_network.initialize_boolean_network(bnd_file, cfg_file, 12);
-
+	
 	for (int i = 0; i < cells.size(); i++)
 	{
 		float x = cells[i].x;
@@ -178,9 +173,8 @@ void setup_tissue( void )
 		if ((phase+1) == 1)
 			pC->phenotype.cycle.pCycle_Model->phases[1].entry_function(pC, pC->phenotype, 0);
 		
-		pC->boolean_network = ecm_network;
-		pC->boolean_network.restart_nodes();
-		pC->custom_data["next_physibossa_run"] = pC->boolean_network.get_time_to_update();
+		getMaBoSSModel(pC->phenotype)->network.restart_nodes();
+		pC->custom_data["next_physibossa_run"] = getMaBoSSModel(pC->phenotype)->network.get_time_to_update();
 	}
 	std::cout << "tissue created" << std::endl;
 
@@ -223,102 +217,56 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 		Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
 		set_input_nodes(pCustomCell);
 
-		pCell->boolean_network.run_maboss();
+		MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
+		maboss_model->network.run_maboss();
 		// Get noisy step size
-		double next_run_in = pCell->boolean_network.get_time_to_update();
+		double next_run_in = maboss_model->network.get_time_to_update();
 		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
 		
 		from_nodes_to_cell(pCustomCell, phenotype, dt);
 	}
 }
 
-void set_input_nodes(Custom_cell* pCell) {
-int ind;
-	nodes = *(pCell->boolean_network.get_nodes());
-	// Oxygen input node O2; Oxygen or Oxy
-	// ind = pCell->boolean_network.get_node_index( "Oxygen" );
-	// if ( ind < 0 )
-	// 	ind = pCell->boolean_network.get_node_index( "Oxy" );
-	// if ( ind < 0 )
-	// 	ind = pCell->boolean_network.get_node_index( "O2" );
-	// if ( ind >= 0 )
-	// 	nodes[ind] = ( !pCell->necrotic_oxygen() );
+void set_input_nodes(Custom_cell* pCell) 
+{
+	MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
 	
-
-	// ind = pCell->boolean_network.get_node_index( "Neighbours" );
-	// if ( ind >= 0 )
-	// 	nodes[ind] = ( pCell->has_neighbor(0) );
-	
-	// ind = pCell->boolean_network.get_node_index( "Nei2" );
-	// if ( ind >= 0 )
-	// 	nodes[ind] = ( pCell->has_neighbor(1) );
-
-	// // If has enough contact with ecm or not
-	// ind = pCell->boolean_network.get_node_index( "ECM_sensing" );
-	// if ( ind >= 0 )
-	// 	nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
-	// // If has enough contact with ecm or not
-	// ind = pCell->boolean_network.get_node_index( "ECM" );
-	// if ( ind >= 0 )
-	// 	nodes[ind] = ( parameters.ints("contact_cell_ECM_threshold") );
-	// // If has enough contact with ecm or not
-	ind = pCell->boolean_network.get_node_index( "ECMicroenv" );
-	if ( ind >= 0 )
-		nodes[ind] = ( touch_ECM(pCell) );
+	if ( maboss_model->network.get_node_index( "ECMicroenv" ) >= 0 )
+		maboss_model->network.set_node_value( "ECMicroenv", touch_ECM(pCell) );
 	
 	// If nucleus is deformed, probability of damage
 	// Change to increase proba with deformation ? + put as parameter
-	ind = pCell->boolean_network.get_node_index( "DNAdamage" );
-	//std::cout << mycell->nucleus_deformation() << std::endl;
-	if ( ind >= 0 )
-		nodes[ind] = ( pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0;
-	/// example
+	if ( maboss_model->network.get_node_index( "DNAdamage" ) >= 0 )
+		maboss_model->network.set_node_value("DNAdamage", 
+			(pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0
+		);
 }
 
 void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 {
-	std::vector<bool>* point_to_nodes = pCell->boolean_network.get_nodes();
-	int bn_index;
+	MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
 
-	bn_index = pCell->boolean_network.get_node_index( "Apoptosis" );
-	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
+	if (maboss_model->network.get_node_index( "Apoptosis" ) >= 0 
+	 	&& maboss_model->network.get_node_value("Apoptosis") 
+	)
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
 		return;
 	}
 
-	bn_index = pCell->boolean_network.get_node_index( "Migration" );
-	if ( bn_index >= 0 )
-	{
-		pCell->evolve_motility_coef( (*point_to_nodes)[bn_index], dt );
-	}
-
-	// bn_index = pCell->boolean_network.get_node_index( "Survival" );
-	// if ( bn_index >= 0 )
-	// {
-	// 	do_proliferation( pCell, phenotype, dt );
-	// }
-
-	bn_index = pCell->boolean_network.get_node_index("CCA");
-	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
-	{
+	if ( maboss_model->network.get_node_index( "Migration" ) >= 0 )
+		pCell->evolve_motility_coef( maboss_model->network.get_node_value("Migration"), dt );
+	
+	if (maboss_model->network.get_node_index("CCA") >= 0 
+		&& maboss_model->network.get_node_value("CCA")
+	)
 		pCell->freezing(1);
-	}	
-
-	// bn_index = pCell->boolean_network.get_node_index("Matrix_modif");
-	// if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
-	// {
-	// 	pCell->set_mmp( (*point_to_nodes)[bn_index] );
-	// }
-
-	bn_index = pCell->boolean_network.get_node_index("EMT");
-	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
-	{
-		pCell->set_mmp( (*point_to_nodes)[bn_index] );
-	}
-
-	/// example
+	
+	if (maboss_model->network.get_node_index("EMT") >= 0 
+		&& maboss_model->network.get_node_value("EMT")
+	)
+		pCell->set_mmp( maboss_model->network.get_node_value("EMT") );
 }
 
 
@@ -407,14 +355,6 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 	} while (!fin.eof());
 	
 	return result;
-}
-
-/* Go to proliferative if needed */
-void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	// If cells is in G0 (quiescent) switch to pre-mitotic phase
-	if ( pCell->phenotype.cycle.current_phase_index() == PhysiCell_constants::Ki67_negative )
-		pCell->phenotype.cycle.advance_cycle(pCell, phenotype, dt);
 }
 
 bool touch_ECM(Custom_cell* pCell)
