@@ -195,6 +195,11 @@
 				</motility>
 
 				<molecular />
+				<intracellular type="maboss">
+					<bnd_filename>./config/boolean_network/bn_nodes.bnd</bnd_filename>
+					<cfg_filename>./config/boolean_network/bn_conf.cfg</cfg_filename>
+					<time_step>12</time_step>
+				</intracellular>			
 			</phenotype>
 			<custom_data/>
 		</cell_definition>
@@ -238,8 +243,6 @@
 		<protein_threshold type="int" units=""> 1 </protein_threshold>
 		<phenotype_number type="int" units=""> 0 </phenotype_number>
 		<secretion_rate type="int" units=""> 0 </secretion_rate>
-		<bnd_file type="string" units="">./config/boolean_network/bn_nodes.bnd</bnd_file>
-		<cfg_file type="string" units="">./config/boolean_network/bn_conf.cfg</cfg_file>
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
 		<init_ecm_filename type="string" units="">./config/ecm.txt</init_ecm_filename>
 		<x_threshold type="double" units="dimensionless">1.</x_threshold>
