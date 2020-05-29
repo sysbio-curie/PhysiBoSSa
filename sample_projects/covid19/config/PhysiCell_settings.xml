@@ -341,6 +341,11 @@
 				</motility>
 				<secretion>
 				</secretion>
+				<intracellular type="maboss">
+					<bnd_filename>./config/boolean_network/epithelium.bnd</bnd_filename>
+					<cfg_filename>./config/boolean_network/epithelium.cfg</cfg_filename>
+					<time_step>12</time_step>
+				</intracellular>
 			</phenotype>
 			<custom_data>
 			</custom_data>
@@ -397,6 +402,11 @@
 						<secretion_target units="substrate density">1</secretion_target>
 					</substrate> 	
 				</secretion>
+				<intracellular type="maboss">
+					<bnd_filename>./config/boolean_network/cd8tcell.bnd</bnd_filename>
+					<cfg_filename>./config/boolean_network/cd8tcell.cfg</cfg_filename>
+					<time_step>12</time_step>
+				</intracellular>
 			</phenotype>
 			<custom_data>
 				<cell_attachment_rate units="1/min">0.2</cell_attachment_rate>
@@ -425,6 +435,11 @@
 					<total units="micron^3">4849</total>
 					<nuclear units="micron^3">485</nuclear>
 				</volume>
+				<intracellular type="maboss">
+					<bnd_filename>./config/boolean_network/macrophage.bnd</bnd_filename>
+					<cfg_filename>./config/boolean_network/macrophage.cfg</cfg_filename>
+					<time_step>12</time_step>
+				</intracellular>
 			</phenotype>
 			<custom_data>
 			</custom_data>
@@ -448,6 +463,11 @@
 					<total units="micron^3">1437</total>
 					<nuclear units="micron^3">718.5</nuclear>
 				</volume>
+				<intracellular type="maboss">
+					<bnd_filename>./config/boolean_network/neutrophil.bnd</bnd_filename>
+					<cfg_filename>./config/boolean_network/neutrophil.cfg</cfg_filename>
+					<time_step>12</time_step>
+				</intracellular>
 			</phenotype>
 			<custom_data>
 			</custom_data>
