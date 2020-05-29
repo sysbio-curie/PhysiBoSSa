@@ -77,10 +77,6 @@
 
 #include "../modules/PhysiCell_settings.h"
 
-#ifdef ADDON_PHYSIBOSS
-#include "../addons/PhysiBoSSa/src/boolean_network.h"
-#endif
-
 using namespace BioFVM; 
 
 namespace PhysiCell{
@@ -552,19 +548,6 @@ class Intracellular
  private:
  public:
     std::string type;
-	
-#ifdef ADDON_PHYSIBOSS
-	std::string bnd_filename;
-	std::string cfg_filename;
-	double time_step;
-	std::map<std::string, double> initial_values;
-	std::map<std::string, double> mutations;
-	std::map<std::string, double> parameters;
-	
-	BooleanNetwork network;
-#endif
-
-	Intracellular();
 };
 
 class Phenotype
@@ -584,7 +567,9 @@ class Phenotype
 	
 	Molecular molecular; 
 	
-	Intracellular intracellular;
+	// We need it to be a pointer to allow polymorphism
+	// then this object could be a MaBoSSIntracellular, or a SBMLIntracellular
+	Intracellular* intracellular;
 	
 	Phenotype(); // done 
 	

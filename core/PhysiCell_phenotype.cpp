@@ -1016,16 +1016,6 @@ void Molecular::advance( Basic_Agent* pCell, Phenotype& phenotype , double dt )
 */
 
 
-Intracellular::Intracellular()
-{
-#ifdef ADDON_PHYSIBOSS
-	initial_values.clear();
-	mutations.clear();
-	parameters.clear();
-#endif
-}
-
-
 Cell_Functions::Cell_Functions()
 {
 	instantiate_cell = NULL;
@@ -1067,6 +1057,7 @@ Phenotype::Phenotype()
 	flagged_for_removal = false; 
 	
 	// sync the molecular stuff here automatically? 
+	intracellular = NULL;
 	
 	return; 
 }
