@@ -70,6 +70,7 @@
 #include "./custom.h"
 #include "../BioFVM/BioFVM.h"  
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
+#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
 #include <math.h>
 using namespace BioFVM;
 
@@ -187,8 +188,9 @@ void setup_tissue( void )
 		if ((phase+1) == 1)
 			pC->phenotype.cycle.pCycle_Model->phases[1].entry_function(pC, pC->phenotype, 0);
 
-		pC->phenotype.intracellular.network.restart_nodes();
-		pC->custom_data["next_physibossa_run"] = pC->phenotype.intracellular.network.get_time_to_update();
+		MaBoSSIntracellular* maboss_model = getMaBoSSModel(pC->phenotype);
+		maboss_model->network.restart_nodes();
+		pC->custom_data["next_physibossa_run"] = maboss_model->network.get_time_to_update();
 		pC->custom_data["ecm_contact"] = pC->ecm_contact;
 		color_node(pC);
 	}
@@ -227,7 +229,7 @@ std::vector<std::string> pMotility_coloring_function( Cell* pCell )
 std::vector<std::string> migration_coloring_function( Cell* pCell )
 {
 	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
-	if ( pCell->phenotype.intracellular.network.get_node_value( parameters.strings("node_to_visualize") ) == 0 )
+	if ( getMaBoSSModel(pCell->phenotype)->network.get_node_value( parameters.strings("node_to_visualize") ) == 0 )
 	{
 		output[0] = "rgb(0,0,255)";
 		output[2] = "rgb(0,0,125)";
@@ -273,9 +275,10 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 		
 		set_input_nodes(pCustomCell);
 
-		pCustomCell->phenotype.intracellular.network.run_maboss();
+		MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCustomCell->phenotype);
+		maboss_model->network.run_maboss();
 		// Get noisy step size
-		double next_run_in = pCustomCell->phenotype.intracellular.network.get_time_to_update();
+		double next_run_in = maboss_model->network.get_time_to_update();
 		pCustomCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
 		
 		from_nodes_to_cell(pCustomCell, phenotype, dt);
@@ -285,104 +288,109 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 	
 }
 
-void set_input_nodes(Custom_cell* pCell) {
-int ind;
-	//nodes = pCell->phenotype.intracellular.network.get_nodes();
-	ind = pCell->phenotype.intracellular.network.get_node_index( "Oxy" );
+void set_input_nodes(Custom_cell* pCell) 
+{	
+	MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
+
+	int ind;
+	//nodes = maboss_model->network.get_nodes();
+	ind = maboss_model->network.get_node_index( "Oxy" );
 	if ( ind >= 0 ){
-		pCell->phenotype.intracellular.network.set_node_value("Oxy", pCell->necrotic_oxygen());
+		maboss_model->network.set_node_value("Oxy", pCell->necrotic_oxygen());
 	}
 
 	// 	nodes[ind] = ( !pCell->necrotic_oxygen() );
 
 	//enough_to_node( pCell, "TGFbR", "tgfb" );
 
-	ind = pCell->phenotype.intracellular.network.get_node_index( "Neighbours" );
+	ind = maboss_model->network.get_node_index( "Neighbours" );
 	if ( ind >= 0 ){
-		pCell->phenotype.intracellular.network.set_node_value("Neighbours", pCell->has_neighbor(0));	
+		maboss_model->network.set_node_value("Neighbours", pCell->has_neighbor(0));	
 	}
 	
-	ind = pCell->phenotype.intracellular.network.get_node_index( "Nei2" );
+	ind = maboss_model->network.get_node_index( "Nei2" );
 	if ( ind >= 0 ){
-		pCell->phenotype.intracellular.network.set_node_value("Nei2", pCell->has_neighbor(1));
+		maboss_model->network.set_node_value("Nei2", pCell->has_neighbor(1));
 	}
 	// // If has enough contact with ecm or not
-	ind = pCell->phenotype.intracellular.network.get_node_index( "ECM_sensing" );
+	ind = maboss_model->network.get_node_index( "ECM_sensing" );
 	if ( ind >= 0 )
-		pCell->phenotype.intracellular.network.set_node_value("ECM_sensing", touch_ECM(pCell));
+		maboss_model->network.set_node_value("ECM_sensing", touch_ECM(pCell));
 	
 	// If nucleus is deformed, probability of damage
 	// Change to increase proba with deformation ? + put as parameter
-	ind = pCell->phenotype.intracellular.network.get_node_index( "DNAdamage" );
+	ind = maboss_model->network.get_node_index( "DNAdamage" );
 	if ( ind >= 0 )
-		pCell->phenotype.intracellular.network.set_node_value("DNAdamage", ( pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0);
+		maboss_model->network.set_node_value("DNAdamage", ( pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0);
 		
 	/// example
 }
 
 void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 {
-	std::vector<bool>* point_to_nodes = pCell->phenotype.intracellular.network.get_nodes();
+	MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
+
+	std::vector<bool>* point_to_nodes = maboss_model->network.get_nodes();
 	int bn_index;
-	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Apoptosis" );
-	if ( bn_index != -1 && pCell->phenotype.intracellular.network.get_node_value( "Apoptosis" ) )
+	bn_index = maboss_model->network.get_node_index( "Apoptosis" );
+	if ( bn_index != -1 && maboss_model->network.get_node_value( "Apoptosis" ) )
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
 		return;
 	}
 
-	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Migration" );
+	bn_index = maboss_model->network.get_node_index( "Migration" );
 	if ( bn_index >= 0 )
 	{
-		pCell->evolve_motility_coef( pCell->phenotype.intracellular.network.get_node_value( "Migration" ), dt );
+		pCell->evolve_motility_coef( maboss_model->network.get_node_value( "Migration" ), dt );
 	}
 
-	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Cell_growth" );
+	bn_index = maboss_model->network.get_node_index( "Cell_growth" );
 	 if ( bn_index >= 0 )
 	 {
 	 	do_proliferation( pCell, phenotype, dt );
 	 }
 /*
-	bn_index = pCell->phenotype.intracellular.network.get_node_index("CCA");
+	bn_index = maboss_model->network.get_node_index("CCA");
 	if ( bn_index != -1 && (*point_to_nodes)[bn_index] )
 	{
 		pCell->freezing(1);
 	}	
 */
-	/*bn_index = pCell->phenotype.intracellular.network.get_node_index( "Polarization" );
+	/*bn_index = maboss_model->network.get_node_index( "Polarization" );
 	if ( bn_index >= 0 )
 		pCell->evolve_polarity_coef( (*point_to_nodes)[bn_index], dt );
 	*/
 
-	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Cell_cell" );
+	bn_index = maboss_model->network.get_node_index( "Cell_cell" );
 	if ( bn_index >= 0 )
-		pCell->evolve_cellcell_coef( pCell->phenotype.intracellular.network.get_node_value( "Cell_cell" ), dt );
+		pCell->evolve_cellcell_coef( maboss_model->network.get_node_value( "Cell_cell" ), dt );
 
-	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Matrix_adhesion" );
+	bn_index = maboss_model->network.get_node_index( "Matrix_adhesion" );
 	if ( bn_index >= 0 )
-		pCell->evolve_integrin_coef( pCell->phenotype.intracellular.network.get_node_value( "Matrix_adhesion" ), dt );
+		pCell->evolve_integrin_coef( maboss_model->network.get_node_value( "Matrix_adhesion" ), dt );
 
-	bn_index = pCell->phenotype.intracellular.network.get_node_index("Matrix_modif");
+	bn_index = maboss_model->network.get_node_index("Matrix_modif");
 	if ( bn_index >= 0 )
 	 {
-	 	pCell->set_mmp( pCell->phenotype.intracellular.network.get_node_value("Matrix_modif") );
+	 	pCell->set_mmp( maboss_model->network.get_node_value("Matrix_modif") );
 	 }
 
-	bn_index = pCell->phenotype.intracellular.network.get_node_index("EMTreg");
+	bn_index = maboss_model->network.get_node_index("EMTreg");
 	if ( bn_index != -1 )
 	{
-		pCell->set_mmp( pCell->phenotype.intracellular.network.get_node_value("EMTreg") );
+		pCell->set_mmp( maboss_model->network.get_node_value("EMTreg") );
 	}
 
 	pCell->freezing( 0 );
-	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Quiescence" );
-	if ( bn_index >= 0 && pCell->phenotype.intracellular.network.get_node_value( "Quiescence" ) )
+	bn_index = maboss_model->network.get_node_index( "Quiescence" );
+	if ( bn_index >= 0 && maboss_model->network.get_node_value( "Quiescence" ) )
 		pCell->freezing(1);
 
-	bn_index = pCell->phenotype.intracellular.network.get_node_index( "Cell_freeze" );
+	bn_index = maboss_model->network.get_node_index( "Cell_freeze" );
 	if ( bn_index >= 0 ){
-		pCell->freezer(3 * pCell->phenotype.intracellular.network.get_node_value( "Cell_freeze" ));
+		pCell->freezer(3 * maboss_model->network.get_node_value( "Cell_freeze" ));
 	}
 
 	/// example
@@ -498,7 +506,7 @@ bool touch_ECM(Custom_cell* pCell)
 void enough_to_node( Custom_cell* pCell, std::string nody, std::string field )
 {
 	int bn_index;
-	bn_index = pCell->phenotype.intracellular.network.get_node_index( nody );;
+	bn_index = getMaBoSSModel(pCell->phenotype)->network.get_node_index( nody );;
 	if ( bn_index >= 0 )
 	{
 		int felt = pCell->feel_enough(field, *pCell);
@@ -509,5 +517,5 @@ void enough_to_node( Custom_cell* pCell, std::string nody, std::string field )
 
 void color_node(Custom_cell* pCell){
 	std::string node_name = parameters.strings("node_to_visualize");
-	pCell->custom_data[node_name] = pCell->phenotype.intracellular.network.get_node_value(node_name);
+	pCell->custom_data[node_name] = getMaBoSSModel(pCell->phenotype)->network.get_node_value(node_name);
 }
