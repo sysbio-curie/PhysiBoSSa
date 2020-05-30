@@ -85,6 +85,11 @@ class MaBoSSNetwork
 		/** \brief Setter update time */
 		inline void set_update_time_step(double time_step) { this->update_time_step = time_step;}
 		
+		/** \brief Change simulation mode */
+		inline void set_discrete_time(bool discrete_time, double time_tick) { 
+			this->engine->setDiscreteTime(discrete_time); this->engine->setTimeTick(time_tick); 
+		}
+		
 		/** \brief Print current state of all the nodes of the network */
 		void print_nodes(std::vector<bool>* node_values);
 };

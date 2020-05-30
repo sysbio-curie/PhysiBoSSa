@@ -33,10 +33,10 @@ class BooleanNetwork
 
 	public:
 		/** \brief Initialize a maboos network */
-		void initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step);
+		void initialize_boolean_network(std::string bnd_file, std::string cfg_file);
 
 		/** \brief Initialize a maboos network, with initial values and mutants */
-		void initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step, std::map<std::string, double> initial_values, std::map<std::string, double> mutations, std::map<std::string, double> parameters);
+		void initialize_boolean_network(std::string bnd_file, std::string cfg_file, std::map<std::string, double> initial_values, std::map<std::string, double> mutations, std::map<std::string, double> parameters);
 		
 		/** \brief Reset nodes and time to update */
 		void restart_nodes();
@@ -46,6 +46,14 @@ class BooleanNetwork
 		
 		/** \brief Get nodes */
 		inline std::vector<bool>* get_nodes() {return &this->nodes;}
+		
+		/** \brief Set average time step */
+		void set_time_step(double time_step) { this->maboss.set_update_time_step(time_step); }
+		
+		/** \brief Set average time step */
+		void set_discrete_time(bool discrete_time, double time_tick) { 
+			this->maboss.set_discrete_time(discrete_time, time_tick); 
+		}
 		
 		/** \brief Get time to update*/
 		inline double get_time_to_update() {return this->time_to_update;}
