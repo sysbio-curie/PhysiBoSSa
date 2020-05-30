@@ -87,7 +87,7 @@ class MaBoSSNetwork
 		 * \brief Run the current network
 		 * \param node_values Vector mapping a boolean network to run a simulation
 		 */
-		void run_simulation(std::vector<bool>* node_values);
+		void run_simulation(std::vector<bool>* node_values, double time_to_update);
 
 		/** 
 		 * \brief Return node of given name current value

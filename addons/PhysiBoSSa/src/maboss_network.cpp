@@ -114,10 +114,11 @@ void MaBoSSNetwork::restart_node_values(std::vector<bool>* output)
 }
 
 /* Run a MaBoSS simulation with the input values*/
-void MaBoSSNetwork::run_simulation(std::vector<bool>* node_values)
+void MaBoSSNetwork::run_simulation(std::vector<bool>* node_values, double time_to_update)
 {	
 	NetworkState_Impl state = this->create_networkstate(node_values);
 
+	engine->setMaxTime(time_to_update);
 	state = engine->run(&state, NULL);
 
 	this->retrieve_networkstate_values(state, node_values);
