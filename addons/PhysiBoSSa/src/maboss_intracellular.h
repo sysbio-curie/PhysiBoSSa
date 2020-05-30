@@ -8,6 +8,7 @@
 #include "../../../modules/PhysiCell_pugixml.h"
 #include "boolean_network.h"
 
+
 class MaBoSSIntracellular : public PhysiCell::Intracellular {
  private:
  public:
@@ -51,6 +52,14 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	
 	bool need_update() {
 		return PhysiCell::PhysiCell_globals.current_time >= this->next_physiboss_run;
+	}
+	
+	bool get_boolean_node_value(std::string name) {
+		return this->network.get_node_value(name);
+	}
+	
+	void set_boolean_node_value(std::string name, bool value) {
+		this->network.set_node_value(name, value);
 	}
 };
 
