@@ -1466,6 +1466,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			if (pParent->phenotype.intracellular->type == "maboss") {
 				MaBoSSIntracellular* maboss_model = new MaBoSSIntracellular(getMaBoSSModel(pParent->phenotype));
 				pCD->phenotype.intracellular = maboss_model->getIntracellularModel();
+
 			}
 		#endif
 			
@@ -2130,6 +2131,8 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			} else {
 				MaBoSSIntracellular* pIntra = new MaBoSSIntracellular(node);
 				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+				pCD->custom_data.add_variable(parameters.strings("next_physibossa_run"), "min", 0.0 ); //for paraview visualization^M
+
 			}
 		}
 #endif
