@@ -93,7 +93,7 @@
 
 		<dt_diffusion units="min">0.02</dt_diffusion>
 		<dt_mechanics units="min">0.1</dt_mechanics>
-		<dt_phenotype units="min">2</dt_phenotype>	
+		<dt_phenotype units="min">0.5</dt_phenotype>	
 	</overall>
 	
 	<parallel>
@@ -179,7 +179,7 @@
 				<intracellular type="maboss">
 					<bnd_filename>./config/boolean_network/model_0.bnd</bnd_filename>
 					<cfg_filename>./config/boolean_network/model.cfg</cfg_filename>
-					<time_step>12</time_step>
+					<time_step>1</time_step>
 					<initial_values>
 						<initial_value node="A">1</initial_value>
 						<initial_value node="C">0</initial_value>
@@ -210,7 +210,7 @@
 			<phenotype>
 				<intracellular type="maboss">
 					<parameters>
-						<parameter name="$time_scale">0.5</parameter>
+						<parameter name="$time_scale">0.1</parameter>
 					</parameters>
 				</intracellular>
 			</phenotype>
