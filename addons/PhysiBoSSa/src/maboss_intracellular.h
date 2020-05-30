@@ -33,10 +33,15 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	
 	MaBoSSIntracellular(MaBoSSIntracellular* copy);
 	
-	void initialize_intracellular_from_pugixml(pugi::xml_node& node);
 	
 	Intracellular* getIntracellularModel() {
 		return static_cast<Intracellular*>(this);
+	}
+	
+	void initialize_intracellular_from_pugixml(pugi::xml_node& node);
+	
+	void start() {
+		this->network.restart_nodes();
 	}
 	
 	void update() {
