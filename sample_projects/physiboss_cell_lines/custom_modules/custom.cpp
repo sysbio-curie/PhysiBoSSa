@@ -180,16 +180,11 @@ void setup_tissue( void )
 void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	
-	if (PhysiCell_globals.current_time >= pCell->custom_data["next_physibossa_run"])
+	if (pCell->phenotype.intracellular->need_update())
 	{	
 		set_input_nodes(pCell);
 
-		MaBoSSIntracellular * maboss_model = getMaBoSSModel(pCell->phenotype);
-		maboss_model->network.run_maboss();
-		
-		// Get noisy step size
-		double next_run_in = maboss_model->network.get_time_to_update();
-		pCell->custom_data["next_physibossa_run"] += next_run_in;
+		pCell->phenotype.intracellular->update();
 		
 		from_nodes_to_cell(pCell, phenotype, dt);
 		color_node(pCell);
