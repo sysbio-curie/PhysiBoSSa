@@ -1951,7 +1951,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		if (model_type == "maboss") {
 			// If it has already be copied
 			if (pParent != NULL && pParent->phenotype.intracellular != NULL) {
-				getMaBoSSModel(pCD->phenotype)->initialize_intracellular_from_pugixml(node);
+				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
 				
 			// Otherwise we need to create a new one
 			} else {
