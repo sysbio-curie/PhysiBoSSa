@@ -201,7 +201,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
 	
-	if ( getMaBoSSModel(pCell->phenotype)->network.get_node_value( parameters.strings("node_to_visualize") ) == 0 )
+	if ( !pCell->phenotype.intracellular->get_boolean_node_value( parameters.strings("node_to_visualize") ) )
 	{
 		output[0] = "rgb(255,0,0)";
 		output[2] = "rgb(125,0,0)";
@@ -217,5 +217,5 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 
 void color_node(Cell* pCell){
 	std::string node_name = parameters.strings("node_to_visualize");
-	pCell->custom_data[node_name] = getMaBoSSModel(pCell->phenotype)->network.get_node_value(node_name);
+	pCell->custom_data[node_name] = pCell->phenotype.intracellular->get_boolean_node_value(node_name);
 }
