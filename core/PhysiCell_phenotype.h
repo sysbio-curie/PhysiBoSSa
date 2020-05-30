@@ -545,8 +545,15 @@ class Intracellular
  public:
     std::string type;
 	
+	// This function parse the xml cell definition
+	virtual void initialize_intracellular_from_pugixml(pugi::xml_node& node) = 0;
+	
+	// This function update the model for the time_step defined in the xml definition
 	virtual void update() = 0;
+	
+	// This function cheks if it's time to update the model
 	virtual bool need_update() = 0;
+	
 };
 
 class Phenotype
