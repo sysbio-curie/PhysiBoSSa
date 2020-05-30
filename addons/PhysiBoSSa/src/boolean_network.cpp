@@ -21,7 +21,7 @@ void BooleanNetwork::restart_nodes()
 /* Update MaboSS network states */
 void BooleanNetwork::run_maboss()
 {
-	this->maboss.run_simulation(&this->nodes);
+	this->maboss.run_simulation(&this->nodes, this->time_to_update);
 	this->set_time_to_update();
 }
 

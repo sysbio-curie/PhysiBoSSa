@@ -70,7 +70,7 @@ class MaBoSSNetwork
 		void restart_node_values(std::vector<bool>* node_values);
 
 		/** \brief Run the current network*/
-		void run_simulation(std::vector<bool>* node_values);
+		void run_simulation(std::vector<bool>* node_values, double time_to_update);
 
 		/** \brief Return node of given name current value
 		 *
