@@ -28,9 +28,11 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 		
 		if (copy->network.has_init()) {
 			network.initialize_boolean_network(
-				copy->bnd_filename, copy->cfg_filename, copy->time_step, 
+				copy->bnd_filename, copy->cfg_filename,
 				copy->initial_values, copy->mutations, copy->parameters
 			);
+			network.set_time_step(copy->time_step);
+			network.set_discrete_time(copy->discrete_time, copy->time_tick);
 		}
 		
 }
@@ -45,10 +47,6 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 	if ( node_cfg )
 	{ cfg_filename = PhysiCell::xml_get_my_string_value (node_cfg); }
 	
-	pugi::xml_node node_timestep = node.child( "time_step" ); 
-	if( node_timestep )
-	{ time_step = PhysiCell::xml_get_my_double_value( node_timestep ); }
-
 	pugi::xml_node node_init_values = node.child( "initial_values" );
 	if( node_init_values )
 	{
@@ -97,11 +95,30 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 	network.initialize_boolean_network(
 		bnd_filename, 
 		cfg_filename,
-		time_step,
 		initial_values,
 		mutations,
 		parameters
-	);	
+	);
+	
+	pugi::xml_node node_timestep = node.child( "time_step" ); 
+	if( node_timestep )
+	{ 
+		time_step = PhysiCell::xml_get_my_double_value( node_timestep );
+		network.set_time_step(time_step);
+	}
+	
+	pugi::xml_node node_discretetime = node.child( "discrete_time" ); 
+	pugi::xml_node node_timetick = node.child( "time_tick" ); 
+
+	if( node_discretetime && node_timetick )
+	{ 
+		discrete_time = PhysiCell::xml_get_my_bool_value( node_discretetime );		
+		time_tick = PhysiCell::xml_get_my_double_value( node_timetick );
+		network.set_discrete_time(discrete_time, time_tick);
+	}
+
+	
+	
 }
 
 MaBoSSIntracellular* getMaBoSSModel(PhysiCell::Phenotype& phenotype) {
