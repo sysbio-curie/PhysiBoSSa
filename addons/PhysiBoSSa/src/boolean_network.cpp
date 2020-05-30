@@ -1,13 +1,12 @@
 #include "boolean_network.h"
 
 /* Initialize a MaBoSS Network instance */
-void BooleanNetwork::initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step){
+void BooleanNetwork::initialize_boolean_network(std::string bnd_file, std::string cfg_file){
 	this->maboss.init_maboss(bnd_file, cfg_file);
-	this->maboss.set_update_time_step(time_step);
 }
 
-void BooleanNetwork::initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step, std::map<std::string, double> initial_values, std::map<std::string, double> mutations, std::map<std::string, double> parameters) {
-	this->initialize_boolean_network(bnd_file, cfg_file, time_step);
+void BooleanNetwork::initialize_boolean_network(std::string bnd_file, std::string cfg_file, std::map<std::string, double> initial_values, std::map<std::string, double> mutations, std::map<std::string, double> parameters) {
+	this->initialize_boolean_network(bnd_file, cfg_file);
 	this->maboss.mutate(mutations);
 	this->maboss.set_initial_values(initial_values);
 	this->maboss.set_parameters(parameters);
