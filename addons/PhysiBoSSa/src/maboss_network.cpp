@@ -23,6 +23,8 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 
 	engine = new StochasticSimulationEngine(this->network, this->config, PhysiCell::UniformInt());
 
+	this->update_time_step = this->config->getMaxTime();
+	
 	// Initialize the map relation between node name and index positions
 	int i = 0;
 	std::vector<Node *> nodes = this->network->getNodes();
