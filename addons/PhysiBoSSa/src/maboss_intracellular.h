@@ -54,6 +54,10 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		return PhysiCell::PhysiCell_globals.current_time >= this->next_physiboss_run;
 	}
 	
+	bool has_node(std::string name) {
+		return this->network.get_node_index(name) >= 0;
+	}
+	
 	bool get_boolean_node_value(std::string name) {
 		return this->network.get_node_value(name);
 	}
