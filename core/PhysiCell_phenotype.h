@@ -561,6 +561,11 @@ class Intracellular
 	// This function cheks if it's time to update the model
 	virtual bool need_update() = 0;
 	
+	// Access value for boolean model
+	virtual bool get_boolean_node_value(std::string name) = 0;
+	
+	// Set value for boolean model
+	virtual void set_boolean_node_value(std::string name, bool value) = 0;
 };
 
 class Phenotype
