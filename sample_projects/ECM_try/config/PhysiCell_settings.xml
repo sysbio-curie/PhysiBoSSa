@@ -246,7 +246,7 @@
 		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
 		<init_ecm_filename type="string" units="">./config/ecm.txt</init_ecm_filename>
 		<x_threshold type="double" units="dimensionless">1.</x_threshold>
-		<membrane_shape type="string" units=""> sheet </membrane_shape>	
+		<membrane_shape type="string" units=""> sphere </membrane_shape>	
 		<membrane_length type="double" units=""> 10 </membrane_length>
 	</user_parameters>
 	

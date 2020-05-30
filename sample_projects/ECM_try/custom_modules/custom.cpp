@@ -69,7 +69,7 @@
 #include <cmath>
 #include "./custom.h"
 #include "../BioFVM/BioFVM.h"  
-#include "../addons/PhysiBoSSa/src/boolean_network.h"
+#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
 using namespace BioFVM;
 
 // declare cell definitions here 
@@ -130,8 +130,7 @@ void create_cell_types( void )
 	display_cell_definitions( std::cout ); 
 	
 	// add custom data here, if any
-	cell_defaults.custom_data.add_variable("next_physibossa_run", "dimensionless", 12.0);
-	
+
 	load_ecm_file();
 
 	return; 
@@ -173,8 +172,7 @@ void setup_tissue( void )
 		if ((phase+1) == 1)
 			pC->phenotype.cycle.pCycle_Model->phases[1].entry_function(pC, pC->phenotype, 0);
 		
-		getMaBoSSModel(pC->phenotype)->network.restart_nodes();
-		pC->custom_data["next_physibossa_run"] = getMaBoSSModel(pC->phenotype)->network.get_time_to_update();
+		pC->phenotype.intracellular->start();
 	}
 	std::cout << "tissue created" << std::endl;
 
@@ -201,53 +199,45 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 
 void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
 {
-	static int o2_index = microenvironment.find_density_index( "oxygen" );
-	double o2 = pCell->nearest_density_vector()[o2_index];
-
-	// update_cell_and_death_parameters_O2_based(pCell, phenotype, dt);
-
 	if( phenotype.death.dead == true )
 	{
 		pCell->functions.update_phenotype = NULL;
 		return;
 	}
 
-	if (PhysiCell_globals.current_time >= pCell->custom_data["next_physibossa_run"])
+	if (pCell->phenotype.intracellular->need_update())
 	{
-		Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
-		set_input_nodes(pCustomCell);
+		set_input_nodes(pCell);
 
-		MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
-		maboss_model->network.run_maboss();
-		// Get noisy step size
-		double next_run_in = maboss_model->network.get_time_to_update();
-		pCell->custom_data["next_physibossa_run"] = PhysiCell_globals.current_time + next_run_in;
-		
-		from_nodes_to_cell(pCustomCell, phenotype, dt);
+		pCell->phenotype.intracellular->update();
+				
+		from_nodes_to_cell(pCell, phenotype, dt);
 	}
 }
 
-void set_input_nodes(Custom_cell* pCell) 
+void set_input_nodes(Cell* pCell) 
 {
-	MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
-	
-	if ( maboss_model->network.get_node_index( "ECMicroenv" ) >= 0 )
-		maboss_model->network.set_node_value( "ECMicroenv", touch_ECM(pCell) );
-	
+	if ( pCell->phenotype.intracellular->has_node("ECMicroenv") ){
+		Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
+		pCell->phenotype.intracellular->set_boolean_node_value("ECMicroenv", touch_ECM(pCustomCell));
+	}
 	// If nucleus is deformed, probability of damage
 	// Change to increase proba with deformation ? + put as parameter
-	if ( maboss_model->network.get_node_index( "DNAdamage" ) >= 0 )
-		maboss_model->network.set_node_value("DNAdamage", 
-			(pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0
+	if ( pCell->phenotype.intracellular->has_node("ECMicroenv") ){
+	
+		Custom_cell* pCustomCell = static_cast<Custom_cell*>(pCell);
+
+		pCell->phenotype.intracellular->set_boolean_node_value("DNAdamage", 
+			(pCustomCell->nucleus_deform > 0.5 ) ? 
+				(2*PhysiCell::UniformRandom() < pCustomCell->nucleus_deform) : 0
 		);
+	}
 }
 
-void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
+void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {
-	MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
-
-	if (maboss_model->network.get_node_index( "Apoptosis" ) >= 0 
-	 	&& maboss_model->network.get_node_value("Apoptosis") 
+	if (pCell->phenotype.intracellular->has_node( "Apoptosis" )
+	 	&& pCell->phenotype.intracellular->get_boolean_node_value("Apoptosis") 
 	)
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
@@ -255,18 +245,22 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		return;
 	}
 
-	if ( maboss_model->network.get_node_index( "Migration" ) >= 0 )
-		pCell->evolve_motility_coef( maboss_model->network.get_node_value("Migration"), dt );
+	if ( pCell->phenotype.intracellular->has_node( "Migration" ) )
+		static_cast<Custom_cell*>(pCell)->evolve_motility_coef( 
+			pCell->phenotype.intracellular->get_boolean_node_value("Migration"), dt 
+		);
 	
-	if (maboss_model->network.get_node_index("CCA") >= 0 
-		&& maboss_model->network.get_node_value("CCA")
+	if (pCell->phenotype.intracellular->has_node("CCA")
+		&& pCell->phenotype.intracellular->get_boolean_node_value("CCA")
 	)
-		pCell->freezing(1);
+		static_cast<Custom_cell*>(pCell)->freezing(1);
 	
-	if (maboss_model->network.get_node_index("EMT") >= 0 
-		&& maboss_model->network.get_node_value("EMT")
+	if (pCell->phenotype.intracellular->has_node("EMT")
+		&& pCell->phenotype.intracellular->get_boolean_node_value("EMT")
 	)
-		pCell->set_mmp( maboss_model->network.get_node_value("EMT") );
+		static_cast<Custom_cell*>(pCell)->set_mmp(
+			pCell->phenotype.intracellular->get_boolean_node_value("EMT") 
+		);
 }
 
 
