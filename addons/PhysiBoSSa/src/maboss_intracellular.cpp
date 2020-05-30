@@ -22,9 +22,9 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 		bnd_filename = copy->bnd_filename;
 		cfg_filename = copy->cfg_filename;
 		time_step = copy->time_step;
-		std::map<std::string, double> initial_values(copy->initial_values);
-		std::map<std::string, double> mutations(copy->mutations);
-		std::map<std::string, double> parameters(copy->parameters);
+		initial_values = copy->initial_values;
+		mutations = copy->mutations;
+		parameters = copy->parameters;
 		
 		if (copy->network.has_init()) {
 			network.initialize_boolean_network(
