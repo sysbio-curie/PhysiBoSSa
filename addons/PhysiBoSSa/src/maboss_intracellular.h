@@ -24,6 +24,8 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	std::map<std::string, double> parameters;
 	
 	BooleanNetwork network;
+	
+	double next_physiboss_run = 0;
 
 	MaBoSSIntracellular();
 	
@@ -35,6 +37,15 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	
 	Intracellular* getIntracellularModel() {
 		return static_cast<Intracellular*>(this);
+	}
+	
+	void update() {
+		this->network.run_maboss();
+		this->next_physiboss_run += this->network.get_time_to_update();
+	}
+	
+	bool need_update() {
+		return PhysiCell::PhysiCell_globals.current_time >= this->next_physiboss_run;
 	}
 };
 
