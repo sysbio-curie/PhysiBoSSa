@@ -151,25 +151,25 @@ void setup_tissue( void )
 			// the formula for C is A&B. Meaning that C will only activate for half the cells
 			pC = create_cell(get_cell_definition("default")); 
 			pC->assign_position(-i-10, -j-10, 0.0 );
-			getMaBoSSModel(pC->phenotype)->network.restart_nodes();
+			pC->phenotype.intracellular->start();
 			
 			// bottom right corner : other
 			// the formula for C is A|B. C will activate in all cells
 			pC = create_cell(get_cell_definition("other")); 
 			pC->assign_position(i+10, -j-10, 0.0 );
-			getMaBoSSModel(pC->phenotype)->network.restart_nodes();
+			pC->phenotype.intracellular->start();
 
 			// top left  corner : another
 			// Here we mutate the C node at zero, so it will stay there
 			pC = create_cell(get_cell_definition("another")); 
 			pC->assign_position(-i-10, j+10, 0.0 );
-			getMaBoSSModel(pC->phenotype)->network.restart_nodes();
+			pC->phenotype.intracellular->start();
 			
 			// top right corner : yet_another
 			// Here we change the default value for the rates, so we slow down the activation of C
 			pC = create_cell(get_cell_definition("yet_another")); 
 			pC->assign_position(i+10, j+10, 0.0 );
-			getMaBoSSModel(pC->phenotype)->network.restart_nodes();
+			pC->phenotype.intracellular->start();
 		}
 
 		
