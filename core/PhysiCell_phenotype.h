@@ -544,6 +544,9 @@ class Intracellular
  private:
  public:
     std::string type;
+	
+	virtual void update() = 0;
+	virtual bool need_update() = 0;
 };
 
 class Phenotype
