@@ -554,8 +554,11 @@ class Intracellular
 	// This function update the model for the time_step defined in the xml definition
 	virtual void update() = 0;
 	
-	// This function cheks if it's time to update the model
+	// This function checks if it's time to update the model
 	virtual bool need_update() = 0;
+	
+	// This function checks if a node exists
+	virtual bool has_node(std::string name) = 0; 
 	
 	// Access value for boolean model
 	virtual bool get_boolean_node_value(std::string name) = 0;
