@@ -63,6 +63,10 @@ class BooleanNetwork
 			this->maboss.set_discrete_time(discrete_time, time_tick); 
 		}
 		
+		void set_scaling(double scaling) {
+			this->maboss.set_scaling(scaling);
+		}
+		
 		/** 
 		 * \brief Get time to update
 		 * \return Time left to run next simulation 

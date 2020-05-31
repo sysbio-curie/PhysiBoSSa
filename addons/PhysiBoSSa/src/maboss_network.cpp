@@ -120,7 +120,7 @@ void MaBoSSNetwork::run_simulation(std::vector<bool>* node_values, double time_t
 {	
 	NetworkState_Impl state = this->create_networkstate(node_values);
 
-	engine->setMaxTime(time_to_update);
+	engine->setMaxTime(time_to_update/scaling);
 	state = engine->run(&state, NULL);
 
 	this->retrieve_networkstate_values(state, node_values);

@@ -16,9 +16,10 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	std::string bnd_filename;
 	std::string cfg_filename;
 	
-	double time_step = 1000.;
+	double time_step = 12;
 	bool discrete_time = false;
 	double time_tick = 0.5;
+	double scaling = 1.0;
 	
 	std::map<std::string, double> initial_values;
 	std::map<std::string, double> mutations;
