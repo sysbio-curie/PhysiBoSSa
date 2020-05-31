@@ -10,31 +10,29 @@ MaBoSSIntracellular::MaBoSSIntracellular() : Intracellular()
 
 MaBoSSIntracellular::MaBoSSIntracellular(pugi::xml_node& node)
 {
-	// MaBoSSIntracellular* pIntra = new MaBoSSIntracellular();
 	type = "maboss";
 	initialize_intracellular_from_pugixml(node);
-
 }
 
 MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy) 
 {
-		type = copy->type;
-		bnd_filename = copy->bnd_filename;
-		cfg_filename = copy->cfg_filename;
-		time_step = copy->time_step;
-		initial_values = copy->initial_values;
-		mutations = copy->mutations;
-		parameters = copy->parameters;
-		
-		if (copy->network.has_init()) {
-			network.initialize_boolean_network(
-				copy->bnd_filename, copy->cfg_filename,
-				copy->initial_values, copy->mutations, copy->parameters
-			);
-			network.set_time_step(copy->time_step);
-			network.set_discrete_time(copy->discrete_time, copy->time_tick);
-		}
-		
+	type = copy->type;
+	bnd_filename = copy->bnd_filename;
+	cfg_filename = copy->cfg_filename;
+	time_step = copy->time_step;
+	initial_values = copy->initial_values;
+	mutations = copy->mutations;
+	parameters = copy->parameters;
+	
+	if (copy->network.has_init()) {
+		network.initialize_boolean_network(
+			copy->bnd_filename, copy->cfg_filename,
+			copy->initial_values, copy->mutations, copy->parameters
+		);
+		network.set_time_step(copy->time_step);
+		network.set_discrete_time(copy->discrete_time, copy->time_tick);
+		network.restart_nodes();
+	}	
 }
 
 void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& node)
