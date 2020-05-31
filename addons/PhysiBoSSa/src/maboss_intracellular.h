@@ -8,10 +8,11 @@
 #include "../../../modules/PhysiCell_pugixml.h"
 #include "boolean_network.h"
 
-
 class MaBoSSIntracellular : public PhysiCell::Intracellular {
  private:
  public:
+	
+	static long counter;
 	
 	std::string bnd_filename;
 	std::string cfg_filename;
@@ -69,7 +70,5 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		this->network.set_node_value(name, value);
 	}
 };
-
-MaBoSSIntracellular* getMaBoSSModel(PhysiCell::Phenotype& phenotype);
 
 #endif

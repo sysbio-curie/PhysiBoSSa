@@ -498,7 +498,7 @@ Cell* Cell::divide( )
 	
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
-
+	
 	return child;
 }
 
@@ -929,8 +929,7 @@ Cell* create_cell( Cell_Definition& cd )
 	pNew->parameters = cd.parameters; 
 	pNew->functions = cd.functions; 
 	
-	pNew->phenotype = cd.phenotype; 
-	
+	pNew->phenotype = cd.phenotype;	
 	pNew->is_movable = true;
 	pNew->is_out_of_domain = false;
 	pNew->displacement.resize(3,0.0); // state? 
