@@ -494,11 +494,7 @@ Cell* Cell::divide( )
 	
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
-
-#ifdef ADDON_PHYSIBOSS
-	child->boolean_network = this->boolean_network;
-#endif
-
+	
 	return child;
 }
 
@@ -913,17 +909,7 @@ Cell* create_cell( Cell_Definition& cd )
 	pNew->parameters = cd.parameters; 
 	pNew->functions = cd.functions; 
 	
-	pNew->phenotype = cd.phenotype; 
-
-	if (cd.phenotype.intracellular != NULL) {	
-#ifdef ADDON_PHYSIBOSS
-		if (cd.phenotype.intracellular->type == "maboss") {
-			MaBoSSIntracellular* maboss_model = new MaBoSSIntracellular(getMaBoSSModel(cd.phenotype));
-			pNew->phenotype.intracellular = maboss_model->getIntracellularModel();
-		}	
-#endif
-	}
-	
+	pNew->phenotype = cd.phenotype;	
 	pNew->is_movable = true;
 	pNew->is_out_of_domain = false;
 	pNew->displacement.resize(3,0.0); // state? 
@@ -2105,86 +2091,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		
 #ifdef ADDON_PHYSIBOSS
 		if (model_type == "maboss") {
-<<<<<<< HEAD
-			
-			pugi::xml_node node_bnd = node.child( "bnd_filename" );
-			if ( node_bnd )
-			{ pIntra->bnd_filename = xml_get_my_string_value (node_bnd); }
-			
-			pugi::xml_node node_cfg = node.child( "cfg_filename" );
-			if ( node_cfg )
-			{ pIntra->cfg_filename = xml_get_my_string_value (node_cfg); }
-			
-			pugi::xml_node node_timestep = node.child( "time_step" ); 
-			if( node_timestep )
-			{ pIntra->time_step = xml_get_my_double_value( node_timestep ); }
-	
-			std::map<std::string, double> initial_values;
-			initial_values.clear();
-			
-			pugi::xml_node node_init_values = node.child( "initial_values" );
-			if( node_init_values )
-			{
-				pugi::xml_node node_init_value = node_init_values.child( "initial_value" );
-				while( node_init_value )
-				{
-					std::string node_name = node_init_value.attribute( "node" ).value(); 
-					double node_value = xml_get_my_double_value( node_init_value );
-					
-					initial_values[node_name] = node_value;
-					
-					node_init_value = node_init_value.next_sibling( "initial_value" ); 
-				}
-			}
-			pIntra->initial_values = initial_values;
-			
-			std::map<std::string, double> mutations;
-			mutations.clear();
-			
-			pugi::xml_node node_mutations = node.child( "mutations" );
-			if( node_mutations )
-			{
-				pugi::xml_node node_mutation = node_mutation.child( "mutation" );
-				while( node_mutation )
-				{
-					std::string node_name = node_mutation.attribute( "node" ).value(); 
-					double node_value = xml_get_my_double_value( node_mutation );
-					
-					mutations[node_name] = node_value;
-					
-					node_mutation = node_mutation.next_sibling( "mutation" ); 
-				}
-			}
-			pIntra->mutations = mutations;
-			
-			std::map<std::string, double> parameters;
-			parameters.clear();
-			
-			pugi::xml_node node_parameters = node.child( "parameters" );
-			if( node_parameters )
-			{
-				pugi::xml_node node_parameter = node_parameters.child( "parameter" );
-				while( node_parameter )
-				{
-					std::string param_name = node_parameter.attribute( "name" ).value(); 
-					double param_value = xml_get_my_double_value( node_parameter );
-					
-					parameters[param_name] = param_value;
-					
-					node_parameter = node_parameter.next_sibling( "parameter" ); 
-				}
-			}
-			pIntra->parameters = parameters;
-			
-			pIntra->network.initialize_boolean_network(
-				pIntra->bnd_filename, 
-				pIntra->cfg_filename,
-				pIntra->time_step,
-				pIntra->initial_values,
-				pIntra->mutations,
-				pIntra->parameters
-			);
-=======
 			// If it has already be copied
 			if (pParent != NULL) {
 				getMaBoSSModel(pCD->phenotype)->initialize_intracellular_from_pugixml(node);
@@ -2194,7 +2100,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				MaBoSSIntracellular* pIntra = new MaBoSSIntracellular(node);
 				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
 			}
->>>>>>> 5131790... Introducing MaBoSSIntracellular, inheriting from Intracellular
 		}
 #endif
 	}	
