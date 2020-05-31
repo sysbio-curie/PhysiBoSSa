@@ -161,9 +161,14 @@ void setup_tissue( void )
 			pC->assign_position(-i-10, j+10, 0.0 );
 			
 			// top right corner : yet_another
-			// Here we change the default value for the rates, so we slow down the activation of C
+			// Here we change the default value for the rates, acelerating the activation of C
 			pC = create_cell(get_cell_definition("yet_another")); 
 			pC->assign_position(i+10, j+10, 0.0 );
+			
+			// right of top right corner : yet_yet_another
+			// Here we change the scaling value, acelerating the activation of C
+			pC = create_cell(get_cell_definition("yet_yet_another")); 
+			pC->assign_position(i+110, j+10, 0.0 );
 		}
 
 		

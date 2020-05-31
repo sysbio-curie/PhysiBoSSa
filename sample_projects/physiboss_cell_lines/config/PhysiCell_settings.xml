@@ -216,6 +216,14 @@
 			</phenotype>
 			<custom_data/>
 		</cell_definition>
+		<cell_definition name="yet_yet_another" parent_type="default" ID="4">
+			<phenotype>
+				<intracellular type="maboss">
+					<scaling>0.5</scaling>
+				</intracellular>
+			</phenotype>
+			<custom_data/>
+		</cell_definition>
 	</cell_definitions>	
 	
 	<user_parameters>
