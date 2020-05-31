@@ -55,7 +55,7 @@ class MaBoSSNetwork
 		/** \brief Initialize network */
 		void init_maboss( std::string networkFile, std::string configFile);
 
-		bool has_init() { return network != NULL && config != NULL; }
+		bool has_init() const { return network != NULL && config != NULL; }
 		void mutate(std::map<std::string, double> mutations);
 
 		void set_initial_values(std::map<std::string, double> initial_values)
