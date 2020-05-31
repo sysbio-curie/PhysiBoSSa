@@ -187,7 +187,6 @@ void setup_tissue( void )
 		if ((phase+1) == 1)
 			pC->phenotype.cycle.pCycle_Model->phases[1].entry_function(pC, pC->phenotype, 0);
 
-		pC->phenotype.intracellular->start();
 		pC->custom_data["ecm_contact"] = pC->ecm_contact;
 		color_node(pC);
 	}
@@ -312,9 +311,7 @@ void set_input_nodes(Custom_cell* pCell)
 
 void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 {
-	
-	// std::vector<bool>* point_to_nodes = maboss_model->network.get_nodes();
-	
+		
 	if ( pCell->phenotype.intracellular->has_node( "Apoptosis" ) 
 		&& pCell->phenotype.intracellular->get_boolean_node_value( "Apoptosis" ) 
 	)

@@ -71,8 +71,6 @@
 #include "../modules/PhysiCell_standard_modules.h" 
 #include "custom_cell.h"
 #include "custom_main.h"
-#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
-
 
 
 using namespace BioFVM; 
