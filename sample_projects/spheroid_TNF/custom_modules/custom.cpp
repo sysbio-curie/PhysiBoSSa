@@ -66,7 +66,7 @@
 */
 
 #include "./custom.h"
-
+#include <sstream>
 // declare cell definitions here 
 
 void create_cell_types( void )
@@ -134,12 +134,7 @@ void setup_tissue( void )
 	Cell* pC;
 
 	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
-	// std::string bnd_file = parameters.strings("bnd_file");
-	// std::string cfg_file = parameters.strings("cfg_file");
-	// BooleanNetwork tnf_network;
-	// double maboss_time_step = parameters.doubles("maboss_time_step");
-	// tnf_network.initialize_boolean_network(bnd_file, cfg_file, maboss_time_step);
-
+	
 	for (int i = 0; i < cells.size(); i++)
 	{
 		float x = cells[i].x;
@@ -156,10 +151,6 @@ void setup_tissue( void )
 		// pC->phenotype.cycle.data.current_phase_index = phase;
 		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
 		
-		MaBoSSIntracellular* maboss_model = getMaBoSSModel(pC->phenotype);
-		maboss_model->network.restart_nodes();
-		static int index_next_physibossa_run = pC->custom_data.find_variable_index("next_physibossa_run");
-		pC->custom_data.variables.at(index_next_physibossa_run).value = maboss_model->network.get_time_to_update();
 		update_custom_variables(pC);
 	}
 
@@ -178,16 +169,11 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 		return;
 	}
 
-	if (PhysiCell_globals.current_time >= pCell->custom_data.variables.at(index_next_physibossa_run).value)
+	if (pCell->phenotype.intracellular->need_update())
 	{
 		set_input_nodes(pCell);
 
-		MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
-
-		maboss_model->network.run_maboss();
-		// Get noisy step size
-		double next_run_in = maboss_model->network.get_time_to_update();
-		pCell->custom_data.variables.at(index_next_physibossa_run).value = PhysiCell_globals.current_time + next_run_in;
+		pCell->phenotype.intracellular->update();
 		
 		update_custom_variables(pCell);
 
@@ -212,9 +198,8 @@ void update_custom_variables( Cell* pCell )
 	pCell->custom_data.variables.at(index_tnf_concentration).value = 
 		pCell->phenotype.molecular.internalized_total_substrates[tnf_index];
 		
-	MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
-	pCell->custom_data.variables.at(index_tnf_node).value = maboss_model->network.get_node_value("TNF");
-	pCell->custom_data.variables.at(index_fadd_node).value = maboss_model->network.get_node_value("FADD");
+	pCell->custom_data.variables.at(index_tnf_node).value = pCell->phenotype.intracellular->get_boolean_node_value("TNF");
+	pCell->custom_data.variables.at(index_fadd_node).value = pCell->phenotype.intracellular->get_boolean_node_value("FADD");
 }
 
 void set_input_nodes(Cell* pCell) {
@@ -224,13 +209,12 @@ void set_input_nodes(Cell* pCell) {
 	if (tnf_index != -1)
 	{
 		double tnf_cell_concentration = pCell->phenotype.molecular.internalized_total_substrates[tnf_index];
-		MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
 
 		if (tnf_cell_concentration >= tnf_threshold)
-			maboss_model->network.set_node_value("TNF", 1);
+			pCell->phenotype.intracellular->set_boolean_node_value("TNF", 1);
 		else
 		{
-			maboss_model->network.set_node_value("TNF", 0);
+			pCell->phenotype.intracellular->set_boolean_node_value("TNF", 0);
 		}
 		
 	}
@@ -238,23 +222,21 @@ void set_input_nodes(Cell* pCell) {
 
 void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 {
-	MaBoSSIntracellular* maboss_model = getMaBoSSModel(pCell->phenotype);
-
-	if ( maboss_model->network.get_node_value( "Apoptosis" ) )
+	if ( pCell->phenotype.intracellular->get_boolean_node_value( "Apoptosis" ) )
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
 		return;
 	}
 
-	if ( maboss_model->network.get_node_value( "NonACD" ) )
+	if ( pCell->phenotype.intracellular->get_boolean_node_value( "NonACD" ) )
 	{
 		int necrosis_model_index = phenotype.death.find_death_model_index( "Necrosis" );
 		pCell->start_death(necrosis_model_index);
 		return;
 	}
 
-	if ( maboss_model->network.get_node_value( "Survival" ) )
+	if ( pCell->phenotype.intracellular->get_boolean_node_value( "Survival" ) )
 	{
 		do_proliferation( pCell, phenotype, dt );
 	}
@@ -264,7 +246,7 @@ void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
 
 	double tnf_secretion_rate = 0;
 	// produce some TNF
-	if ( maboss_model->network.get_node_value( "NFkB" ) )
+	if ( pCell->phenotype.intracellular->get_boolean_node_value( "NFkB" ) )
 	{
 		tnf_secretion_rate = (tnf_secretion / microenvironment.voxels(pCell->get_current_voxel_index()).volume);
 

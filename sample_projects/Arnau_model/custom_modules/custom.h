@@ -72,9 +72,6 @@
 #include "../modules/PhysiCell_standard_modules.h" 
 #include "custom_main.h"
 #include "custom_cell.h"
-#include "../addons/PhysiBoSSa/src/boolean_network.h"
-
-
 
 using namespace BioFVM; 
 using namespace PhysiCell;

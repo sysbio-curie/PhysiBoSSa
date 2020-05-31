@@ -67,9 +67,10 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <sstream>
 #include "./custom.h"
 #include "../BioFVM/BioFVM.h"  
-#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
+
 using namespace BioFVM;
 
 // declare cell definitions here 
@@ -172,7 +173,6 @@ void setup_tissue( void )
 		if ((phase+1) == 1)
 			pC->phenotype.cycle.pCycle_Model->phases[1].entry_function(pC, pC->phenotype, 0);
 		
-		pC->phenotype.intracellular->start();
 	}
 	std::cout << "tissue created" << std::endl;
 
