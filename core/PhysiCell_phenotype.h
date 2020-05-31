@@ -565,6 +565,8 @@ class Intracellular
 	
 	// Set value for boolean model
 	virtual void set_boolean_node_value(std::string name, bool value) = 0;
+	
+	virtual Intracellular* clone() = 0;
 };
 
 class Phenotype
@@ -596,6 +598,45 @@ class Phenotype
 	
 	// make sure cycle, death, etc. are synced to the defaults. 
 	void sync_to_default_functions( void ); // done 
+	
+	void operator=(const Phenotype &p ) { 
+		
+        flagged_for_division = p.flagged_for_division;
+		flagged_for_removal = p.flagged_for_removal;
+		
+		cycle = p.cycle;
+		death = p.death;
+		volume = p.volume;
+		geometry = p.geometry;
+		mechanics = p.mechanics;
+		motility = p.motility;
+		secretion = p.secretion;
+		
+		molecular = p.molecular;
+		
+		if (p.intracellular != NULL)
+			intracellular = p.intracellular->clone();
+   }
+	
+	
+	void operator=(Phenotype &p ) { 
+		
+        flagged_for_division = p.flagged_for_division;
+		flagged_for_removal = p.flagged_for_removal;
+		
+		cycle = p.cycle;
+		death = p.death;
+		volume = p.volume;
+		geometry = p.geometry;
+		mechanics = p.mechanics;
+		motility = p.motility;
+		secretion = p.secretion;
+		
+		molecular = p.molecular;
+		
+		if (p.intracellular != NULL)
+			intracellular = p.intracellular->clone();
+    }
 };
 
 };

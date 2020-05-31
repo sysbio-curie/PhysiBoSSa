@@ -910,17 +910,6 @@ Cell* create_cell( Cell_Definition& cd )
 	pNew->functions = cd.functions; 
 	
 	pNew->phenotype = cd.phenotype; 
-
-	if (cd.phenotype.intracellular != NULL) {	
-#ifdef ADDON_PHYSIBOSS
-		if (cd.phenotype.intracellular->type == "maboss") {
-			MaBoSSIntracellular* maboss_model = new MaBoSSIntracellular(getMaBoSSModel(cd.phenotype));
-			pNew->phenotype.intracellular = maboss_model->getIntracellularModel();
-			pNew->phenotype.intracellular->start();
-
-		}	
-#endif
-	}
 	
 	pNew->is_movable = true;
 	pNew->is_out_of_domain = false;
@@ -1441,18 +1430,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		// but recover the name and ID (type)
 		pCD->name = cd_node.attribute("name").value();
 		pCD->type = cd_node.attribute("ID").as_int(); 
-		
-		if (pParent->phenotype.intracellular != NULL) {
-			
-		#ifdef ADDON_PHYSIBOSS
-			if (pParent->phenotype.intracellular->type == "maboss") {
-				MaBoSSIntracellular* maboss_model = new MaBoSSIntracellular(getMaBoSSModel(pParent->phenotype));
-				pCD->phenotype.intracellular = maboss_model->getIntracellularModel();
-
-			}
-		#endif
-			
-		}
 	} 
 	
 	// sync to microenvironment
