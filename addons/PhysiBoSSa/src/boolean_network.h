@@ -62,6 +62,10 @@ class BooleanNetwork
 			this->maboss.set_discrete_time(discrete_time, time_tick); 
 		}
 		
+		void set_scaling(double scaling) {
+			this->maboss.set_scaling(scaling);
+		}
+		
 		/** \brief Get time to update*/
 		inline double get_time_to_update() {return this->time_to_update;}
 		

@@ -20,6 +20,9 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 	bnd_filename = copy->bnd_filename;
 	cfg_filename = copy->cfg_filename;
 	time_step = copy->time_step;
+	discrete_time = copy->discrete_time;
+	time_tick = copy->time_tick;
+	scaling = copy->scaling;
 	initial_values = copy->initial_values;
 	mutations = copy->mutations;
 	parameters = copy->parameters;
@@ -31,6 +34,7 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 		);
 		network.set_time_step(copy->time_step);
 		network.set_discrete_time(copy->discrete_time, copy->time_tick);
+		network.set_scaling(copy->scaling);
 		network.restart_nodes();
 	}	
 }
@@ -115,7 +119,12 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 		network.set_discrete_time(discrete_time, time_tick);
 	}
 
-	
+	pugi::xml_node node_scaling = node.child( "scaling" ); 
+	if( node_scaling )
+	{ 
+		scaling = PhysiCell::xml_get_my_double_value( node_scaling );
+		network.set_scaling(scaling);
+	}
 	
 }
 

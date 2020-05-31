@@ -26,9 +26,16 @@ class MaBoSSNetwork
 
 		StochasticSimulationEngine* engine;
 		
+<<<<<<< HEAD
 		/** \brief Time step between each MaBoSS simulation */
 		double update_time_step = 12;
 
+=======
+		/** \brief Time step to update the cycle */
+		double update_time_step = 12.0;
+		double scaling = 1.0;
+		
+>>>>>>> Add scaling to modify simulation timescale
 		/** \brief Initial value probabilities, by node */
 		std::map< std::string, double > initial_values;
 		
@@ -107,6 +114,13 @@ class MaBoSSNetwork
 		 * \param time_step Time step between each MaBoSS simulation
 		 */
 		inline void set_update_time_step(double time_step) { this->update_time_step = time_step;}
+		
+		/** \brief Change simulation mode */
+		inline void set_discrete_time(bool discrete_time, double time_tick) { 
+			this->engine->setDiscreteTime(discrete_time); this->engine->setTimeTick(time_tick); 
+		}
+
+		inline void set_scaling(double scaling) { this->scaling = scaling; }
 		
 		/** 
 		 * \brief Print current state of all the nodes of the network 
