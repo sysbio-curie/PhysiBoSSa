@@ -216,6 +216,7 @@
 					<bnd_filename>./config/boolean_network/TNF_nodes.bnd</bnd_filename>
 					<cfg_filename>./config/boolean_network/TNF_conf.cfg</cfg_filename>
 					<time_step>12</time_step>
+					<scaling>12</scaling>
 				</intracellular>
 			</phenotype>
 			<custom_data>
