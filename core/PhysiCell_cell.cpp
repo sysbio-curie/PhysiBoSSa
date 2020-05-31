@@ -936,6 +936,8 @@ Cell* create_cell( Cell_Definition& cd )
 		if (cd.phenotype.intracellular->type == "maboss") {
 			MaBoSSIntracellular* maboss_model = new MaBoSSIntracellular(getMaBoSSModel(cd.phenotype));
 			pNew->phenotype.intracellular = maboss_model->getIntracellularModel();
+			pNew->phenotype.intracellular->start();
+
 		}	
 #endif
 	}
