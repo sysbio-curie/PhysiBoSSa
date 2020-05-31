@@ -162,8 +162,7 @@ class Cell : public Basic_Agent
 
 	Cell_State state; 
 	Phenotype phenotype; 
-
-
+	
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 
 	
@@ -227,6 +226,7 @@ class Cell : public Basic_Agent
 
 Cell* create_cell( Cell* (*custom_instantiate)() = NULL );  
 Cell* create_cell( Cell_Definition& cd );  
+
 
 void delete_cell( int ); 
 void delete_cell( Cell* ); 
