@@ -215,6 +215,16 @@ covid19:
 	mkdir -p ./scripts/
 	cp ./sample_projects/covid19/scripts/* ./scripts/
 
+mycovid19:
+	cp -r ./sample_projects/mycovid19/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/mycovid19/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/mycovid19/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/mycovid19/config/* ./config/
+	mkdir -p ./scripts/
+	cp ./sample_projects/mycovid19/scripts/* ./scripts/
 
 drug-AGS: 	
 	cp ./sample_projects/drug_AGS/custom_modules/* ./custom_modules/

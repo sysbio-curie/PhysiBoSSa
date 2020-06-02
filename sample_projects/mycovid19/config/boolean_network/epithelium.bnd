@@ -1,0 +1,35 @@
+Node Presence_Virus {
+  logic = Presence_Virus;
+  rate_up  = @logic ? $binding : 0; 
+  rate_down  = @logic ? 0 : $unbinding;
+}
+
+Node BoundReceptor {
+  logic = Presence_Virus & !Internal;
+  rate_up  = @logic ? $binding : 0; 
+  rate_down  = @logic ? 0 : $unbinding;
+}
+
+Node Internal {
+  logic = !Internal;
+  rate_up = @logic ? $endocytosis : 0;
+  rate_down  = @logic ? 0 : $exocytosis;
+}
+
+Node Replicate_Virus {
+  logic = BoundReceptor & Internal;
+  rate_up = @logic ? $virus_replication : 0;
+  rate_down  = @logic ? 0 : $virus_replication_stop;
+}
+
+Node Export_Virus {
+  logic = Replicate_Virus;
+  rate_up = @logic ? $virus_export : 0;
+  rate_down  = @logic ? 0 : $virus_export_stop;
+}
+
+Node Death {
+  logic = Replicate_Virus;
+  rate_up = @logic ? $death_rate : 0;
+  rate_down = 0;
+}
