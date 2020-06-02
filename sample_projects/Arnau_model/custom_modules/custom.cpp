@@ -67,11 +67,9 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <sstream>
 #include "./custom.h"
 #include "../BioFVM/BioFVM.h"  
-#include "../addons/PhysiBoSSa/src/boolean_network.h"
-#include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
-#include <math.h>
 using namespace BioFVM;
 
 // declare cell definitions here 
