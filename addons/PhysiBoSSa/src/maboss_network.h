@@ -42,6 +42,7 @@ class MaBoSSNetwork
 		/** \brief Mutations to apply to the network */
 		std::map< std::string, double > mutations;
 	
+		std::map< std::string, Node*> nodesByName;
 		inline void set_time_to_update(){this->time_to_update = (PhysiCell::UniformRandom()+0.5) * this->get_update_time_step();}
 
 	
@@ -52,6 +53,7 @@ class MaBoSSNetwork
 			network = NULL;
 			config = NULL;
 			engine = NULL;
+			this->nodesByName.clear();
 		}
 		
 		/** Desctructor */

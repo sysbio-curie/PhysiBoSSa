@@ -22,13 +22,16 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 	engine = new StochasticSimulationEngine(this->network, this->config, PhysiCell::UniformInt());
 
 	this->update_time_step = this->config->getMaxTime();
+	
+	for (auto node : this->network->getNodes()) {
+		this->nodesByName[node->getLabel()] = node;
+	}
 }
 
 void MaBoSSNetwork::mutate(std::map<std::string, double> mutations) 
 {
 	for (auto mutation : mutations) {
-		Node * node = this->network->getNode(mutation.first);
-		node->mutate(mutation.second);
+		nodesByName[mutation.first]->mutate(mutation.second);
 	}
 }
 
@@ -49,7 +52,7 @@ void MaBoSSNetwork::restart_node_values()
 	this->network->initStates(state, engine->random_generator);
 	
 	for (auto initial_value : initial_values) {
-		state.setNodeState(network->getNode(initial_value.first), PhysiCell::UniformRandom() < initial_value.second);
+		state.setNodeState(nodesByName[initial_value.first], PhysiCell::UniformRandom() < initial_value.second);
 	}
 	
 	this->set_time_to_update();
@@ -65,15 +68,15 @@ void MaBoSSNetwork::run_simulation()
 }
 
 bool MaBoSSNetwork::has_node( std::string name ) {
-	return network->isNodeDefined(name);
+	return nodesByName.find(name) != nodesByName.end();
 }
 
 void MaBoSSNetwork::set_node_value(std::string name, bool value) {
-	state.setNodeState(network->getNode(name), value);
+	state.setNodeState(nodesByName[name], value);
 }
 
 bool MaBoSSNetwork::get_node_value(std::string name) {
-	return state.getNodeState(network->getNode(name));
+	return state.getNodeState(nodesByName[name]);
 }
 
 /* Print current state of all the nodes of the network */
