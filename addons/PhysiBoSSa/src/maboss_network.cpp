@@ -1,5 +1,4 @@
 #include "maboss_network.h"
-#include "../../../core/PhysiCell_utilities.h"
 
 /* Default constructor */
 void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile)
@@ -24,26 +23,6 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 	engine = new StochasticSimulationEngine(this->network, this->config, PhysiCell::UniformInt());
 
 	this->update_time_step = this->config->getMaxTime();
-	
-	// Initialize the map relation between node name and index positions
-	int i = 0;
-	std::vector<Node *> nodes = this->network->getNodes();
-	for (auto node : nodes)
-	{
-		this->node_names[ node->getLabel() ] = i;
-		i++;
-	}
-}
-
-/** Default estructor */
-void MaBoSSNetwork::delete_maboss()
-{
-	delete this->engine;
-	this->engine = NULL;
-	delete this->network;
-	this->network = NULL;
-	delete this->config;
-	this->config = NULL;
 }
 
 void MaBoSSNetwork::mutate(std::map<std::string, double> mutations) 
@@ -64,88 +43,48 @@ void MaBoSSNetwork::set_parameters(std::map<std::string, double> parameters)
 	}
 }
 
-
-/* Creates a NetworkState_Impl from the input vector */
-NetworkState_Impl MaBoSSNetwork::create_networkstate(std::vector<bool>* input)
-{
-	int i = 0;
-	std::vector<Node*> nodes = this->network->getNodes();
-	NetworkState state;
-	for (auto node : nodes)
-	{
-		state.setNodeState(node, (NodeState) (*input)[i]);
-		i ++;
-	}
-	return state.getState();
-}
-
-/* Transfer state values to an output vector */
-void MaBoSSNetwork::retrieve_networkstate_values(NetworkState_Impl input_state, std::vector<bool>* output)
-{
-	int i = 0;
-	std::vector<Node*> nodes = this->network->getNodes();
-	NetworkState state = (NetworkState) input_state;
-	for ( auto node: nodes )
-	{
-		(*output)[i] = state.getNodeState( node ) ;
-		i++;
-	}
-}
-
 /* Reset a vector of bools to the init state of the network */
-void MaBoSSNetwork::restart_node_values(std::vector<bool>* output)
+void MaBoSSNetwork::restart_node_values()
 {
-	// Create MaBoSS objects to get an initial state of the network
-	NetworkState network_state;
-	// Create MaBoSS initial states
-	this->network->initStates(network_state, engine->random_generator);
-
-	// Transfer network state to output vector
-	int i = 0;
-	std::vector<Node *> nodes = this->network->getNodes();
-	(*output).resize(nodes.size());
-	for (auto node : nodes)
-	{
-		(*output)[i] =  network_state.getNodeState( node );
-		i++;
-	}
+	// NetworkState network_state;
+	this->network->initStates(state, engine->random_generator);
 	
 	for (auto initial_value : initial_values) {
-		(*node_values)[node_names[initial_value.first]] = PhysiCell::UniformRandom() < initial_value.second;
+		state.setNodeState(network->getNode(initial_value.first), PhysiCell::UniformRandom() < initial_value.second);
 	}
+	
+	this->set_time_to_update();
 }
 
 /* Run a MaBoSS simulation with the input values*/
-void MaBoSSNetwork::run_simulation(std::vector<bool>* node_values, double time_to_update)
+void MaBoSSNetwork::run_simulation()
 {	
-	NetworkState_Impl state = this->create_networkstate(node_values);
-
 	engine->setMaxTime(time_to_update/scaling);
-	state = engine->run(&state, NULL);
+	state = engine->run(state, NULL);
+	this->set_time_to_update();
 
-	this->retrieve_networkstate_values(state, node_values);
 }
 
-/* Return the index of node based on node name */
-int MaBoSSNetwork::get_maboss_node_index( std::string name )
-{
-	auto res = this->node_names.find(name);
-	if ( res != this->node_names.end() )
-		return res->second;
-	
-	// If node name is noy found, throw an exception
-	std::string err_msg = "A node with name " + name + " does not exist in the network.";
-	throw std::invalid_argument(err_msg);
+bool MaBoSSNetwork::has_node( std::string name ) {
+	return network->isNodeDefined(name);
+}
+
+void MaBoSSNetwork::set_node_value(std::string name, bool value) {
+	state.setNodeState(network->getNode(name), value);
+}
+
+bool MaBoSSNetwork::get_node_value(std::string name) {
+	return state.getNodeState(network->getNode(name));
 }
 
 /* Print current state of all the nodes of the network */
-void MaBoSSNetwork::print_nodes(std::vector<bool>* node_values)
+void MaBoSSNetwork::print_nodes()
 {
 	int i = 0;
 	std::vector<Node*> nodes = this->network->getNodes();
 	for ( auto node: nodes )
 	{
-		std::cout << node->getLabel() << "=" << (*node_values)[i] << "; ";
+		std::cout << node->getLabel() << "=" << state.getNodeState(node) << "; ";
 		i++;
 	}
 	std::cout << std::endl;
