@@ -15,6 +15,7 @@
 #include "BooleanNetwork.h"
 #include "RunConfig.h"
 #include "utils.h"
+#include "../../../core/PhysiCell_utilities.h"
 
 class MaBoSSNetwork
 {
@@ -25,9 +26,14 @@ class MaBoSSNetwork
 		RunConfig* config;
 
 		StochasticSimulationEngine* engine;
+		NetworkState state;
 		
 		/** \brief Time step to update the cycle */
 		double update_time_step = 12.0;
+		
+		/** \brief Real time to update, after applying noise */
+		double time_to_update;
+
 		double scaling = 1.0;
 		
 		/** \brief Initial value probabilities, by node */
@@ -35,22 +41,27 @@ class MaBoSSNetwork
 		
 		/** \brief Mutations to apply to the network */
 		std::map< std::string, double > mutations;
+	
+		inline void set_time_to_update(){this->time_to_update = (PhysiCell::UniformRandom()+0.5) * this->get_update_time_step();}
 
-		/** \brief Names and indices of network nodes */
-		std::map< std::string, int > node_names;
-
-		/** \brief Given a vectors of bools, returns the corresponding state */
-		NetworkState_Impl load_state(std::vector<bool>* input);
-
-		/** \brief Given a state and a vectors of bools, writes the states into the vector */
-		void recover_state(NetworkState_Impl state, std::vector<bool>* output);
-
+	
 	public:
 	
 		/** Constructor */
 		MaBoSSNetwork() {
 			network = NULL;
 			config = NULL;
+			engine = NULL;
+		}
+		
+		/** Desctructor */
+		~MaBoSSNetwork() {
+			delete this->engine;
+			this->engine = NULL;
+			delete this->network;
+			this->network = NULL;
+			delete this->config;
+			this->config = NULL;
 		}
 		
 		/** \brief Initialize network */
@@ -64,27 +75,32 @@ class MaBoSSNetwork
 
 		void set_parameters(std::map<std::string, double> parameters);
 
-		/** \brief Destructor */
-		void delete_maboss();
-
 		/** \brief Restart a vector of bools, to the init values of the network */
-		void restart_node_values(std::vector<bool>* node_values);
+		void restart_node_values();
 
 		/** \brief Run the current network*/
-		void run_simulation(std::vector<bool>* node_values, double time_to_update);
+		void run_simulation();
 
 		/** \brief Return node of given name current value
 		 *
 		 * Return -1 if node doesn't exit \n
 		 * Return 0 if node is 0 \n
 		 * Return 1 if node is 1 */
-		int get_maboss_node_index( std::string name );
+		// int get_maboss_node_index( std::string name );
 
+		bool has_node( std::string name );
+		void set_node_value(std::string name, bool value);
+		bool get_node_value(std::string name);
+		
 		/** \brief Return update time value */
 		inline double get_update_time_step(){ return this->update_time_step; }
 
 		/** \brief Setter update time */
 		inline void set_update_time_step(double time_step) { this->update_time_step = time_step;}
+		
+		
+		/** \brief Get time to update*/
+		inline double get_time_to_update() {return this->time_to_update;}
 		
 		/** \brief Change simulation mode */
 		inline void set_discrete_time(bool discrete_time, double time_tick) { 
@@ -94,7 +110,10 @@ class MaBoSSNetwork
 		inline void set_scaling(double scaling) { this->scaling = scaling; }
 		
 		/** \brief Print current state of all the nodes of the network */
-		void print_nodes(std::vector<bool>* node_values);
+		void print_nodes();
+		
+		
+
 };
 
 #endif

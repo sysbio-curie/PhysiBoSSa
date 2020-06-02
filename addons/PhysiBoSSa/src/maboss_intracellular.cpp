@@ -27,15 +27,15 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 	mutations = copy->mutations;
 	parameters = copy->parameters;
 	
-	if (copy->network.has_init()) {
-		network.initialize_boolean_network(
-			copy->bnd_filename, copy->cfg_filename,
-			copy->initial_values, copy->mutations, copy->parameters
-		);
-		network.set_time_step(copy->time_step);
-		network.set_discrete_time(copy->discrete_time, copy->time_tick);
-		network.set_scaling(copy->scaling);
-		network.restart_nodes();
+	if (copy->maboss.has_init()) {
+		maboss.init_maboss(copy->bnd_filename, copy->cfg_filename);
+		maboss.mutate(mutations);
+		maboss.set_initial_values(initial_values);
+		maboss.set_parameters(parameters);
+		maboss.set_update_time_step(copy->time_step);
+		maboss.set_discrete_time(copy->discrete_time, copy->time_tick);
+		maboss.set_scaling(copy->scaling);
+		maboss.restart_node_values();
 	}	
 }
 
@@ -94,19 +94,16 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 		}
 	}
 	
-	network.initialize_boolean_network(
-		bnd_filename, 
-		cfg_filename,
-		initial_values,
-		mutations,
-		parameters
-	);
+	maboss.init_maboss(bnd_filename, cfg_filename);
+	maboss.mutate(mutations);
+	maboss.set_initial_values(initial_values);
+	maboss.set_parameters(parameters);	
 	
 	pugi::xml_node node_timestep = node.child( "time_step" ); 
 	if( node_timestep )
 	{ 
 		time_step = PhysiCell::xml_get_my_double_value( node_timestep );
-		network.set_time_step(time_step);
+		maboss.set_update_time_step(time_step);
 	}
 	
 	pugi::xml_node node_discretetime = node.child( "discrete_time" ); 
@@ -116,14 +113,14 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 	{ 
 		discrete_time = PhysiCell::xml_get_my_bool_value( node_discretetime );		
 		time_tick = PhysiCell::xml_get_my_double_value( node_timetick );
-		network.set_discrete_time(discrete_time, time_tick);
+		maboss.set_discrete_time(discrete_time, time_tick);
 	}
 
 	pugi::xml_node node_scaling = node.child( "scaling" ); 
 	if( node_scaling )
 	{ 
 		scaling = PhysiCell::xml_get_my_double_value( node_scaling );
-		network.set_scaling(scaling);
+		maboss.set_scaling(scaling);
 	}
 	
 }

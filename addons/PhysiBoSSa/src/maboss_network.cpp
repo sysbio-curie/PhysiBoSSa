@@ -1,5 +1,4 @@
 #include "maboss_network.h"
-#include "../../../core/PhysiCell_utilities.h"
 
 /* Default constructor */
 void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile)
@@ -23,25 +22,6 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 	engine = new StochasticSimulationEngine(this->network, this->config, PhysiCell::UniformInt());
 
 	this->update_time_step = this->config->getMaxTime();
-	
-	int i = 0;
-	std::vector<Node *> nodes = this->network->getNodes();
-	for (auto node : nodes)
-	{
-		this->node_names[ node->getLabel() ] = i;
-		i++;
-	}
-}
-
-/** Default estructor */
-void MaBoSSNetwork::delete_maboss()
-{
-	delete this->engine;
-	this->engine = NULL;
-	delete this->network;
-	this->network = NULL;
-	delete this->config;
-	this->config = NULL;
 }
 
 void MaBoSSNetwork::mutate(std::map<std::string, double> mutations) 
@@ -62,84 +42,48 @@ void MaBoSSNetwork::set_parameters(std::map<std::string, double> parameters)
 	}
 }
 
-
-/* Creates a NetworkState_Impl from the input */
-NetworkState_Impl MaBoSSNetwork::load_state(std::vector<bool>* input)
-{
-	int i = 0;
-	std::vector<Node*> nodes = this->network->getNodes();
-	NetworkState state_to_load;
-	for (auto node : nodes)
-	{
-		state_to_load.setNodeState(node, (NodeState) (*input)[i]);
-		i ++;
-	}
-	return state_to_load.getState();
-}
-
-/* Transfer state values to a vector of bools */
-void MaBoSSNetwork::recover_state(NetworkState_Impl state, std::vector<bool>* output)
-{
-	int i = 0;
-	std::vector<Node*> nodes = this->network->getNodes();
-	NetworkState state_to_retrieve = (NetworkState) state;
-	for ( auto node: nodes )
-	{
-		(*output)[i] = state_to_retrieve.getNodeState( node ) ;
-		i++;
-	}
-}
-
 /* Reset a vector of bools to the init state of the network */
-void MaBoSSNetwork::restart_node_values(std::vector<bool>* node_values)
+void MaBoSSNetwork::restart_node_values()
 {
-	NetworkState network_state;
-	this->network->initStates(network_state, engine->random_generator);
-
-	int i = 0;
-	std::vector<Node *> nodes = this->network->getNodes();
-	(*node_values).resize(nodes.size());
-	for (auto node : nodes)
-	{
-		(*node_values)[i] =  network_state.getNodeState( node ) ;;
-		i++;
-	}
+	// NetworkState network_state;
+	this->network->initStates(state, engine->random_generator);
 	
 	for (auto initial_value : initial_values) {
-		(*node_values)[node_names[initial_value.first]] = PhysiCell::UniformRandom() < initial_value.second;
+		state.setNodeState(network->getNode(initial_value.first), PhysiCell::UniformRandom() < initial_value.second);
 	}
+	
+	this->set_time_to_update();
 }
 
 /* Run the current network */
-void MaBoSSNetwork::run_simulation(std::vector<bool>* node_values, double time_to_update)
+void MaBoSSNetwork::run_simulation()
 {	
-	NetworkState_Impl state = this->load_state(node_values);
-
 	engine->setMaxTime(time_to_update/scaling);
-	state = engine->run(&state, NULL);
+	state = engine->run(state, NULL);
+	this->set_time_to_update();
 
-	this->recover_state(state, node_values);
 }
 
-/* Return the index of node based on node's name */
-int MaBoSSNetwork::get_maboss_node_index( std::string name )
-{
-	auto res = this->node_names.find(name);
-	if ( res != this->node_names.end() )
-		return res->second;
-		
-	std::string err_msg = "A node with name " + name + " does not exist in the network.";
-	throw std::invalid_argument(err_msg);
+bool MaBoSSNetwork::has_node( std::string name ) {
+	return network->isNodeDefined(name);
+}
+
+void MaBoSSNetwork::set_node_value(std::string name, bool value) {
+	state.setNodeState(network->getNode(name), value);
+}
+
+bool MaBoSSNetwork::get_node_value(std::string name) {
+	return state.getNodeState(network->getNode(name));
 }
 
 /* Print current state of all the nodes of the network */
-void MaBoSSNetwork::print_nodes(std::vector<bool>* node_values)
+void MaBoSSNetwork::print_nodes()
 {
 	int i = 0;
 	std::vector<Node*> nodes = this->network->getNodes();
 	for ( auto node: nodes )
 	{
-		std::cout << node->getLabel() << "=" << (*node_values)[i] << "; ";
+		std::cout << node->getLabel() << "=" << state.getNodeState(node) << "; ";
 		i++;
 	}
 	std::cout << std::endl;
