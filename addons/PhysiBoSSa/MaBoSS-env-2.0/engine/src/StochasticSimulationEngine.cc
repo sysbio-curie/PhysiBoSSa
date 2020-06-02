@@ -58,18 +58,18 @@ NodeIndex StochasticSimulationEngine::getTargetNode(RandomGenerator *random_gene
   return node_idx;
 }
 
-NetworkState_Impl StochasticSimulationEngine::run(NetworkState_Impl* initial_state, std::ostream *output_traj)
+NetworkState StochasticSimulationEngine::run(NetworkState& initial_state, std::ostream *output_traj)
 {
   const std::vector<Node *> &nodes = network->getNodes();
   std::vector<Node *>::const_iterator begin = nodes.begin();
   std::vector<Node *>::const_iterator end = nodes.end();
   NetworkState network_state;
     
-  if (initial_state != NULL) {
-    network_state = *initial_state;
-  } else {
-    network->initStates(network_state, random_generator);
-  }
+  // if ( != NULL) {
+    network_state = initial_state;
+  // } else {
+  //   network->initStates(network_state, random_generator);
+  // }
   
   double tm = 0.;
   unsigned int step = 0;
@@ -142,5 +142,5 @@ NetworkState_Impl StochasticSimulationEngine::run(NetworkState_Impl* initial_sta
     step++;
   }
   
-  return network_state.getState();
+  return network_state;
 }

@@ -77,7 +77,7 @@ public:
   void setDiscreteTime(bool _discrete_time) { this->discrete_time = _discrete_time; }
   void setTimeTick(double _time_tick) { this->time_tick = _time_tick; }
   
-  NetworkState_Impl run(NetworkState_Impl* initial_state = NULL, std::ostream* output_traj = NULL);
+  NetworkState run(NetworkState& initial_state, std::ostream* output_traj = NULL);
 };
 
 #endif
