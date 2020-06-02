@@ -167,10 +167,7 @@ reset:
 animate:
 	ffmpeg -i output/snapshot%8d.svg animation.mp4; vlc animation.mp4
 
-MaBoSS-clean:
-	cd $(MABOSS_DIR)/src && make clean
-	
-clean: MaBoSS-clean
+clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
 	
