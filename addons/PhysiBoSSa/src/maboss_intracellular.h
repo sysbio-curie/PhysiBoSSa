@@ -6,7 +6,7 @@
 #include "../../../core/PhysiCell_phenotype.h"
 #include "../../../core/PhysiCell_cell.h"
 #include "../../../modules/PhysiCell_pugixml.h"
-#include "boolean_network.h"
+#include "maboss_network.h"
 
 class MaBoSSIntracellular : public PhysiCell::Intracellular {
  private:
@@ -26,8 +26,8 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	std::map<std::string, double> mutations;
 	std::map<std::string, double> parameters;
 	
-	BooleanNetwork network;
-	
+	MaBoSSNetwork maboss;
+
 	double next_physiboss_run = 0;
 
 	MaBoSSIntracellular();
@@ -46,12 +46,12 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	void initialize_intracellular_from_pugixml(pugi::xml_node& node);
 	
 	void start() {
-		this->network.restart_nodes();
+		this->maboss.restart_node_values();
 	}
 	
 	void update() {
-		this->network.run_maboss();
-		this->next_physiboss_run += this->network.get_time_to_update();
+		this->maboss.run_simulation();
+		this->next_physiboss_run += this->maboss.get_time_to_update();
 	}
 	
 	bool need_update() {
@@ -59,15 +59,15 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	}
 	
 	bool has_node(std::string name) {
-		return this->network.get_node_index(name) >= 0;
+		return this->maboss.has_node(name);
 	}
 	
 	bool get_boolean_node_value(std::string name) {
-		return this->network.get_node_value(name);
+		return this->maboss.get_node_value(name);
 	}
 	
 	void set_boolean_node_value(std::string name, bool value) {
-		this->network.set_node_value(name, value);
+		this->maboss.set_node_value(name, value);
 	}
 };
 
