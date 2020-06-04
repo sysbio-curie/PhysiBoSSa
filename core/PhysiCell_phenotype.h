@@ -566,6 +566,8 @@ class Intracellular
 	// Set value for boolean model
 	virtual void set_boolean_node_value(std::string name, bool value) = 0;
 	
+	virtual std::string get_state() = 0;
+	
 	virtual Intracellular* clone() = 0;
 };
 
