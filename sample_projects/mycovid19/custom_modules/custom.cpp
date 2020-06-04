@@ -105,7 +105,9 @@ void create_cell_types( void )
 	
 	Cell_Definition* epitheliumCD = find_cell_definition("lung epithelium"); 
 	Epithelial_Cell::setup_cell_definition(epitheliumCD);
-	
+	epitheliumCD->phenotype.secretion.sync_to_microenvironment( &microenvironment );
+	epitheliumCD->phenotype.molecular.sync_to_microenvironment( &microenvironment );
+
 	// register the submodels 
 	// (which ensures that the cells have all the internal variables they need) 
 	

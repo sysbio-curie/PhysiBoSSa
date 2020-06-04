@@ -20,14 +20,14 @@ void Epithelial_Cell::set_input_nodes(Cell* pCell)
 	int virion_index = pCell->get_microenvironment()->find_density_index( "virion" );
     if (static_cast<Epithelial_Cell*>(pCell)->isInfected)
 	{
-		std::cout << "We are infected (" << &pCell << ")" << std::endl;
+		// std::cout << "We are infected (" << &pCell << ")" << std::endl;
 		pCell->phenotype.intracellular->set_boolean_node_value("Presence_Virus", true);
 		
-	} else if (pCell->nearest_density_vector()[virion_index] > 0.1) {
-		std::cout << "We are feeling the virus (" << &pCell << ")" << std::endl;
+	} else if (pCell->nearest_density_vector()[virion_index] > pCell->custom_data["virion_detection_threshold"]) {
+		// std::cout << "We are feeling the virus (" << &pCell << ")" << std::endl;
 		pCell->phenotype.intracellular->set_boolean_node_value("Presence_Virus", true);
 		
-		pCell->nearest_density_vector()[virion_index] -= 0.1;
+		// pCell->nearest_density_vector()[virion_index] -= 0.1;
 	}
 }	
 
@@ -46,19 +46,15 @@ void Epithelial_Cell::from_nodes_to_cell(Cell* pCell)
 	{
 		static_cast<Epithelial_Cell*>(pCell)->isInfectious = true;	
 
-		std::cout << "We are infectious (" << &pCell << ")" << std::endl;
-		//Export virus to microenvironment, at a specific rate
-		
-		// int virus_external = ; 
-		// phenotype.secretion.net_export_rates[virus_external] = 1;
+		// std::cout << "We are infectious (" << &pCell << ")" << std::endl;
 		int virion_index = pCell->get_microenvironment()->find_density_index( "virion" );
-
-		pCell->nearest_density_vector()[virion_index] = 1;
+		// pCell->nearest_density_vector()[virion_index] += 10;
+		pCell->phenotype.secretion.net_export_rates[virion_index] = pCell->custom_data["virion_export_rate"];
 
 	}
 	
 	if (pCell->phenotype.intracellular->get_boolean_node_value("Death")) {
-		std::cout << "We are dying (" << &pCell << ")" << std::endl;
+		// std::cout << "We are dying (" << &pCell << ")" << std::endl;
 		static int apoptosis_index = pCell->phenotype.death.find_death_model_index( "apoptosis" ); 
 		pCell->start_death(apoptosis_index);
 	}
