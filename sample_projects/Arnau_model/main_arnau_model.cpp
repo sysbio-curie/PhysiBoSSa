@@ -77,6 +77,7 @@
 #include "./modules/PhysiCell_standard_modules.h" 
 #include "./custom_modules/custom_main.h"
 // put custom code modules here! 
+#include "./addons/PhysiBoSSa/src/maboss_intracellular.h"
 
 #include "./custom_modules/custom.h" 
 	
@@ -139,6 +140,7 @@ int main( int argc, char* argv[] )
 	
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
+	MaBoSSIntracellular::save_PhysiBoSS( PhysiCell_settings.folder, "initial" );
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
 
@@ -187,6 +189,11 @@ int main( int argc, char* argv[] )
 					sprintf( filename , "%s/output%08u" , PhysiCell_settings.folder.c_str(),  PhysiCell_globals.full_output_index ); 
 					
 					save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
+					
+					char index_str[16];
+					sprintf(index_str, "%08u", PhysiCell_globals.full_output_index);
+					MaBoSSIntracellular::save_PhysiBoSS( PhysiCell_settings.folder, std::string(index_str) );
+
 				}
 				
 				PhysiCell_globals.full_output_index++; 
