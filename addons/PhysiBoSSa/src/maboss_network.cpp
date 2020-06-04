@@ -80,6 +80,10 @@ bool MaBoSSNetwork::get_node_value(std::string name) {
 	return state.getNodeState(nodesByName[name]);
 }
 
+std::string MaBoSSNetwork::get_state() {
+	return state.getName(network);
+}
+
 /* Print current state of all the nodes of the network */
 void MaBoSSNetwork::print_nodes()
 {
