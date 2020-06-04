@@ -122,10 +122,24 @@ void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& 
 		scaling = PhysiCell::xml_get_my_double_value( node_scaling );
 		maboss.set_scaling(scaling);
 	}
-	
 }
 
 MaBoSSIntracellular* getMaBoSSModel(PhysiCell::Phenotype& phenotype) {
 	return static_cast<MaBoSSIntracellular*>(phenotype.intracellular);
 }
 
+void MaBoSSIntracellular::save_PhysiBoSS(std::string path, std::string index)
+{
+
+	std::string state_file_name = path + "/states_" + index + ".csv";
+					
+	std::ofstream state_file( state_file_name );
+	
+	state_file << "ID,state" << std::endl;
+
+	for( auto cell : *PhysiCell::all_cells )
+		state_file << cell->ID << "," << cell->phenotype.intracellular->get_state() << std::endl;
+		
+	state_file.close();
+
+}
