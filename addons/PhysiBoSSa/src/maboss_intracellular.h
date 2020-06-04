@@ -69,6 +69,10 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	void set_boolean_node_value(std::string name, bool value) {
 		this->maboss.set_node_value(name, value);
 	}
+	
+	std::string get_state() {
+		return this->maboss.get_state();
+	}
 };
 
 #endif
