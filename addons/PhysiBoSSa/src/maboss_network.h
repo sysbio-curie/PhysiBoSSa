@@ -93,6 +93,7 @@ class MaBoSSNetwork
 		bool has_node( std::string name );
 		void set_node_value(std::string name, bool value);
 		bool get_node_value(std::string name);
+		std::string get_state();
 		
 		/** \brief Return update time value */
 		inline double get_update_time_step(){ return this->update_time_step; }
