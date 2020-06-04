@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include "../../../core/PhysiCell.h"
 #include "../../../core/PhysiCell_phenotype.h"
 #include "../../../core/PhysiCell_cell.h"
 #include "../../../modules/PhysiCell_pugixml.h"
@@ -73,6 +74,8 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	std::string get_state() {
 		return this->maboss.get_state();
 	}
+	
+	static void save_PhysiBoSS(std::string path, std::string index);
 };
 
 #endif
