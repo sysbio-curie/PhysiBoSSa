@@ -68,14 +68,6 @@
 #include "../core/PhysiCell.h"
 #include "../modules/PhysiCell_standard_modules.h" 
 
-// #include "./submodel_data_structures.h" 
-// #include "./internal_viral_dynamics.h"
-// #include "./internal_viral_response.h" 
-// #include "./receptor_dynamics.h" 
-// #include "./immune_submodels.h" 
-// #include "./epithelium_submodel.h" 
-#include "Epithelial_cell.h"
-
 using namespace BioFVM; 
 using namespace PhysiCell;
 
@@ -88,11 +80,6 @@ void setup_tissue( void );
 void setup_microenvironment( void ); 
 
 // custom pathology coloring function 
-
-// std::string blue_yellow_interpolation( double min, double val, double max );
-// std::vector<std::string> epithelium_coloring_function( Cell* );
 std::vector<std::string> tissue_coloring_function( Cell* );
-
-// eventually move this to a tissue submodel 
-
-// void move_exported_to_viral_field( void ); 
+ 
+void update_tissue(double diffusion_dt);
