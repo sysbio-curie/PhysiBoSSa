@@ -33,3 +33,13 @@ Node Death {
   rate_up = @logic ? $death_rate : 0;
   rate_down = 0;
 }
+
+Node TCellBound {
+  logic = TCellBound;
+}
+
+Node DeathByTCell {
+  logic = TCellBound;
+  rate_up = @logic ? $death_rate_by_tcell : 0;
+  rate_down = 0;
+}

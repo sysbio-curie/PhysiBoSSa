@@ -66,6 +66,9 @@
 */
 
 #include "./custom.h"
+#include "./Epithelial_cell.h"
+#include "./Macrophage.h"
+#include "./TCell.h"
 
 void create_cell_types( void )
 {
@@ -89,7 +92,6 @@ void create_cell_types( void )
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
 	int virion_index = microenvironment.find_density_index( "virion" ); 
-	int assembled_virion_index = microenvironment.find_density_index( "assembled virion" );
 	
 	/*
 	   This parses the cell definitions in the XML config file. 
@@ -105,26 +107,16 @@ void create_cell_types( void )
 	
 	Cell_Definition* epitheliumCD = find_cell_definition("lung epithelium"); 
 	Epithelial_Cell::setup_cell_definition(epitheliumCD);
-	epitheliumCD->phenotype.secretion.sync_to_microenvironment( &microenvironment );
-	epitheliumCD->phenotype.molecular.sync_to_microenvironment( &microenvironment );
+	epitheliumCD->phenotype.sync_to_microenvironment( &microenvironment );
 
-	// register the submodels 
-	// (which ensures that the cells have all the internal variables they need) 
+	Cell_Definition* macrophagesCD = find_cell_definition("macrophage"); 
+	Macrophage::setup_cell_definition(macrophagesCD);
+	macrophagesCD->phenotype.sync_to_microenvironment( &microenvironment );
 	
-	// Cell_Definition* pCD = find_cell_definition( "lung epithelium" ); 
-	// pCD->phenotype.molecular.fraction_released_at_death[virion_index] = 
-	// 	parameters.doubles("virus_fraction_released_at_death"); 
-	// pCD->phenotype.molecular.fraction_released_at_death[assembled_virion_index] = 
-	// 	parameters.doubles("virus_fraction_released_at_death"); 
-
-	// immune_submodels_setup();
-	// receptor_dynamics_model_setup(); 
-	// internal_virus_model_setup();
-	// internal_virus_response_model_setup();
-	// epithelium_submodel_setup(); 
-
-	// submodel_registry.display( std::cout ); 
-		
+	Cell_Definition* tcellCD = find_cell_definition("CD8 Tcell"); 
+	TCell::setup_cell_definition(tcellCD);
+	tcellCD->phenotype.sync_to_microenvironment( &microenvironment );
+			
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 
 	*/
@@ -139,38 +131,12 @@ void setup_microenvironment( void )
 {
 	// set domain parameters 
 	
-/* now this is in XML 
-	default_microenvironment_options.X_range = {-1000, 1000}; 
-	default_microenvironment_options.Y_range = {-1000, 1000}; 
-	default_microenvironment_options.simulate_2D = true; 
-*/
-	
 	// make sure to override and go back to 2D 
 	if( default_microenvironment_options.simulate_2D == false )
 	{
 		std::cout << "Warning: overriding XML config option and setting to 2D!" << std::endl; 
 		default_microenvironment_options.simulate_2D = true; 
 	}
-	
-/* now this is in XML 	
-	// no gradients need for this example 
-
-	default_microenvironment_options.calculate_gradients = false; 
-	
-	// set Dirichlet conditions 
-
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	
-	// if there are more substrates, resize accordingly 
-	std::vector<double> bc_vector( 1 , 38.0 ); // 5% o2
-	default_microenvironment_options.Dirichlet_condition_vector = bc_vector;
-	
-	// set initial conditions 
-	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
-*/
-	
-	// put any custom code to set non-homogeneous initial conditions or 
-	// extra Dirichlet nodes here. 
 	
 	// initialize BioFVM 
 	
@@ -241,188 +207,255 @@ void setup_tissue( void )
 		}
 	}
 	
-	// int number_of_virions = (int) ( parameters.doubles("multiplicity_of_infection") * 
-	// 	(*all_cells).size() ); 
-	// double single_virion_density_change = 1.0 / microenvironment.mesh.dV; 
+	std::cout << "Infecting center cell with one virion ... " << std::endl; 
+	static_cast<Epithelial_Cell*>(pNearestCell)->isInfected = true; 
 	
-	// infect the cell closest to the center  
-
-	if( parameters.bools( "use_single_infected_cell" ) == true )
-	{
-		std::cout << "Infecting center cell with one virion ... " << std::endl; 
-		static_cast<Epithelial_Cell*>(pNearestCell)->isInfected = true; 
-	}
-	// else
-	// {
-	// 	std::cout << "Placing " << number_of_virions << " virions ... " << std::endl; 
-	// 	for( int n=0 ; n < number_of_virions ; n++ )
-	// 	{
-	// 		// pick a random voxel 
-	// 		std::vector<double> position = {0,0,0}; 
-	// 		position[0] = x_min + (x_max-x_min)*UniformRandom(); 
-	// 		position[1] = y_min + (y_max-y_min)*UniformRandom(); 
-			
-	// 		int m = microenvironment.nearest_voxel_index( position ); 
-			
-	// 		// int n = (int) ( ( microenvironment.number_of_voxels()-1.0 ) * UniformRandom() ); 
-	// 		// microenvironment(i,j)[nV] += single_virion_density_change; 
-	// 		microenvironment(m)[nV] += single_virion_density_change; 
-	// 	}
-	// }
+	// now place immune cells 
+	for (int i=0; i < parameters.ints("number_macrophages"); i++) {
 	
-	// // now place immune cells 
-	
-	// initial_immune_cell_placement();
-	
+		pC = create_cell( get_cell_definition("macrophage" ) ); 
+		pC->assign_position( 
+			x_min + (x_max-x_min)*UniformRandom(),
+			y_min + (y_max-y_min)*UniformRandom(),
+			0.0 + parameters.doubles("immune_z_offset")
+		);
+		
+	}	
+		
 	return; 
 }
 
-std::vector<std::string> epithelium_coloring_function( Cell* pCell )
-{
-	std::vector<std::string> output( 4, "black" ); 
-
-	// static int color_index = cell_defaults.custom_data.find_variable_index( "assembled virion" ); 
-	// static int color_index = 
-	// 	cell_defaults.custom_data.find_variable_index( parameters.strings["color_variable"].value ); 
-	// static int nV = cell_defaults.custom_data.find_variable_index( "virion" ); 
-	
-	// color by assembled virion 
-	
-	if( pCell->phenotype.death.dead == false )
-	{
-		// // find fraction of max viral load 
-		// double v = pCell->custom_data[ color_index ] ; 
-		
-		// double interpolation = 0; 
-		// if( v < 1 )
-		// { interpolation = 0; } 
-		// if( v >= 1.0 && v < 10 )
-		// { interpolation = 0.25; } 
-		// if( v >= 10.0 && v < 100 )
-		// { interpolation = 0.5; } 
-		// if( v >= 100.0 && v < 1000 )
-		// { interpolation = 0.75; } 
-		// if( v >= 1000.0 )
-		// { interpolation = 1.0; } 
-
-		// int red = (int) floor( 255.0 * interpolation ) ; 
-		// int green = red; 
-		// int blue = 255 - red; 
-
-		char color [1024]; 
-		
-		sprintf( color, "rgb(%u,%u,%u)" , 0, 255,0 );
-		
-		if (static_cast<Epithelial_Cell*>(pCell)->isInContact)
-			sprintf( color, "rgb(%u,%u,%u)" , 255,125,0 );
-		
-		if (static_cast<Epithelial_Cell*>(pCell)->isInfected)
-			sprintf( color, "rgb(%u,%u,%u)" , 255,0,0 );
-		
-		if (static_cast<Epithelial_Cell*>(pCell)->isInfectious)
-			sprintf( color, "rgb(%u,%u,%u)" , 255,125,255 );
-		
-		
-		output[0] = color; 
-		output[2] = color; 
-		output[3] = color; 
-	}
-	
-	return output; 
-}
-
-// void move_exported_to_viral_field( void )
-// {
-// 	static int nV = microenvironment.find_density_index( "virion" ); 
-// 	static int nA = microenvironment.find_density_index( "assembled virion" ); 
-	
-// 	#pragma omp parallel for 
-// 	for( int n = 0 ; n < microenvironment.number_of_voxels() ; n++ )
-// 	{
-// 		microenvironment(n)[nV] += microenvironment(n)[nA]; 
-// 		microenvironment(n)[nA] = 0; 
-// 	}
-	
-// 	return;
-// }
-
-// std::string blue_yellow_interpolation( double min, double val, double max )
-// {
-// // 	std::string out;
-	
-// 	double interpolation = (val-min)/(max-min+1e-16); 
-// 	if( interpolation < 0.0 )
-// 	{ interpolation = 0.0; } 
-// 	if( interpolation > 1.0 )
-// 	{ interpolation = 1.0; }
-	
-// 	int red_green = (int) floor( 255.0 * interpolation ) ; 
-// 	int blue = 255 - red_green; 
-
-// 	char color [1024]; 
-// 	sprintf( color, "rgb(%u,%u,%u)" , red_green,red_green,blue ); 
-// 	return color;  
-// }
 
 std::vector<std::string> tissue_coloring_function( Cell* pCell )
 {
-	static int lung_epithelial_type = get_cell_definition( "lung epithelium" ).type; 
-	
-	// static int CD8_Tcell_type = get_cell_definition( "CD8 Tcell" ).type; 
-	// static int Macrophage_type = get_cell_definition( "macrophage" ).type; 
-	// static int Neutrophil_type = get_cell_definition( "neutrophil" ).type; 
-	
-	// start with white 
+	int lung_epithelial_type = get_cell_definition( "lung epithelium" ).type; 
+	int macrophage_type = get_cell_definition( "macrophage" ).type; 
+	int tcell_type = get_cell_definition( "CD8 Tcell" ).type; 
 	
 	std::vector<std::string> output = {"white", "black", "white" , "white" };	
-	// false_cell_coloring_cytometry(pCell); 
+
+	if (pCell->type == lung_epithelial_type)
+			return static_cast<Epithelial_Cell*>(pCell)->coloring_function();
+
+	else if (pCell->type == macrophage_type)
+			return static_cast<Macrophage*>(pCell)->coloring_function();
 	
-	if( pCell->phenotype.death.dead == true )
-	{
-		// if( pCell->type != lung_epithelial_type )
-		// {
-		// 	output[0] = parameters.strings("apoptotic_immune_color");		
-		// 	output[2] = output[0]; 		
-		// 	output[3] = output[0]; 	
-		// 	return output; 
-		// }
-
-		output[0] = parameters.strings("apoptotic_epithelium_color");	
-		output[2] = output[0]; 		
-		output[3] = output[0]; 		
-		return output; 
-	}
-
-	if( pCell->phenotype.death.dead == false && pCell->type == lung_epithelial_type )
-	{
-		// color by virion 
-		output = epithelium_coloring_function(pCell); 
-		return output; 
-	}
+	else if (pCell->type == tcell_type)
+			return static_cast<TCell*>(pCell)->coloring_function();
 	
-	// if( pCell->phenotype.death.dead == false && pCell->type == CD8_Tcell_type )
-	// {
-	// 	output[0] = parameters.strings("CD8_Tcell_color");  
-	// 	output[2] = parameters.strings("CD8_Tcell_color");  
-	// 	output[3] = parameters.strings("CD8_Tcell_color"); 
-	// 	return output; 
-	// }
-
-	// if( pCell->phenotype.death.dead == false && pCell->type == Macrophage_type )
-	// {
-	// 	output[0] = parameters.strings("Macrophage_color");  
-	// 	output[2] = parameters.strings("Macrophage_color");  
-	// 	output[3] = parameters.strings("Macrophage_color"); 
-	// 	return output; 
-	// }
-
-	// if( pCell->phenotype.death.dead == false && pCell->type == Neutrophil_type )
-	// {
-	// 	output[0] = parameters.strings("Neutrophil_color");  
-	// 	output[2] = parameters.strings("Neutrophil_color");  
-	// 	output[3] = parameters.strings("Neutrophil_color");  
-	// 	return output; 
-	// }
-
 	return output; 
+}
+ 
+void keep_immune_cells_off_edge( void )
+{
+	static double Xmin = microenvironment.mesh.bounding_box[0]; 
+	static double Ymin = microenvironment.mesh.bounding_box[1]; 
+	static double Zmin = microenvironment.mesh.bounding_box[2]; 
+
+	static double Xmax = microenvironment.mesh.bounding_box[3]; 
+	static double Ymax = microenvironment.mesh.bounding_box[4]; 
+	static double Zmax = microenvironment.mesh.bounding_box[5]; 
+
+	static bool setup_done = false; 
+	if( default_microenvironment_options.simulate_2D == true && setup_done == false )
+	{
+		Zmin = 0.0; 
+		Zmax = 0.0; 
+	}
+	
+	static double Xrange = (Xmax - Xmin); 
+	static double Yrange = (Ymax - Ymin); 
+	static double Zrange = (Zmax - Zmin); 
+	
+	// warning hardcoded
+	static double relative_edge_margin = 0; // 0.1; 
+	static double relative_interior = 1 - 2 * relative_edge_margin; 
+	
+	if( setup_done == false )
+	{
+		Xmin += relative_edge_margin*Xrange; 
+		Ymin += relative_edge_margin*Yrange; 
+		Zmin += relative_edge_margin*Zrange;
+		
+		Xrange *= relative_interior;
+		Yrange *= relative_interior;
+		Zrange *= relative_interior;  
+		setup_done = true; 
+	}
+	
+	static int epithelial_type = get_cell_definition( "lung epithelium" ).type; 
+	
+	for( int n=0 ; n < (*all_cells).size() ; n++ )
+	{
+		Cell* pC = (*all_cells)[n]; 
+		if (pC->type != epithelial_type)
+			static_cast<Immune_cell*>(pC)->keep_in_bounds(Xmin, Xrange, Ymin, Yrange, Zmin, Zrange);
+	}
+	return; 
+}
+
+
+void keep_immune_cells_in_bounds( double dt )
+{
+	static double dt_bounds = 5; 
+	static double next_time = 0.0; 
+
+	static double t_bounds = 0.0; 
+	static double t_last_bounds = 0.0; 
+	static double t_next_bounds = 0.0; 
+	
+	static double tolerance = 0.1 * diffusion_dt; 
+	
+	// is it time for the next immune recruitment? 
+	if( t_bounds > t_next_bounds- tolerance )
+	{
+		double elapsed_time = (t_bounds - t_last_bounds );
+		
+		keep_immune_cells_off_edge(); 
+		
+		t_last_bounds = t_bounds; 
+		t_next_bounds = t_bounds + dt_bounds; 
+	}
+	t_bounds += dt; 
+
+	return; 
+}
+
+
+void create_infiltrating_Tcell(void)
+{
+	// static Cell_Definition* pCD = find_cell_definition( "CD8 Tcell" );
+	// create_infiltrating_immune_cell( pCD ); 
+
+	// return; 
+	static double Xmin = microenvironment.mesh.bounding_box[0]; 
+	static double Ymin = microenvironment.mesh.bounding_box[1]; 
+	static double Zmin = microenvironment.mesh.bounding_box[2]; 
+
+	static double Xmax = microenvironment.mesh.bounding_box[3]; 
+	static double Ymax = microenvironment.mesh.bounding_box[4]; 
+	static double Zmax = microenvironment.mesh.bounding_box[5]; 
+	
+	static bool setup_done = false; 
+	
+	if( default_microenvironment_options.simulate_2D == true && setup_done == false )
+	{
+		Zmin = 0.0; 
+		Zmax = 0.0; 
+	}
+	
+	static double Xrange = (Xmax - Xmin); 
+	static double Yrange = (Ymax - Ymin); 
+	static double Zrange = (Zmax - Zmin); 
+	
+	// keep cells away from the outer edge 
+	
+	if( setup_done == false )
+	{
+		Xmin += 0.1*Xrange; 
+		Ymin += 0.1*Yrange; 
+		Zmin = 0;
+		
+		Xrange *= 0.8;
+		Yrange *= 0.8;
+		Zrange = 0.0; 
+		setup_done = true; 
+	}
+	
+	// create some of each type of cell 
+	
+	Cell* pC;
+	
+	std::vector<double> position = {0,0,0}; 
+	position[0] = Xmin + UniformRandom()*Xrange; 
+	position[1] = Ymin + UniformRandom()*Yrange; 
+	position[2] = parameters.doubles("immune_z_offset"); 
+		
+	pC = create_cell( get_cell_definition("CD8 Tcell" ) ); 
+	pC->assign_position( position );
+		
+	static int proinflammatory_cytokine_index = microenvironment.find_density_index( "pro-inflammatory cytokine");
+	pC->phenotype.secretion.uptake_rates[proinflammatory_cytokine_index] = 
+		parameters.doubles("activated_cell_cytokine_uptake_rate"); // 10;
+	
+	return;
+}
+
+
+
+void immune_cell_recruitment( double dt )
+{
+	static int proinflammatory_cytokine_index = 
+		microenvironment.find_density_index("pro-inflammatory cytokine");
+	
+	static double dt_immune = parameters.doubles( "immune_dt" ); 
+	static double t_immune = 0.0; 
+	static double t_last_immune = 0.0; 
+	static double t_next_immune = 0.0; 
+	
+	static double tolerance = 0.1 * diffusion_dt; 
+	
+	// is it time for the next immune recruitment? 
+	if( t_immune > t_next_immune- tolerance )
+	{
+		double elapsed_time = (t_immune - t_last_immune );
+//		std::cout << "Immune time! " << t_immune << " (elapsed: " << elapsed_time << ") " << std::endl; 
+		
+		
+		// CD8 T cell recruitment 
+		
+		static double CD8_Tcell_recruitment_rate = parameters.doubles( "CD8_Tcell_max_recruitment_rate" ); 
+		static double TC_min_signal = parameters.doubles( "CD8_Tcell_recruitment_min_signal" ); 
+		static double TC_sat_signal = parameters.doubles( "CD8_Tcell_recruitment_saturation_signal" ); 
+		static double TC_max_minus_min = TC_sat_signal - TC_min_signal; 
+		
+		double total_rate = 0;
+		// integrate \int_domain r_max * (signal-signal_min)/(signal_max-signal_min) * dV 
+		double total_scaled_signal= 0.0;
+		for( int n=0; n<microenvironment.mesh.voxels.size(); n++ )
+		{
+			// (signal(x)-signal_min)/(signal_max/signal_min)
+			double dRate = ( microenvironment(n)[proinflammatory_cytokine_index] - TC_min_signal ); 
+			dRate /= TC_max_minus_min; 
+			// crop to [0,1] 
+			if( dRate > 1 ) 
+			{ dRate = 1; } 
+			if( dRate < 0 )
+			{ dRate = 0; }
+			total_rate += dRate; 
+		}	
+		// multiply by dV and rate_max 
+		total_scaled_signal = total_rate; 
+		
+		total_rate *= microenvironment.mesh.dV; 
+		total_rate *= CD8_Tcell_recruitment_rate; 
+		
+		// expected number of new neutrophils 
+		int number_of_new_cells = (int) round( total_rate * elapsed_time ); 
+		if( number_of_new_cells )
+		{
+			// std::cout << "\tRecruiting " << number_of_new_cells << " CD8 T cells ... " << std::endl; 
+			
+//			std::cout << "\tTotal signal/dV : " << total_scaled_signal << std::endl;
+//			std::cout << "\tTotal signa : " << total_scaled_signal * microenvironment.mesh.dV << std::endl; 
+//			double total_volume = microenvironment.mesh.dV * microenvironment.mesh.voxels.size() ; 
+//			std::cout << "\tmean signal : " << total_scaled_signal * microenvironment.mesh.dV / total_volume << std::endl; 
+			for( int n = 0; n < number_of_new_cells ; n++ )
+			{ create_infiltrating_Tcell(); }
+		}
+		
+		t_last_immune = t_immune; 
+		t_next_immune = t_immune + dt_immune; 
+		
+		// std::cout << "\t\tnext immune time: " << t_next_immune << std::endl;  
+	}
+	t_immune += dt; 
+	return; 
+}
+
+void update_tissue(double diffusion_dt)
+{
+	immune_cell_recruitment( diffusion_dt ); 
+	
+	keep_immune_cells_in_bounds( diffusion_dt ); 
 }
