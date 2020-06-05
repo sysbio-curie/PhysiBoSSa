@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">2000</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">10000</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -136,6 +136,7 @@
 			<initial_condition units="virion/um^3">0</initial_condition>
 			<Dirichlet_boundary_condition units="virion/um^3" enabled="false">0</Dirichlet_boundary_condition>
 		</variable>
+		
 		<variable name="chemokine" units="mol/um^3" ID="2">
 			<physical_parameter_set>
 				<diffusion_coefficient units="micron^2/min">555.56</diffusion_coefficient>
@@ -143,6 +144,15 @@
 			</physical_parameter_set>
 			<initial_condition units="mol/um^3">0</initial_condition>
 			<Dirichlet_boundary_condition units="mol/um^3" enabled="true">0</Dirichlet_boundary_condition>
+		</variable>
+		
+		<variable name="pro-inflammatory cytokine" units="mol/um^3" ID="3">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">555.56</diffusion_coefficient>
+				<decay_rate units="1/min">1.02e-2</decay_rate>  
+			</physical_parameter_set>
+			<initial_condition units="mol/um^3">0</initial_condition>
+			<Dirichlet_boundary_condition units="mol/um^3" enabled="false">0</Dirichlet_boundary_condition>
 		</variable>
 
 		<options>
@@ -256,40 +266,7 @@
 
 				<molecular />
 			</phenotype>
-			<custom_data>  
-				<!-- for internal viral dynamics --> 
-				<virion_detection_threshold type="double" units="virion" description="quantity of virion to activate the presence_virus variable">1</virion_detection_threshold> 
-				<virion_export_rate type="double" units="virion/min" description="rate at which a virion is exported from a live cell">5000</virion_export_rate> 
-
-				<!-- ACE2 receptor trafficking --> 
-				<ACE2_binding_rate type="double" units="1/min" description="ACE2 receptor-virus binding rate">0.001</ACE2_binding_rate> 
-				<ACE2_endocytosis_rate type="double" units="1/min" description="ACE2 receptor-virus endocytosis rate">0.01</ACE2_endocytosis_rate> 
-				<ACE2_cargo_release_rate type="double" units="1/min" description="ACE2 receptor-virus cargo release rate">0.001</ACE2_cargo_release_rate> 
-				<ACE2_recycling_rate type="double" units="1/min" description="ACE2 receptor recycling rate">0.01</ACE2_recycling_rate> 
-				
-				<!-- cell virus response --> 
-				<max_infected_apoptosis_rate type="double" units="1/min" description="maximum rate of cell apoptosis due to viral infection">0.001</max_infected_apoptosis_rate>
-				<max_apoptosis_half_max type="double" units="virion" description="viral load at which cells reach half max apoptosis rate">500</max_apoptosis_half_max>
-				<apoptosis_hill_power type="double" units="none" description="Hill power for viral load apoptosis response">1</apoptosis_hill_power> 
-				<virus_fraction_released_at_death type="double" units="none" description="fraction of internal virus released at cell death">0</virus_fraction_released_at_death>
-				<infected_cell_chemokine_secretion_rate units="1/min" type="double">1</infected_cell_chemokine_secretion_rate>
-				
-				<!-- for the immune model --> 
-				<TCell_contact_time type="double" units="min">0.0</TCell_contact_time>
-				<cell_attachment_rate units="1/min">0</cell_attachment_rate>
-				<cell_attachment_lifetime units="min">0</cell_attachment_lifetime>
-				
-				<TCell_contact_death_threshold units="min">50</TCell_contact_death_threshold>  
-				<max_attachment_distance units="micron">15</max_attachment_distance>
-				<elastic_attachment_coefficient units="1/min">0.01</elastic_attachment_coefficient>
-				<maximum_tolerated_ingested_debris units="micron^3">3000</maximum_tolerated_ingested_debris>
-				
-				<activated_macrophage_speed units="micron/min" type="double">0.4</activated_macrophage_speed>
-				<activated_macrophage_secretion_rate units="1/min" type="double">10</activated_macrophage_secretion_rate>
-				<!-- your custom data and parameters go here (for new submodels) --> 
-				
-			
-			</custom_data>
+		
 		</cell_definition>
 		
 		<cell_definition name="lung epithelium" parent_type="default" ID="1">
@@ -310,12 +287,132 @@
 					<bnd_filename>./config/boolean_network/epithelium.bnd</bnd_filename>
 					<cfg_filename>./config/boolean_network/epithelium.cfg</cfg_filename>
 					<time_step>12</time_step>
-					<scaling>20</scaling>
+					<scaling>100</scaling>
 				</intracellular>
+			</phenotype>
+			<custom_data>  
+				<!-- for internal viral dynamics --> 
+				<virion_detection_threshold type="double" units="virion" description="quantity of virion to activate the presence_virus variable">0.1</virion_detection_threshold> 
+				<virion_export_rate type="double" units="virion/min" description="rate at which a virion is exported from a live cell">1000</virion_export_rate> 
+			</custom_data>
+		</cell_definition>
+		
+		<!-- generic immune cell type --> 
+		<cell_definition name="immune" parent_type="default" ID="2">
+			<phenotype>
+				<mechanics> 
+					<cell_cell_adhesion_strength units="micron/min">0</cell_cell_adhesion_strength>
+					<cell_cell_repulsion_strength units="micron/min">0.001</cell_cell_repulsion_strength>
+				</mechanics>
+				<death>
+					<model code="100" name="apoptosis"> 
+						<rate units="1/min">5e-4</rate> <!-- 5e-4 --> 
+					</model> 
+				</death>
+				<motility>  
+					<speed units="micron/min">4</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">0.7</migration_bias>
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>true</enabled>
+							<substrate>chemokine</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+				<secretion>
+					<substrate name="pro-inflammatory cytokine">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+					</substrate> 	
+				</secretion>
 			</phenotype>
 			<custom_data>
 			</custom_data>
 		</cell_definition>
+		
+		<cell_definition name="macrophage" parent_type="immune" ID="3">
+			<phenotype>
+				<death>
+					<!-- death is about 5x slower --> 
+					<model code="100" name="apoptosis"> 
+						<rate units="1/min">1e-5</rate> <!-- 5.31667e-05 --> 
+					</model> 
+				</death>
+				<motility>  
+					<speed>1</speed>
+					<migration_bias>0</migration_bias>
+					<persistence_time>1</persistence_time>
+					<option>
+						<use_2D>true</use_2D>
+						<enabled>true</enabled>
+						<chemotaxis>
+							<substrate>chemokine</substrate>
+						</chemotaxis>
+					</option>
+				</motility>
+
+				<volume>
+					<total units="micron^3">4849</total>
+					<nuclear units="micron^3">485</nuclear>
+				</volume>
+				<intracellular type="maboss">
+					<bnd_filename>./config/boolean_network/macrophage.bnd</bnd_filename>
+					<cfg_filename>./config/boolean_network/macrophage.cfg</cfg_filename>
+					<time_step>12</time_step>
+					<scaling>1</scaling>
+				</intracellular>
+			</phenotype>
+			<custom_data>  
+				<virion_detection_threshold type="double" units="virion" description="quantity of virion to activate the presence_virus variable">0.05</virion_detection_threshold> 
+				<macrophage_eating_rate type="double" units="virion/min" description="rate at which a virion is eated by a macrophage">10000</macrophage_eating_rate> 
+				<macrophage_cytokin_release_rate type="double" units="cytokin/min" description="rate at which cytokins will be released by macrophage">1000</macrophage_cytokin_release_rate>
+			</custom_data>
+		</cell_definition>	
+		
+		<cell_definition name="CD8 Tcell" parent_type="immune" ID="4">
+			<phenotype>
+				<motility>  
+					<speed units="micron/min">0.1</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">0.7</migration_bias>
+					<options>
+						<enabled>true</enabled>
+						<use_2D>true</use_2D>
+						<chemotaxis>
+							<enabled>true</enabled>
+							<substrate>pro-inflammatory cytokine</substrate>
+							<direction>1</direction>
+						</chemotaxis>
+					</options>
+				</motility>
+				<volume>
+					<total units="micron^3">478</total>
+					<nuclear units="micron^3">95</nuclear>
+				</volume>
+				<secretion>
+					<!-- <substrate name="pro-inflammatory cytokine">
+						<secretion_rate units="1/min">1</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+					</substrate> 	 -->
+				</secretion>
+				<intracellular type="maboss">
+					<bnd_filename>./config/boolean_network/tcell.bnd</bnd_filename>
+					<cfg_filename>./config/boolean_network/tcell.cfg</cfg_filename>
+					<time_step>12</time_step>
+					<scaling>100</scaling>
+				</intracellular>
+			</phenotype>
+			<custom_data>
+				<cell_attachment_rate units="1/min">0.2</cell_attachment_rate>
+				<cell_attachment_lifetime units="min">8.5</cell_attachment_lifetime>
+				<max_attachment_distance units="micron">15</max_attachment_distance>
+
+			</custom_data>
+		</cell_definition>	
 	</cell_definitions>
 	
 	
@@ -323,11 +420,7 @@
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 
-
-		<div_ACE2 type="divider" description="--ACE2 receptor model initialization--"/>
-		<!--
-			<ACE2_receptors_per_cell type="double" units="dimensionless" description="number of ACE2 receptors per cell">1000</ACE2_receptors_per_cell> --> <!-- not used? --> 
-		
+	
 		<div_initialization type="divider" description="---Initialization Options--"/>
 			<multiplicity_of_infection type="double" units="none" description="multiplicity of infection: virions/cells at t=0">0.01</multiplicity_of_infection>
 			<use_single_infected_cell type="bool" units="none" description="Infect center cell with one virion (overrides MOI)">true</use_single_infected_cell>
@@ -338,7 +431,18 @@
 			<apoptotic_epithelium_color type="string" description="">black</apoptotic_epithelium_color>
 			
 			<lung_epithelium_color type="string" description="">blue</lung_epithelium_color>
+		
+			<immune_dt type="double" units="min" description="how often we check to introduce immune cells">10</immune_dt> 
 			
+			<immune_z_offset type="double" units="micron" description="immune cell position over the epithelium">0</immune_z_offset>
+			
+			
+			<CD8_Tcell_max_recruitment_rate type="double" units="cells/min/micron^3">4e-8</CD8_Tcell_max_recruitment_rate> <!-- 4e-8 -->
+			<CD8_Tcell_recruitment_min_signal type="double" units="substrate/micron^3">0.3</CD8_Tcell_recruitment_min_signal>
+			<CD8_Tcell_recruitment_saturation_signal type="double" units="substrate/micron^3">.5</CD8_Tcell_recruitment_saturation_signal>
+		
+		<number_macrophages type="int" units="macrophages">100</number_macrophages>
+		<number_tcells type="int" units="macrophages">100</number_tcells>
 	</user_parameters>
 	
 </PhysiCell_settings>
