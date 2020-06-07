@@ -2,9 +2,6 @@
 #define __Macrophage__
 
 #include "./Immune_cell.h"
-// #include "../core/PhysiCell.h"
-// #include "../core/PhysiCell_phenotype.h"
-// #include "../modules/PhysiCell_standard_modules.h" 
 
 using namespace BioFVM; 
 using namespace PhysiCell;
@@ -15,8 +12,9 @@ class Macrophage : public Immune_cell
   public:
   
     bool hasDetectedVirus;
-  
-    Macrophage() { hasDetectedVirus = false; }
+    bool isActive;
+    bool isAttachedToTCell;
+    Macrophage() { hasDetectedVirus = false; isActive=false; isAttachedToTCell=false;}
     
     static Cell* create_cell();
     static void setup_cell_definition(Cell_Definition* cd);
