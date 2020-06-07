@@ -374,7 +374,7 @@
 		<cell_definition name="CD8 Tcell" parent_type="immune" ID="4">
 			<phenotype>
 				<motility>  
-					<speed units="micron/min">0.1</speed>
+					<speed units="micron/min">0.2</speed>
 					<persistence_time units="min">1</persistence_time>
 					<migration_bias units="dimensionless">0.7</migration_bias>
 					<options>

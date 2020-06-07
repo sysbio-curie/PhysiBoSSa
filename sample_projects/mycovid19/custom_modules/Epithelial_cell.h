@@ -19,8 +19,9 @@ class Epithelial_Cell : public Attachable_cell
     bool isInfected;
     bool isInfectious;
     bool isAttachedToTCell;
+    bool isCured;
     
-    Epithelial_Cell() { isInfected = false; isInfectious = false; isAttachedToTCell=false;}
+    Epithelial_Cell() { isInfected = false; isInfectious = false; isAttachedToTCell=false; isCured=false;}
     
     static Cell* create_cell();
     static void setup_cell_definition(Cell_Definition* cd);

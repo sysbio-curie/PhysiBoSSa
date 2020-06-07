@@ -9,10 +9,6 @@ void Immune_cell::keep_in_bounds(double Xmin, double Xrange, double Ymin, double
 	static int macrophage_type = get_cell_definition( "macrophage" ).type; 
 	static int tcell_type = get_cell_definition( "CD8 Tcell" ).type; 
 
-	if (position[2] > 0.11 || position[2] < 0.09) {
-		std::cout << "You shouldn't be here" << std::endl;
-	}
-
 	if( phenotype.death.dead == false && is_out_of_domain)
 	{
 		is_out_of_domain = false; 

@@ -224,7 +224,7 @@ void Immune_system::keep_immune_cells_off_edge( void )
 
 void Immune_system::keep_immune_cells_in_bounds( double dt )
 {
-	static double dt_bounds = 5; 
+	static double dt_bounds = 0.1; 
 	static double next_time = 0.0; 
 
 	static double t_bounds = 0.0; 
