@@ -27,6 +27,11 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 	for (auto node : this->network->getNodes()) {
 		this->nodesByName[node->getLabel()] = node;
 	}
+	
+	for (auto node : network->getNodes())
+      if (!node->isInternal()) 
+        output_mask.setNodeState(node, true);
+
 }
 
 void MaBoSSNetwork::mutate(std::map<std::string, double> mutations) 
@@ -81,7 +86,7 @@ bool MaBoSSNetwork::get_node_value(std::string name) {
 }
 
 std::string MaBoSSNetwork::get_state() {
-	return state.getName(network);
+	return NetworkState(state.getState() & output_mask.getState()).getName(network);
 }
 
 /* Print current state of all the nodes of the network */
