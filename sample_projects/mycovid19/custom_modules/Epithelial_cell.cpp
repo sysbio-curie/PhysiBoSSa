@@ -61,6 +61,7 @@ void Epithelial_Cell::from_nodes_to_cell()
 
 		int virion_index = get_microenvironment()->find_density_index( "virion" );		
 		phenotype.secretion.net_export_rates[virion_index] = 0;
+		isCured = true;
 		isInfected = false;
 	}
 }
@@ -103,7 +104,7 @@ std::vector<std::string> Epithelial_Cell::coloring_function(  )
 		if (isInfectious)
 			sprintf( color, "rgb(%u,%u,%u)" , 255,0,0 );
 		
-		if (phenotype.intracellular->get_boolean_node_value("CureByTCell"))
+		if (isCured)
 			sprintf( color, "rgb(%u,%u,%u)" , 0,125, 0 );
 		
 		output[0] = color; 

@@ -69,7 +69,7 @@ bool TCell::attempt_immune_cell_attachment(Cell* pTarget , double dt )
 		&& !(static_cast<Macrophage*>(pTarget)->isActive && !isActive))
 		
 	|| 	(pTarget->type == get_cell_definition( "lung epithelium").type
-		&& !(static_cast<Epithelial_Cell*>(pTarget)->isInfected && isActive)) 
+		&& !(static_cast<Epithelial_Cell*>(pTarget)->isInfected && !static_cast<Epithelial_Cell*>(pTarget)->isCured && isActive)) 
 	) 
 	{ return false; }
 
