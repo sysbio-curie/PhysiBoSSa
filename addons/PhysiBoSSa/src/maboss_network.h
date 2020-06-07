@@ -27,6 +27,7 @@ class MaBoSSNetwork
 
 		StochasticSimulationEngine* engine;
 		NetworkState state;
+		NetworkState output_mask;
 		
 		/** \brief Time step between each MaBoSS simulation */
 		double update_time_step = 12.0;
