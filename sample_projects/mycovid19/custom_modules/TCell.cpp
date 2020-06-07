@@ -4,8 +4,6 @@
 
 using namespace PhysiCell; 
 
-std::string tcell_submodel_version = "0.0.1"; 
-
 Cell* TCell::create_cell() 
 {
 	return static_cast<Cell*>(new TCell);		
@@ -18,22 +16,19 @@ void TCell::setup_cell_definition(Cell_Definition* cd)
 	cd->functions.custom_cell_rule = TCell::function_mechanics;
 }
 
-void TCell::set_input_nodes() {
-	if (isBoundToMacrophage) {
-		phenotype.intracellular->set_boolean_node_value("Contact_Macrophage", true);
-	}
-	
-	if (isBoundToEpithelium) {
-		phenotype.intracellular->set_boolean_node_value("Contact_Epithelium", true);
-	}
+void TCell::set_input_nodes() 
+{	
+	phenotype.intracellular->set_boolean_node_value("Contact_Macrophage", isBoundToMacrophage);
+	phenotype.intracellular->set_boolean_node_value("Contact_Epithelium", isBoundToEpithelium);
 }	
 
-void TCell::from_nodes_to_cell() {
-	
+void TCell::from_nodes_to_cell() 
+{	
 	if (this->phenotype.intracellular->get_boolean_node_value("Active")) {
 		isActive = true;
 		remove_all_adhesions();
 
+		// Activated TCell will hunt for infected cells which export virus. So virus is used for chemotaxis
 		phenotype.motility.chemotaxis_index = get_microenvironment()->find_density_index( "virion");
 		// bias direction is gradient for the indicated substrate 
 		phenotype.motility.migration_bias_direction = nearest_gradient(phenotype.motility.chemotaxis_index);
@@ -42,7 +37,6 @@ void TCell::from_nodes_to_cell() {
 
 		// normalize 
 		normalize( &( phenotype.motility.migration_bias_direction ) );
-
 	}
 }
 
@@ -66,17 +60,16 @@ void TCell::function_phenotype(Phenotype& phenotype, double dt )
 
 bool TCell::attempt_immune_cell_attachment(Cell* pTarget , double dt )
 {
-	// // if the target is not infected, give up 
-	// if( pTarget->custom_data[ "assembled_virion" ] < 1 )
-	// { return false; }
-		
+	// Checking if the is in our targets, otherwise return		
 	if (
-		!(pTarget->type == get_cell_definition( "macrophage" ).type 
-		&& static_cast<Macrophage*>(pTarget)->hasDetectedVirus
-		) 
-	&& 	!(pTarget->type == get_cell_definition( "lung epithelium").type
-		&& static_cast<Epithelial_Cell*>(pTarget)->isInfectious
-		) 
+		pTarget->type == get_cell_definition( "CD8 Tcell" ).type 
+		
+	||
+		(pTarget->type == get_cell_definition( "macrophage" ).type 
+		&& !(static_cast<Macrophage*>(pTarget)->isActive && !isActive))
+		
+	|| 	(pTarget->type == get_cell_definition( "lung epithelium").type
+		&& !(static_cast<Epithelial_Cell*>(pTarget)->isInfected && isActive)) 
 	) 
 	{ return false; }
 
@@ -91,9 +84,6 @@ bool TCell::attempt_immune_cell_attachment(Cell* pTarget , double dt )
 	{ return false; } 
 
 	// now, get the attachment probability 
-	
-	// std::cout << "We are close to some macrophages !!" << std::endl;
-	
 	double attachment_probability = custom_data["cell_attachment_rate"] * dt; 
 
 	// don't need to cap it at 1.00: if prob > 100%, 
@@ -105,6 +95,8 @@ bool TCell::attempt_immune_cell_attachment(Cell* pTarget , double dt )
 		
 		if (pTarget->type == get_cell_definition( "macrophage" ).type) {
 			isBoundToMacrophage = true;
+			static_cast<Macrophage*>(pTarget)->isAttachedToTCell = true;
+			
 		} else if (pTarget->type == get_cell_definition( "lung epithelium" ).type) {
 			isBoundToEpithelium = true;
 			static_cast<Epithelial_Cell*>(pTarget)->isAttachedToTCell = true;
@@ -140,7 +132,6 @@ Cell* TCell::check_neighbors_for_attachment(double dt)
 
 void TCell::function_mechanics(Phenotype& phenotype, double dt)
 {
-	
 	// if I'm dead, don't bother 
 	if( phenotype.death.dead == true )
 	{
@@ -161,45 +152,8 @@ void TCell::function_mechanics(Phenotype& phenotype, double dt)
 	if( state.neighbors.size() == 0 )
 	{ phenotype.motility.is_motile = true; }
 	else
-	{ phenotype.motility.is_motile = false; }	
-	
-	// check for contact with infected cell 
-	
-	// if I'm adhered to something ... 
-	if( state.neighbors.size() > 0 )
-	{
-		// // add the elastic forces 
-		// extra_elastic_attachment_mechanics( pCell, phenotype, dt );
+	{ phenotype.motility.is_motile = false; return; }	
 		
-		// // induce damage to whatever we're adhered to 
-		// #pragma omp critical(track_contact_time)
-		// {
-		// 	for( int n = 0; n < pCell->state.neighbors.size() ; n++ )
-		// 	{
-		// 		pCell->state.neighbors[n]->custom_data["TCell_contact_time"] += dt; 
-		// 	}
-		// }
-
-		// decide whether to detach 
-		// bool detach_me = false; 
-		
-		// if( UniformRandom() < dt / ( pCell->custom_data["cell_attachment_lifetime"] + 1e-15 ) )
-		// { detach_me = true; }
-		
-		// if I detach, go through the process 
-		// if( detach_me )
-		// {
-		// 	// detach all attached cells 
-		// 	for( int n = 0; n < pCell->state.neighbors.size() ; n++ )
-		// 	{
-		// 		detach_cells( pCell, pCell->state.neighbors[n] ); 
-		// 	}
-		// 	// resume motile behavior 
-		// 	phenotype.motility.is_motile = true; 
-		// }
-		return; 
-	}
-	
 	// I'm not attached, look for cells nearby and try to attach
 	
 	// if this returns non-NULL, we're now attached to a cell 
@@ -209,8 +163,9 @@ void TCell::function_mechanics(Phenotype& phenotype, double dt)
 		phenotype.motility.is_motile = false; 
 		return; 
 	}
+	
 	isBoundToEpithelium = false;
-	phenotype.motility.is_motile = true; // I suggest eliminating this. 
+	isBoundToMacrophage = false;
 	
 	return; 
 }

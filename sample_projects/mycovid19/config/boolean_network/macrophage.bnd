@@ -2,14 +2,9 @@ Node Presence_Virus {
   logic = Presence_Virus;
 }
 
-Node Eating {
+Node Active {
   logic = Presence_Virus;
-  rate_up  = @logic ? $eating_activation : 0; 
-  rate_down  = @logic ? 0 : $eating_inactivation;
+  rate_up  = @logic ? $activation : 0; 
+  rate_down  = @logic ? 0 : $inactivation;
 }
 
-Node Release_Cytokines {
-  logic = Presence_Virus;
-  rate_up  = @logic ? $cytokin_activation : 0; 
-  rate_down  = @logic ? 0 : $cytokin_inactivation;
-}

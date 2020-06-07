@@ -2,8 +2,6 @@
 
 using namespace PhysiCell; 
 
-std::string macrophage_submodel_version = "0.0.1"; 
-
 Cell* Macrophage::create_cell() 
 {
 	return static_cast<Cell*>(new Macrophage);		
@@ -18,27 +16,24 @@ void Macrophage::setup_cell_definition(Cell_Definition* cd)
 void Macrophage::set_input_nodes() 
 {
 	int virion_index = get_microenvironment()->find_density_index( "virion" );
-
-	if (nearest_density_vector()[virion_index] > custom_data["virion_detection_threshold"]) {
-		phenotype.intracellular->set_boolean_node_value("Presence_Virus", true);
-		hasDetectedVirus = true;
-	}
+	hasDetectedVirus = nearest_density_vector()[virion_index] > custom_data["virion_detection_threshold"];
+	phenotype.intracellular->set_boolean_node_value("Presence_Virus", hasDetectedVirus);
 }	
 
 void Macrophage::from_nodes_to_cell() 
 {
-
-	if (phenotype.intracellular->get_boolean_node_value("Eating")){
-		int virion_index = get_microenvironment()->find_density_index( "virion" );
-		phenotype.secretion.uptake_rates[virion_index] = custom_data["macrophage_eating_rate"];
-	}
+	int virion_index = get_microenvironment()->find_density_index( "virion" );
+	int cytokines_index = get_microenvironment()->find_density_index( "pro-inflammatory cytokine" );
 	
-	if (phenotype.intracellular->get_boolean_node_value("Release_Cytokines")) {
-		int cytokines_index = get_microenvironment()->find_density_index( "pro-inflammatory cytokine" );
+	isActive = phenotype.intracellular->get_boolean_node_value("Active");
+	if (isActive){
+		phenotype.secretion.uptake_rates[virion_index] = custom_data["macrophage_eating_rate"];
 		phenotype.secretion.secretion_rates[cytokines_index] = custom_data["macrophage_cytokin_release_rate"];
+	} else {
+		phenotype.secretion.uptake_rates[virion_index] = 0;
+		phenotype.secretion.secretion_rates[cytokines_index] = 0;
 	}
 }
-
 
 void Macrophage::function_phenotype(Phenotype& phenotype, double dt ) 
 {  
@@ -65,11 +60,16 @@ std::vector<std::string> Macrophage::coloring_function()
 	{
 		char color [1024]; 
 		
-		sprintf( color, "rgb(%u,%u,%u)" , 0,0, 255 );
-		
-		if (hasDetectedVirus)
-			sprintf( color, "rgb(%u,%u,%u)" , 125,125,255 );
-		
+		int virion_index = get_microenvironment()->find_density_index( "virion" );
+		unsigned int gradient = (unsigned int) ((130/custom_data["virion_detection_threshold"])*(nearest_density_vector()[virion_index]));
+		gradient = gradient < 0 ? 0 : gradient;
+		gradient = gradient > 130 ? 130 : gradient;
+	
+		sprintf( color, "rgb(%u,%u,%u)" ,0,gradient, 255 );
+
+		if (isActive)
+			sprintf( color, "rgb(%u,%u,%u)", 0, 255, 255);
+			
 		output[0] = color; 
 		output[2] = color; 
 		output[3] = color; 
