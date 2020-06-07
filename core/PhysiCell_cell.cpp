@@ -725,16 +725,15 @@ void Cell::update_voxel_in_container()
 	// int temp_current_voxel_index;
 	// Check to see if we need to remove agents that are pushed out of boundary
 	// if(!get_container()->underlying_mesh.is_position_valid(position[0],position[1],position[2]))	
-		
 	if(updated_current_mechanics_voxel_index==-1)// updated_current_mechanics_voxel_index is updated in update_position
 	{
 		// check if this agent has a valid voxel index, if so, remove it from previous voxel
 		if( get_current_mechanics_voxel_index() >= 0)
 		{
-			// #pragma omp critical
+			#pragma omp critical
 			{get_container()->remove_agent_from_voxel(this, get_current_mechanics_voxel_index());}
 		}
-		// #pragma omp critical
+		#pragma omp critical
 		{get_container()->add_agent_to_outer_voxel(this);}
 		// std::cout<<"cell out of boundary..."<< __LINE__<<" "<<ID<<std::endl;
 		current_mechanics_voxel_index=-1;
@@ -749,7 +748,7 @@ void Cell::update_voxel_in_container()
 	// update mesh indices (if needed)
 	if(updated_current_mechanics_voxel_index!= get_current_mechanics_voxel_index())
 	{
-		// #pragma omp critical
+		#pragma omp critical
 		{
 			container->remove_agent_from_voxel(this, get_current_mechanics_voxel_index());
 			container->add_agent_to_voxel(this, updated_current_mechanics_voxel_index);
