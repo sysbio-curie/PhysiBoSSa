@@ -93,11 +93,11 @@
 	
 		<dt_diffusion units="min">0.01</dt_diffusion>
 		<dt_mechanics units="min">0.1</dt_mechanics>
-		<dt_phenotype units="min">6</dt_phenotype>	
+		<dt_phenotype units="min">1</dt_phenotype>	
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>6</omp_num_threads>
+		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -105,11 +105,11 @@
 
 		<full_data>
 			<interval units="min">60</interval>
-			<enable>true</enable>
+			<enable>false</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">7.5</interval>
+			<interval units="min">2</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -236,8 +236,8 @@
 				</volume> 				
 				
 				<mechanics> 
-					<cell_cell_adhesion_strength units="micron/min">0.4</cell_cell_adhesion_strength>
-					<cell_cell_repulsion_strength units="micron/min">10.0</cell_cell_repulsion_strength>
+					<cell_cell_adhesion_strength units="micron/min">0.0</cell_cell_adhesion_strength>
+					<cell_cell_repulsion_strength units="micron/min">0.0</cell_cell_repulsion_strength>
 					<relative_maximum_adhesion_distance units="dimensionless">1.25</relative_maximum_adhesion_distance>
 					
 					<options>
@@ -286,8 +286,7 @@
 				<intracellular type="maboss">
 					<bnd_filename>./config/boolean_network/epithelium.bnd</bnd_filename>
 					<cfg_filename>./config/boolean_network/epithelium.cfg</cfg_filename>
-					<time_step>12</time_step>
-					<scaling>100</scaling>
+					<time_step>2</time_step>
 				</intracellular>
 			</phenotype>
 			<custom_data>  
@@ -362,13 +361,12 @@
 				<intracellular type="maboss">
 					<bnd_filename>./config/boolean_network/macrophage.bnd</bnd_filename>
 					<cfg_filename>./config/boolean_network/macrophage.cfg</cfg_filename>
-					<time_step>12</time_step>
-					<scaling>1</scaling>
+					<time_step>2</time_step>
 				</intracellular>
 			</phenotype>
 			<custom_data>  
 				<virion_detection_threshold type="double" units="virion" description="quantity of virion to activate the presence_virus variable">0.05</virion_detection_threshold> 
-				<macrophage_eating_rate type="double" units="virion/min" description="rate at which a virion is eated by a macrophage">10000</macrophage_eating_rate> 
+				<macrophage_eating_rate type="double" units="virion/min" description="rate at which a virion is eated by a macrophage">1000</macrophage_eating_rate> 
 				<macrophage_cytokin_release_rate type="double" units="cytokin/min" description="rate at which cytokins will be released by macrophage">1000</macrophage_cytokin_release_rate>
 			</custom_data>
 		</cell_definition>	
@@ -402,8 +400,7 @@
 				<intracellular type="maboss">
 					<bnd_filename>./config/boolean_network/tcell.bnd</bnd_filename>
 					<cfg_filename>./config/boolean_network/tcell.cfg</cfg_filename>
-					<time_step>12</time_step>
-					<scaling>100</scaling>
+					<time_step>2</time_step>
 				</intracellular>
 			</phenotype>
 			<custom_data>
@@ -434,14 +431,14 @@
 		
 			<immune_dt type="double" units="min" description="how often we check to introduce immune cells">10</immune_dt> 
 			
-			<immune_z_offset type="double" units="micron" description="immune cell position over the epithelium">0</immune_z_offset>
+			<immune_z_offset type="double" units="micron" description="immune cell position over the epithelium">0.1</immune_z_offset>
 			
 			
 			<CD8_Tcell_max_recruitment_rate type="double" units="cells/min/micron^3">4e-8</CD8_Tcell_max_recruitment_rate> <!-- 4e-8 -->
 			<CD8_Tcell_recruitment_min_signal type="double" units="substrate/micron^3">0.3</CD8_Tcell_recruitment_min_signal>
 			<CD8_Tcell_recruitment_saturation_signal type="double" units="substrate/micron^3">.5</CD8_Tcell_recruitment_saturation_signal>
 		
-		<number_macrophages type="int" units="macrophages">100</number_macrophages>
+		<number_macrophages type="int" units="macrophages">200</number_macrophages>
 		<number_tcells type="int" units="macrophages">100</number_tcells>
 	</user_parameters>
 	

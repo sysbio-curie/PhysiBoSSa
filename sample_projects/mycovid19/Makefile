@@ -68,7 +68,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := custom.o Attachable_cell.o Epithelial_cell.o Immune_cell.o Macrophage.o TCell.o
+PhysiCell_custom_module_OBJECTS := custom.o Immune_system.o Attachable_cell.o Epithelial_cell.o Immune_cell.o Macrophage.o TCell.o
 
 PhysiBoSSa_OBJECTS := maboss_network.o maboss_intracellular.o
 
@@ -164,6 +164,9 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
+
+Immune_system.o: ./custom_modules/Immune_system.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/Immune_system.cpp
 
 Attachable_cell.o: ./custom_modules/Attachable_cell.cpp
 	$(COMPILE_COMMAND) -c ./custom_modules/Attachable_cell.cpp

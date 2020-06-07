@@ -1,35 +1,21 @@
 Node Presence_Virus {
   logic = Presence_Virus;
-  rate_up  = @logic ? $binding : 0; 
-  rate_down  = @logic ? 0 : $unbinding;
 }
 
-Node BoundReceptor {
-  logic = Presence_Virus & !Internal;
-  rate_up  = @logic ? $binding : 0; 
-  rate_down  = @logic ? 0 : $unbinding;
+Node Infected {
+  logic = Presence_Virus & !Infected & !CureByTCell;
+  rate_up = @logic ? $infection : 0;
+  rate_down  = 0;
 }
 
-Node Internal {
-  logic = !Internal;
-  rate_up = @logic ? $endocytosis : 0;
-  rate_down  = @logic ? 0 : $exocytosis;
-}
-
-Node Replicate_Virus {
-  logic = BoundReceptor & Internal;
-  rate_up = @logic ? $virus_replication : 0;
-  rate_down  = @logic ? 0 : $virus_replication_stop;
-}
-
-Node Export_Virus {
-  logic = Replicate_Virus;
-  rate_up = @logic ? $virus_export : 0;
-  rate_down  = @logic ? 0 : $virus_export_stop;
+Node Infectious {
+  logic = Infected & !CureByTCell;
+  rate_up = @logic ? $infectious_start : 0;
+  rate_down  = @logic ? 0 : $infectious_stop;
 }
 
 Node Death {
-  logic = Replicate_Virus;
+  logic = Infectious & !CureByTCell;
   rate_up = @logic ? $death_rate : 0;
   rate_down = 0;
 }
@@ -39,7 +25,13 @@ Node TCellBound {
 }
 
 Node DeathByTCell {
-  logic = TCellBound;
+  logic = TCellBound & Infectious & !CureByTCell;
   rate_up = @logic ? $death_rate_by_tcell : 0;
+  rate_down = 0;
+}
+
+Node CureByTCell {
+  logic = TCellBound & Infected & !Infectious & !DeathByTCell;
+  rate_up = @logic ? $cure_rate_by_tcell : 0;
   rate_down = 0;
 }
