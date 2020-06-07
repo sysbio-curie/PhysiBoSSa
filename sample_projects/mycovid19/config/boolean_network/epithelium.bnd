@@ -1,0 +1,37 @@
+Node Presence_Virus {
+  logic = Presence_Virus;
+}
+
+Node Infected {
+  logic = Presence_Virus & !Infected & !CureByTCell;
+  rate_up = @logic ? $infection : 0;
+  rate_down  = 0;
+}
+
+Node Infectious {
+  logic = Infected & !CureByTCell;
+  rate_up = @logic ? $infectious_start : 0;
+  rate_down  = @logic ? 0 : $infectious_stop;
+}
+
+Node Death {
+  logic = Infectious & !CureByTCell;
+  rate_up = @logic ? $death_rate : 0;
+  rate_down = 0;
+}
+
+Node TCellBound {
+  logic = TCellBound;
+}
+
+Node DeathByTCell {
+  logic = TCellBound & Infectious & !CureByTCell;
+  rate_up = @logic ? $death_rate_by_tcell : 0;
+  rate_down = 0;
+}
+
+Node CureByTCell {
+  logic = TCellBound & Infected & !Infectious & !DeathByTCell;
+  rate_up = @logic ? $cure_rate_by_tcell : 0;
+  rate_down = 0;
+}

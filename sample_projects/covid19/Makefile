@@ -68,9 +68,9 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := custom.o Epithelial_cell.o
+PhysiCell_custom_module_OBJECTS := custom.o submodel_data_structures.o internal_viral_dynamics.o internal_viral_response.o receptor_dynamics.o immune_submodels.o epithelium_submodel.o
 
-PhysiBoSSa_OBJECTS := maboss_network.o maboss_intracellular.o
+PhysiBoSSa_OBJECTS := maboss_network.o boolean_network.o maboss_intracellular.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -165,9 +165,23 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
-Epithelial_cell.o: ./custom_modules/Epithelial_cell.cpp
-	$(COMPILE_COMMAND) -c ./custom_modules/Epithelial_cell.cpp
+submodel_data_structures.o: ./custom_modules/submodel_data_structures.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/submodel_data_structures.cpp
 
+internal_viral_dynamics.o: ./custom_modules/internal_viral_dynamics.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/internal_viral_dynamics.cpp
+
+internal_viral_response.o: ./custom_modules/internal_viral_response.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/internal_viral_response.cpp
+
+receptor_dynamics.o: ./custom_modules/receptor_dynamics.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/receptor_dynamics.cpp
+	
+immune_submodels.o: ./custom_modules/immune_submodels.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/immune_submodels.cpp 
+	
+epithelium_submodel.o: ./custom_modules/epithelium_submodel.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/epithelium_submodel.cpp 
 
 # user-defined PhysiCell modules
 
@@ -176,6 +190,9 @@ MaBoSS:
 
 maboss_network.o: ./addons/PhysiBoSSa/src/maboss_network.cpp MaBoSS
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/maboss_network.cpp
+
+boolean_network.o: ./addons/PhysiBoSSa/src/boolean_network.cpp MaBoSS
+	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/boolean_network.cpp
 
 maboss_intracellular.o: ./addons/PhysiBoSSa/src/maboss_intracellular.cpp MaBoSS
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/maboss_intracellular.cpp
