@@ -1,0 +1,13 @@
+Node Contact_Macrophage {
+  logic = Contact_Macrophage;
+}
+
+Node Active {
+  logic = Contact_Macrophage;
+  rate_up  = @logic ? $tcell_activation : 0; 
+  rate_down  = @logic ? 0 : $tcell_inactivation;
+}
+
+Node Contact_Epithelium {
+  logic = Contact_Epithelium;
+}

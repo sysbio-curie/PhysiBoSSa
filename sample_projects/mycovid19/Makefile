@@ -68,7 +68,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := custom.o Epithelial_cell.o
+PhysiCell_custom_module_OBJECTS := custom.o Immune_system.o Attachable_cell.o Epithelial_cell.o Immune_cell.o Macrophage.o TCell.o
 
 PhysiBoSSa_OBJECTS := maboss_network.o maboss_intracellular.o
 
@@ -165,9 +165,23 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
+Immune_system.o: ./custom_modules/Immune_system.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/Immune_system.cpp
+
+Attachable_cell.o: ./custom_modules/Attachable_cell.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/Attachable_cell.cpp
+	
 Epithelial_cell.o: ./custom_modules/Epithelial_cell.cpp
 	$(COMPILE_COMMAND) -c ./custom_modules/Epithelial_cell.cpp
 
+Immune_cell.o: ./custom_modules/Immune_cell.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/Immune_cell.cpp
+
+Macrophage.o: ./custom_modules/Macrophage.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/Macrophage.cpp
+
+TCell.o: ./custom_modules/TCell.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/TCell.cpp
 
 # user-defined PhysiCell modules
 
@@ -209,12 +223,7 @@ data-cleanup:
 FOLDER := output
 FRAMERATE := 24
 movie:
-	#copy $(FOLDER)/snap*.jpg .
-	mencoder "mf://snapshot*.jpg" -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=10000:mbd=2:trell -mf fps=$(FRAMERATE):type=jpg -nosound -o out.avi	
-	# mencoder "mf://snapshot*.jpg" -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=10000:mbd=2:trell -mf fps=$(FRAMERATE):type=jpg -nosound -o out.mp4 -of mpeg
-	ffmpeg -i out.avi -vcodec libx264 -pix_fmt yuv420p -strict -2 -acodec aac out.mp4
-	ffmpeg -r 24 -f image2 -i snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -acodec aac out1.mp4
-	#del snap*.jpg
+	ffmpeg -r 5 -f image2 -i output/snapshot%08d.svg -vcodec libx264 -pix_fmt yuv420p -strict -2 -acodec aac out1.mp4
 # archival 
 	
 checkpoint: 
