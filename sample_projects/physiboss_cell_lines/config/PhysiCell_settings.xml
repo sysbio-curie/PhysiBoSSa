@@ -210,7 +210,7 @@
 			<phenotype>
 				<intracellular type="maboss">
 					<parameters>
-						<parameter name="$time_scale">0.1</parameter>
+						<parameter name="$time_scale">0.2</parameter>
 					</parameters>
 				</intracellular>
 			</phenotype>
@@ -219,7 +219,7 @@
 		<cell_definition name="yet_yet_another" parent_type="default" ID="4">
 			<phenotype>
 				<intracellular type="maboss">
-					<scaling>0.5</scaling>
+					<scaling>0.25</scaling>
 				</intracellular>
 			</phenotype>
 			<custom_data/>
