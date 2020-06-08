@@ -224,6 +224,16 @@
 			</phenotype>
 			<custom_data/>
 		</cell_definition>
+		<cell_definition name="last_one" parent_type="default" ID="5">
+			<phenotype>
+				<intracellular type="maboss">
+					<parameters>
+						<parameter name="$time_scale">0.0</parameter>
+					</parameters>
+				</intracellular>
+			</phenotype>
+			<custom_data/>
+		</cell_definition>
 	</cell_definitions>	
 	
 	<user_parameters>
