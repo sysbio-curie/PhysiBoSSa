@@ -44,6 +44,8 @@ class MaBoSSNetwork
 		std::map< std::string, double > mutations;
 	
 		std::map< std::string, Node*> nodesByName;
+		std::map< std::string, const Symbol*> parametersByName;
+	
 		inline void set_time_to_update(){this->time_to_update = (PhysiCell::UniformRandom()+0.5) * this->get_update_time_step();}
 
 	
@@ -81,6 +83,9 @@ class MaBoSSNetwork
 
 		void set_parameters(std::map<std::string, double> parameters);
 
+		double get_parameter_value(std::string name);
+		void set_parameter_value(std::string name, double value);
+		
 		/** \brief Restart a vector of bools, to the init values of the network */
 		void restart_node_values();
 
