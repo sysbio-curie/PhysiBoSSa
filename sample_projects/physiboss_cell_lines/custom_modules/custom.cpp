@@ -145,30 +145,35 @@ void setup_tissue( void )
 	for (int i=0; i < 90; i+= 10)
 		for (int j=0; j < 90; j+= 10){
 			
-			// bottom left corner : default
+			// bottom left : default
 			// the formula for C is A&B. Meaning that C will only activate for half the cells
 			pC = create_cell(get_cell_definition("default")); 
 			pC->assign_position(-i-10, -j-10, 0.0 );
 			
-			// bottom right corner : other
+			// bottom middle : other
 			// the formula for C is A|B. C will activate in all cells
 			pC = create_cell(get_cell_definition("other")); 
 			pC->assign_position(i+10, -j-10, 0.0 );
 
-			// top left  corner : another
+			// top left : another
 			// Here we mutate the C node at zero, so it will stay there
 			pC = create_cell(get_cell_definition("another")); 
 			pC->assign_position(-i-10, j+10, 0.0 );
 			
-			// top right corner : yet_another
+			// top middle : yet_another
 			// Here we change the default value for the rates, acelerating the activation of C
 			pC = create_cell(get_cell_definition("yet_another")); 
 			pC->assign_position(i+10, j+10, 0.0 );
 			
-			// right of top right corner : yet_yet_another
-			// Here we change the scaling value, acelerating the activation of C
+			// top right : yet_yet_another
+			// Here we acelerate the activation of C by changing the scaling value
 			pC = create_cell(get_cell_definition("yet_yet_another")); 
 			pC->assign_position(i+110, j+10, 0.0 );
+			
+			// bottom right : last_one
+			// Here we start with $time_scale = 0, then at the middle of the simulation we set it to 0.1
+			pC = create_cell(get_cell_definition("last_one")); 
+			pC->assign_position(i+110, -j-10, 0.0 );
 		}
 
 		
@@ -181,6 +186,13 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 	
 	if (pCell->phenotype.intracellular->need_update())
 	{	
+		if (
+			pCell->type == get_cell_definition("last_one").type
+			&& PhysiCell::PhysiCell_globals.current_time >= 100.0 
+			&& pCell->phenotype.intracellular->get_parameter_value("$time_scale") == 0.0
+		)
+			pCell->phenotype.intracellular->set_parameter_value("$time_scale", 0.1);
+
 		set_input_nodes(pCell);
 
 		pCell->phenotype.intracellular->update();
