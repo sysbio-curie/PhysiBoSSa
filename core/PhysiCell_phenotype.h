@@ -570,6 +570,12 @@ class Intracellular
 	// Set value for boolean model
 	virtual void set_boolean_node_value(std::string name, bool value) = 0;
 	
+	// Get value for maboss model parameter
+	virtual double get_parameter_value(std::string name) = 0;
+	
+	// Set value for maboss model parameter
+	virtual void set_parameter_value(std::string name, double value) = 0;
+	
 	virtual std::string get_state() = 0;
 	
 	virtual Intracellular* clone() = 0;
