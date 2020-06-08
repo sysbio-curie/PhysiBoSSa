@@ -102,11 +102,11 @@ bool TCell::attempt_immune_cell_attachment(Cell* pTarget , double dt )
 		
 		if (pTarget->type == get_cell_definition( "macrophage" ).type) {
 			isBoundToMacrophage = true;
-			static_cast<Macrophage*>(pTarget)->isAttachedToTCell = true;
+			static_cast<Macrophage*>(pTarget)->bindTCell();
 			
 		} else if (pTarget->type == get_cell_definition( "lung epithelium" ).type) {
 			isBoundToEpithelium = true;
-			static_cast<Epithelial_Cell*>(pTarget)->isAttachedToTCell = true;
+			static_cast<Epithelial_Cell*>(pTarget)->bindTCell();
 		}
 		return true; 
 	}

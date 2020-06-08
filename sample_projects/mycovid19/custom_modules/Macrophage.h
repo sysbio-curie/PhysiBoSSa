@@ -25,6 +25,10 @@ class Macrophage : public Immune_cell
     static void setup_cell_definition(Cell_Definition* cd);
 
     std::vector<std::string> coloring_function();
+    
+    void bindTCell() {
+      isAttachedToTCell = true;
+    }
 
     static void function_phenotype( Cell* pCell, Phenotype& phenotype, double dt ) {
       static_cast<Macrophage*>(pCell)->function_phenotype(phenotype, dt);

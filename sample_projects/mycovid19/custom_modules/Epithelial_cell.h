@@ -25,8 +25,12 @@ class Epithelial_Cell : public Attachable_cell
     
     static Cell* create_cell();
     static void setup_cell_definition(Cell_Definition* cd);
-        
+    
     std::vector<std::string> coloring_function();
+
+    void bindTCell() {
+      isAttachedToTCell = true;
+    }
 
     static void function_phenotype( Cell* pCell, Phenotype& phenotype, double dt ) {
       static_cast<Epithelial_Cell*>(pCell)->function_phenotype(phenotype, dt);
