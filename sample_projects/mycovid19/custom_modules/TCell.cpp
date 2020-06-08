@@ -57,20 +57,27 @@ void TCell::function_phenotype(Phenotype& phenotype, double dt )
 	
 }
 
+bool TCell::can_attach(Cell* pTarget) {
+	return (
+		(
+			!isActive
+			&& pTarget->type == get_cell_definition("macrophage").type
+			&& static_cast<Macrophage*>(pTarget)->isActive
+		)
+		||
+		(
+			isActive
+			&& pTarget->type == get_cell_definition("lung epithelium").type
+			&& static_cast<Epithelial_Cell*>(pTarget)->isInfected
+			&& !static_cast<Epithelial_Cell*>(pTarget)->isCured
+		)
+	);
+}
 
 bool TCell::attempt_immune_cell_attachment(Cell* pTarget , double dt )
 {
 	// Checking if the is in our targets, otherwise return		
-	if (
-		pTarget->type == get_cell_definition( "CD8 Tcell" ).type 
-		
-	||
-		(pTarget->type == get_cell_definition( "macrophage" ).type 
-		&& !(static_cast<Macrophage*>(pTarget)->isActive && !isActive))
-		
-	|| 	(pTarget->type == get_cell_definition( "lung epithelium").type
-		&& !(static_cast<Epithelial_Cell*>(pTarget)->isInfected && !static_cast<Epithelial_Cell*>(pTarget)->isCured && isActive)) 
-	) 
+	if (!can_attach(pTarget))
 	{ return false; }
 
 	// if the target cell is dead, give up 

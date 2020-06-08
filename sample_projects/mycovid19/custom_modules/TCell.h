@@ -16,6 +16,7 @@ class TCell : public Immune_cell
     void function_phenotype(Phenotype& phenotype, double dt);
     void function_mechanics( Phenotype& phenotype, double dt );
 
+    bool can_attach(Cell* pTarget);
     bool attempt_immune_cell_attachment(Cell* pTarget , double dt );
     Cell* check_neighbors_for_attachment(double dt);
     
