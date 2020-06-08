@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import csv
 from collections import Counter
 import numpy as np
+import itertools
 
 def create_dict(number_of_files, folder):
     "create a dictionary with the states file in the folder 'output', half of the dict is used to calculate the percentage of the node, the other half is for the states"
@@ -22,7 +23,6 @@ def create_dict(number_of_files, folder):
         file_dict["node_step{0}".format(i)] = nodes_dict
         file_dict["state_step{0}".format(i)] = states_dict
 
-    print(file_dict["state_step3"]["5"])
     return file_dict
 
 def node_counter(number_of_files, file_dict):
@@ -34,7 +34,10 @@ def node_counter(number_of_files, file_dict):
             for value in file_dict["node_step{0}".format(i)][key]:
                 node_list.append(value)
         node_counts = Counter(node_list)
-        count_dict["node_count{0}".format(i)] = node_counts
+        fix_count_dict = {}
+        for key, group in itertools.groupby(node_counts, lambda k: 'others' if (node_counts[k]<(0.01* (len(file_dict)))) else k):
+            fix_count_dict[key] = sum([node_counts[k] for k in list(group)])
+        count_dict["node_count{0}".format(i)] = fix_count_dict
     return count_dict
 
 def print_all_nodes_pie(node_counter_dict):
@@ -58,7 +61,11 @@ def state_counter(number_of_files, file_dict):
             for value in file_dict["state_step{0}".format(i)][key]:
                 state_list.append(file_dict["state_step{0}".format(i)][key])
         state_counts = Counter(state_list)
-        count_dict["state_count{0}".format(i)] = state_counts
+        fix_count_dict = {}
+        for key, group in itertools.groupby(state_counts, lambda k: 'others' if (state_counts[k]<(1* (len(file_dict)))) else k):
+            fix_count_dict[key] = sum([state_counts[k] for k in list(group)])
+        count_dict["state_count{0}".format(i)] = fix_count_dict
+    
     return count_dict
 
 def print_all_states_pie(count_dict):
@@ -86,7 +93,7 @@ def print_states_pie(count_dict, step):
     k = "state_count{0}".format(step)
     labels = count_dict[k].keys()
     sizes = count_dict[k].values()
-    fig1, ax1 = plt.subplots(figsize=(6, 3), subplot_kw=dict(aspect="equal"))
+    fig1, ax1 = plt.subplots(figsize=(8, 6), subplot_kw=dict(aspect="equal"))
 
     wedges, texts, fig1 = ax1.pie(sizes, textprops=dict(color="w"), autopct='%1.1f%%')
     ax1.legend(wedges, labels=labels,
@@ -112,6 +119,45 @@ def print_nodes_pie(node_counter_dict, step):
             shadow=True)
     ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     plt.tight_layout()
+    plt.show()
+
+
+
+
+def create_area_chart(count_dict):
+    "plot an area chart with the evolution of the network states during the simulation"
+
+    state_list = []
+    all_state = []
+    a = []
+    for k in count_dict:
+        state_list.append(list(count_dict[k].keys()))
+        for l in state_list:
+            for state in l:
+                all_state.append(state)
+    all_state = list(dict.fromkeys(all_state))
+    
+    for state_count in count_dict:
+        b = []
+        for states in all_state:
+            try:
+                b.append(count_dict[state_count][states])
+            except:
+                b.append(0)
+        a.append(b)
+    a = np.array(a)
+    #print(a)
+    a = np.transpose(a)
+    percent = a /  a.sum(axis=0).astype(float) * 100
+    x = np.arange(len(count_dict))
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.stackplot(x, percent, labels=all_state)
+    ax.legend(labels=all_state, bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+    ax.set_title('100 % stacked area chart')
+    ax.set_ylabel('Percent (%)')
+    ax.margins(0, 0) # Set margins to avoid "whitespace"
+
     plt.show()
 
 
