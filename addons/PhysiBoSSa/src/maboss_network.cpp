@@ -24,8 +24,15 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 
 	this->update_time_step = this->config->getMaxTime();
 	
+	// Building map of nodes for fast later access 
 	for (auto node : this->network->getNodes()) {
 		this->nodesByName[node->getLabel()] = node;
+	}
+	
+	// Building map of parameters for fast later access
+	for (auto parameter : this->network->getSymbolTable()->getSymbolsNames()) {
+		if (parameter[0] == '$')
+			this->parametersByName[parameter] = this->network->getSymbolTable()->getSymbol(parameter);
 	}
 	
 	for (auto node : network->getNodes())
@@ -43,12 +50,21 @@ void MaBoSSNetwork::mutate(std::map<std::string, double> mutations)
 
 void MaBoSSNetwork::set_parameters(std::map<std::string, double> parameters) 
 {	
-	SymbolTable* symbol_table = this->network->getSymbolTable();
-	
 	for (auto parameter: parameters) {
-		const Symbol* symbol_paraneter = symbol_table->getSymbol(parameter.first);
-		symbol_table->setSymbolValue(symbol_paraneter, parameter.second);
+		set_parameter_value(parameter.first, parameter.second);
 	}
+}
+
+double MaBoSSNetwork::get_parameter_value(std::string name) 
+{
+	return network->getSymbolTable()->getSymbolValue(parametersByName[name]);
+}
+
+
+void MaBoSSNetwork::set_parameter_value(std::string name, double value) 
+{
+	network->getSymbolTable()->setSymbolValue(parametersByName[name], value);
+	network->getSymbolTable()->unsetSymbolExpressions();
 }
 
 /* Reset a vector of bools to the init state of the network */

@@ -71,6 +71,14 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		this->maboss.set_node_value(name, value);
 	}
 	
+	double get_parameter_value(std::string name) {
+		return this->maboss.get_parameter_value(name);
+	}
+	
+	void set_parameter_value(std::string name, double value) {
+		this->maboss.set_parameter_value(name, value);
+	}
+	
 	std::string get_state() {
 		return this->maboss.get_state();
 	}
