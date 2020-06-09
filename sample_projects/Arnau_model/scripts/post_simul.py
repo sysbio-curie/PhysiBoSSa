@@ -58,14 +58,12 @@ def state_counter(number_of_files, file_dict):
     for i in range (0, number_of_files):
         state_list = []
         for key in file_dict["state_step{0}".format(i)]:
-            for value in file_dict["state_step{0}".format(i)][key]:
-                state_list.append(file_dict["state_step{0}".format(i)][key])
-        state_counts = Counter(state_list)
+            state_list.append(file_dict["state_step{0}".format(i)][key])
+            state_counts = Counter(state_list)
         fix_count_dict = {}
-        for key, group in itertools.groupby(state_counts, lambda k: 'others' if (state_counts[k]<(1* (len(file_dict)))) else k):
+        for key, group in itertools.groupby(state_counts, lambda k: 'others' if (state_counts[k]<(0.01* (len(file_dict)))) else k):
             fix_count_dict[key] = sum([state_counts[k] for k in list(group)])
-        count_dict["state_count{0}".format(i)] = fix_count_dict
-    
+        count_dict["state_count{0}".format(i)] = fix_count_dict    
     return count_dict
 
 def print_all_states_pie(count_dict):
