@@ -160,7 +160,7 @@
 						<!-- - to + -->
 						<rate start_index="0" end_index="1" fixed_duration="true">0.016666667</rate>
 						<!-- + (pre-mitotic) to + (post-mitotic)  -->
-						<rate start_index="1" end_index="2" fixed_duration="true">Infinity</rate>
+						<rate start_index="1" end_index="2" fixed_duration="true">1e30</rate>
 						<!-- + (post-mitotic) to - -->
 						<rate start_index="2" end_index="0" fixed_duration="true">0.006666667</rate>
 					</transition_rates>
@@ -168,14 +168,14 @@
 				
 				<death>  
 					<model code="100" name="apoptosis"> 
-						<rate units="1/min">5.31667e-05</rate>
+						<death_rate units="1/min">5.31667e-05</death_rate>
 						<transition_rates units="1/min">
-							<rate start_index="0" end_index="1" fixed_duration="true">Infinity</rate>
+							<rate start_index="0" end_index="1" fixed_duration="true">1e30</rate>
 						</transition_rates>
 					</model> 
 
 					<model code="101" name="necrosis">
-						<rate units="1/min">0.0</rate>
+						<death_rate units="1/min">0.0</death_rate>
 						<transition_rates units="1/min">
 							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
 							<rate start_index="1" end_index="2" fixed_duration="true">1.15741e-5</rate>
@@ -197,13 +197,13 @@
 				<intracellular type="maboss">
 					<bnd_filename>./config/boolean_network/CCM_mod4_1.bnd</bnd_filename>
 					<cfg_filename>./config/boolean_network/CCM_mod4_1.cfg</cfg_filename>
-					<time_step>12</time_step>
+					<time_step units="min">12</time_step>
 					<initial_values>
-						<initial_value node="ECM_sensing">0.5</initial_value>
-						<initial_value node="Apoptosis">0.01</initial_value>
+						<initial_value node="ECM_sensing" units="dimensionless">0.5</initial_value>
+						<initial_value node="Apoptosis" units="dimensionless">0.01</initial_value>
 					</initial_values>
 					<mutations>
-						<mutation node="Hypoxia">1.0</mutation>
+						<mutation node="Hypoxia" units="dimensionless">1.0</mutation>
 					</mutations>
 				</intracellular>			
 			</phenotype>
