@@ -73,6 +73,7 @@ namespace PhysiCell{
 	
 PhysiCell_Settings PhysiCell_settings; 
 User_Parameters parameters; 
+User_Parameters* user_parameters = &parameters;
 
 bool physicell_config_dom_initialized = false; 
 pugi::xml_document physicell_config_doc; 	
