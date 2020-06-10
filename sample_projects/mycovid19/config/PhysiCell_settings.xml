@@ -105,11 +105,11 @@
 
 		<full_data>
 			<interval units="min">60</interval>
-			<enable>false</enable>
+			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">2</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -189,7 +189,7 @@
 				
 				<death>  
 					<model code="100" name="apoptosis"> 
-						<rate units="1/min">0</rate> <!-- 5.31667e-05 --> 
+						<death_rate units="1/min">0</death_rate> <!-- 5.31667e-05 --> 
 						<transition_rates units="1/min">
 							<rate start_index="0" end_index="1" fixed_duration="true">0.00193798</rate>
 						</transition_rates>
@@ -204,7 +204,7 @@
 					</model> 
 
 					<model code="101" name="necrosis">
-						<rate units="1/min">0.0</rate>
+						<death_rate units="1/min">0.0</death_rate>
 						<transition_rates units="1/min">
 							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
 							<rate start_index="1" end_index="2" fixed_duration="true">1.15741e-5</rate>
@@ -273,7 +273,7 @@
 			<phenotype>
 				<death>
 					<model code="100" name="apoptosis"> 
-						<rate units="1/min">0</rate> <!-- 5.31667e-05 --> 
+						<death_rate units="1/min">0</death_rate> <!-- 5.31667e-05 --> 
 					</model> 
 				</death>
 				<motility>  
@@ -290,9 +290,6 @@
 				</intracellular>
 			</phenotype>
 			<custom_data>  
-				<!-- for internal viral dynamics --> 
-				<virion_detection_threshold type="double" units="virion" description="quantity of virion to activate the presence_virus variable">0.1</virion_detection_threshold> 
-				<virion_export_rate type="double" units="virion/min" description="rate at which a virion is exported from a live cell">1000</virion_export_rate> 
 			</custom_data>
 		</cell_definition>
 		
@@ -305,7 +302,7 @@
 				</mechanics>
 				<death>
 					<model code="100" name="apoptosis"> 
-						<rate units="1/min">5e-4</rate> <!-- 5e-4 --> 
+						<death_rate units="1/min">5e-4</death_rate> <!-- 5e-4 --> 
 					</model> 
 				</death>
 				<motility>  
@@ -338,20 +335,20 @@
 				<death>
 					<!-- death is about 5x slower --> 
 					<model code="100" name="apoptosis"> 
-						<rate units="1/min">1e-5</rate> <!-- 5.31667e-05 --> 
+						<death_rate units="1/min">1e-5</death_rate> <!-- 5.31667e-05 --> 
 					</model> 
 				</death>
 				<motility>  
 					<speed>1</speed>
 					<migration_bias>0</migration_bias>
 					<persistence_time>1</persistence_time>
-					<option>
+					<options>
 						<use_2D>true</use_2D>
 						<enabled>true</enabled>
 						<chemotaxis>
 							<substrate>chemokine</substrate>
 						</chemotaxis>
-					</option>
+					</options>
 				</motility>
 
 				<volume>
@@ -365,9 +362,6 @@
 				</intracellular>
 			</phenotype>
 			<custom_data>  
-				<virion_detection_threshold type="double" units="virion" description="quantity of virion to activate the presence_virus variable">0.05</virion_detection_threshold> 
-				<macrophage_eating_rate type="double" units="virion/min" description="rate at which a virion is eated by a macrophage">1000</macrophage_eating_rate> 
-				<macrophage_cytokin_release_rate type="double" units="cytokin/min" description="rate at which cytokins will be released by macrophage">1000</macrophage_cytokin_release_rate>
 			</custom_data>
 		</cell_definition>	
 		
@@ -391,11 +385,7 @@
 					<total units="micron^3">478</total>
 					<nuclear units="micron^3">95</nuclear>
 				</volume>
-				<secretion>
-					<!-- <substrate name="pro-inflammatory cytokine">
-						<secretion_rate units="1/min">1</secretion_rate>
-						<secretion_target units="substrate density">1</secretion_target>
-					</substrate> 	 -->
+				<secretion>	
 				</secretion>
 				<intracellular type="maboss">
 					<bnd_filename>./config/boolean_network/tcell.bnd</bnd_filename>
@@ -404,10 +394,7 @@
 				</intracellular>
 			</phenotype>
 			<custom_data>
-				<cell_attachment_rate units="1/min">0.2</cell_attachment_rate>
-				<cell_attachment_lifetime units="min">8.5</cell_attachment_lifetime>
-				<max_attachment_distance units="micron">15</max_attachment_distance>
-
+		
 			</custom_data>
 		</cell_definition>	
 	</cell_definitions>
@@ -417,29 +404,44 @@
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 
-	
+				
 		<div_initialization type="divider" description="---Initialization Options--"/>
 			<multiplicity_of_infection type="double" units="none" description="multiplicity of infection: virions/cells at t=0">0.01</multiplicity_of_infection>
 			<use_single_infected_cell type="bool" units="none" description="Infect center cell with one virion (overrides MOI)">true</use_single_infected_cell>
 			
 		<div_colors type="divider" description="---Cell Color Options--"/>
-			<color_variable type="string" description="color cells based on this variable">assembled_virion</color_variable>
-			
+			<color_variable type="string" description="color cells based on this variable">assembled_virion</color_variable>		
 			<apoptotic_epithelium_color type="string" description="">black</apoptotic_epithelium_color>
-			
 			<lung_epithelium_color type="string" description="">blue</lung_epithelium_color>
-		
-			<immune_dt type="double" units="min" description="how often we check to introduce immune cells">10</immune_dt> 
-			
+	
+		<div_epithelium type="divider" description="---Epithelium Options---"/>
+			<virion_detection_threshold type="double" units="virion" description="quantity of virion to activate the presence_virus variable">0.1</virion_detection_threshold> 
+			<virion_export_rate type="double" units="virion/min" description="rate at which a virion is exported from a live cell">1000</virion_export_rate> 
+	
+		<div_macrophage type="divider" description="---Macrophage Options---"/>
+
+			<macrophage_virion_detection_threshold type="double" units="virion" description="quantity of virion to activate the presence_virus variable">0.05</macrophage_virion_detection_threshold> 
+			<macrophage_eating_rate type="double" units="virion/min" description="rate at which a virion is eated by a macrophage">1000</macrophage_eating_rate> 
+			<macrophage_cytokin_release_rate type="double" units="cytokin/min" description="rate at which cytokins will be released by macrophage">1000</macrophage_cytokin_release_rate>
+
+		<div_tcells type="divider" description="---Tcells Options---"/>
+
+			<cell_attachment_rate type="double"  units="1/min">0.2</cell_attachment_rate>
+			<cell_attachment_lifetime type="double" units="min">8.5</cell_attachment_lifetime>
+			<max_attachment_distance type="double" units="micron">15</max_attachment_distance>
+
+		<div_immune_system type="divider" description="---Immune System Options---"/>
+
+			<immune_dt type="double" units="min" description="how often we check to introduce immune cells">10</immune_dt> 	
 			<immune_z_offset type="double" units="micron" description="immune cell position over the epithelium">0.1</immune_z_offset>
 			
+			<number_macrophages type="int" units="macrophages">200</number_macrophages>
 			
 			<CD8_Tcell_max_recruitment_rate type="double" units="cells/min/micron^3">4e-8</CD8_Tcell_max_recruitment_rate> <!-- 4e-8 -->
 			<CD8_Tcell_recruitment_min_signal type="double" units="substrate/micron^3">0.3</CD8_Tcell_recruitment_min_signal>
 			<CD8_Tcell_recruitment_saturation_signal type="double" units="substrate/micron^3">.5</CD8_Tcell_recruitment_saturation_signal>
 		
-		<number_macrophages type="int" units="macrophages">200</number_macrophages>
-		<number_tcells type="int" units="macrophages">100</number_tcells>
+
 	</user_parameters>
 	
 </PhysiCell_settings>

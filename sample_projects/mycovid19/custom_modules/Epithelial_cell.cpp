@@ -26,7 +26,7 @@ void Epithelial_Cell::set_input_nodes()
 		phenotype.intracellular->set_boolean_node_value("Infectious", true);
 		
 	} else {
-		bool presence_virus = nearest_density_vector()[virion_index] > custom_data["virion_detection_threshold"];
+		bool presence_virus = nearest_density_vector()[virion_index] > user_parameters->doubles("virion_detection_threshold");
 		phenotype.intracellular->set_boolean_node_value("Presence_Virus", presence_virus);
 	}
 	
@@ -43,7 +43,7 @@ void Epithelial_Cell::from_nodes_to_cell()
 	if (isInfectious)
 	{
 		int virion_index = get_microenvironment()->find_density_index( "virion" );
-		phenotype.secretion.net_export_rates[virion_index] = custom_data["virion_export_rate"];
+		phenotype.secretion.net_export_rates[virion_index] = user_parameters->doubles("virion_export_rate");
 	}
 	
 	if (phenotype.intracellular->get_boolean_node_value("Death") || phenotype.intracellular->get_boolean_node_value("DeathByTCell")) {
@@ -92,7 +92,7 @@ std::vector<std::string> Epithelial_Cell::coloring_function(  )
 	{
 		char color [1024]; 
 		int virion_index = get_microenvironment()->find_density_index( "virion" );
-		unsigned int gradient = (unsigned int) ((255/custom_data["virion_detection_threshold"])*(nearest_density_vector()[virion_index]));
+		unsigned int gradient = (unsigned int) ((255/user_parameters->doubles("virion_detection_threshold"))*(nearest_density_vector()[virion_index]));
 		gradient = gradient < 0 ? 0 : gradient;
 		gradient = gradient > 255 ? 255 : gradient;
 		

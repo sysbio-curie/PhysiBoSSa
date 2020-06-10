@@ -80,11 +80,11 @@ bool TCell::attempt_immune_cell_attachment(Cell* pTarget , double dt )
 	// if the target cell is too far away, give up 
 	std::vector<double> displacement = pTarget->position - position;
 	double distance_scale = norm( displacement ); 
-	if( distance_scale > custom_data["max_attachment_distance"] )
+	if( distance_scale > user_parameters->doubles("max_attachment_distance") )
 	{ return false; } 
 
 	// now, get the attachment probability 
-	double attachment_probability = custom_data["cell_attachment_rate"] * dt; 
+	double attachment_probability = user_parameters->doubles("cell_attachment_rate") * dt; 
 
 	// don't need to cap it at 1.00: if prob > 100%, 
 	// then this statement always evaluates as true, 
