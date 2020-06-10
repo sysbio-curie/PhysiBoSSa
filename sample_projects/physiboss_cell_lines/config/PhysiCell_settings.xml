@@ -154,11 +154,11 @@
 				
 				<death>  
 					<model code="100" name="apoptosis"> 
-						<rate units="1/min">0</rate>
+						<death_rate units="1/min">0</death_rate>
 					</model> 
 
 					<model code="101" name="necrosis">
-						<rate units="1/min">0.0</rate>
+						<death_rate units="1/min">0.0</death_rate>
 					</model> 
 				</death>					
 				
