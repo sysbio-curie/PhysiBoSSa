@@ -210,7 +210,7 @@ def filter_states(max_cell, all_counts, percentage):
                 b = b + copy_all_counts[i][state]
             except:
                 b = b + 0
-        all_counts[i]["others"] = a
+        all_counts[i]["others"] = b
 
     return all_counts
 
