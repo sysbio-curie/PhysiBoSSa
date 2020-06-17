@@ -219,7 +219,7 @@ void Custom_cell::set_motility( double dt )
             set_3D_random_motility(dt);
             break;
         case 1:
-            set_3D_polarized_motility(dt);
+            set_oxygen_motility(dt);
             break;
         default:
             return;
