@@ -193,7 +193,7 @@ void Custom_cell::set_3D_polarized_motility( double dt )
     motility *= get_motility_amplitude(pmotility);
 }
 
-void Custom_cell::set_oxygen_motility(double dt){
+void Custom_cell::set_oxygen_motility(){
 
 		phenotype.motility.chemotaxis_index = get_microenvironment()->find_density_index( "oxygen");
 		// bias direction is gradient for the indicated substrate 
@@ -292,9 +292,12 @@ void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, dou
 		}
 	}
 	
-	// Add active motility term
-	if ( !(pCustomCell->passive()) )
-		pCustomCell->set_motility(dt);
+	pCell->update_motility_vector(dt); 
+	pCell->velocity += phenotype.motility.motility_vector; 
+
+	// // Add active motility term
+	// if ( !(pCustomCell->passive()) )
+	// 	pCustomCell->set_motility(dt);
 	
 	return; 
 }
