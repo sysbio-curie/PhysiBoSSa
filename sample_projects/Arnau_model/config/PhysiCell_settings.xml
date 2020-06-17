@@ -202,9 +202,6 @@
 						<initial_value node="ECM_sensing" units="dimensionless">0.5</initial_value>
 						<initial_value node="Apoptosis" units="dimensionless">0.01</initial_value>
 					</initial_values>
-					<mutations>
-						<mutation node="Hypoxia" units="dimensionless">1.0</mutation>
-					</mutations>
 				</intracellular>			
 			</phenotype>
 			<custom_data/>
