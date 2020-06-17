@@ -128,7 +128,7 @@ void create_cell_types( void )
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("ecm_contact", "dimensionless", 0.0); //for paraview visualization
 	cell_defaults.custom_data.add_variable(parameters.strings("node_to_visualize"), "dimensionless", 0.0 ); //for paraview visualization
-	load_ecm_file();
+	build_ecm_shape();
 
 	//Setting the custom_create_cell pointer to our create_custom_cell
 	cell_defaults.functions.instantiate_cell = Custom_cell::create_custom_cell;
@@ -161,29 +161,35 @@ void setup_microenvironment( void )
 void setup_tissue( void )
 {
 	Custom_cell* pC;
-	std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
+	//std::vector<init_record> cells = read_init_file(parameters.strings("init_cells_filename"), ';', true);
+	double cell_radius = cell_defaults.phenotype.geometry.radius; 
+	double cell_spacing = 0.95 * 2.0 * cell_radius; 
 	
-	for (int i = 0; i < cells.size(); i++)
+	double tumor_radius = 100;
+	std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,tumor_radius);
+
+	for (int i = 0; i < positions.size(); i++)
 	{
+		/*
 		float x = cells[i].x;
 		float y = cells[i].y;
 		float z = cells[i].z;
 		float radius = cells[i].radius;
 		int phase = cells[i].phase;
 		double elapsed_time = cells[i].elapsed_time;
-
+*/
 		pC = static_cast<Custom_cell*>(create_cell(cell_defaults));
-		pC->assign_position( x, y, z );
-		double volume = sphere_volume_from_radius(radius);
+		pC->assign_position( positions[i] );
+		double volume = sphere_volume_from_radius(cell_radius);
 		pC->set_total_volume(volume);
 		pC->phenotype.volume.target_solid_nuclear = cell_defaults.phenotype.volume.target_solid_nuclear;
 		pC->phenotype.volume.target_solid_cytoplasmic = cell_defaults.phenotype.volume.target_solid_cytoplasmic;
 		pC->phenotype.volume.rupture_volume = cell_defaults.phenotype.volume.rupture_volume;
 		
-		pC->phenotype.cycle.data.current_phase_index = phase+1;
-		pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
-		if ((phase+1) == 1)
-			pC->phenotype.cycle.pCycle_Model->phases[1].entry_function(pC, pC->phenotype, 0);
+		//pC->phenotype.cycle.data.current_phase_index = phase+1;
+		//pC->phenotype.cycle.data.elapsed_time_in_phase = elapsed_time;
+		//if ((phase+1) == 1)
+			//pC->phenotype.cycle.pCycle_Model->phases[1].entry_function(pC, pC->phenotype, 0);
 
 		pC->custom_data["ecm_contact"] = pC->ecm_contact;
 		color_node(pC);
@@ -276,11 +282,11 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 }
 
 void set_input_nodes(Custom_cell* pCell) 
-{	
+{	/*
 	if ( pCell->phenotype.intracellular->has_node( "Oxy" ) ){
 		pCell->phenotype.intracellular->set_boolean_node_value("Oxy", pCell->necrotic_oxygen());
 	}
-
+*/
 	// 	nodes[ind] = ( !pCell->necrotic_oxygen() );
 
 	//enough_to_node( pCell, "TGFbR", "tgfb" );
@@ -318,6 +324,7 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		pCell->start_death(apoptosis_model_index);
 		return;
 	}
+	
 
 	if ( pCell->phenotype.intracellular->has_node( "Migration" ) )
 		pCell->evolve_motility_coef( pCell->phenotype.intracellular->get_boolean_node_value( "Migration" ), dt );
@@ -370,40 +377,27 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 }
 
 
-/* Load ecm density values from given file */
-void load_ecm_file()
-{
-	// strip( &ecm_file );
-	std::cout << "Loading ECM file " << parameters.strings("init_ecm_filename") << std::endl;
-	std::ifstream infile;
-	infile.open( parameters.strings("init_ecm_filename") );
-	std::string array[4];
-	int i = 0;
-	std::string line;
-	//skip first line: title
-	getline( infile, line, '\n' ); 
-	while ( getline( infile, line, '\n') )
-	{
-		std::stringstream ss;
-		ss.str( line );
-		i = 0;
-		while ( getline( ss, array[i], ';') )
-		{
-			i++;
-		}
-		double x = std::stod(array[0]);
-		double y = std::stod(array[1]);
-		double z = std::stod(array[2]);
-		double amount = std::stod(array[3]);
-		std::vector<double> pos(3);
-		pos[0] = x;
-		pos[1] = y;
-		pos[2] = z;
-		int voxel_index = microenvironment.nearest_voxel_index( pos );
-		microenvironment.density_vector(voxel_index)[microenvironment.find_density_index("ecm")] += amount; 		
-	}
-	infile.close();
+
+
+void build_ecm_shape() {
+ 
+ // Here we design a spherical shell of ecm
+ std::vector<double> center(3, 0);
+ double inner_radius = 100;
+ double outer_radius = 150;
+ 
+ for (auto voxel : microenvironment.mesh.voxels) {
+ // Compute norm to center
+ double t_norm = norm(voxel.center);
+ // If norm is in [inner_radius, outer_radius], then we add it
+ if (t_norm < outer_radius && t_norm > inner_radius) {
+ microenvironment.density_vector(voxel.mesh_index)[microenvironment.find_density_index("ecm")] = 0.3; 
+ 
+ }
+ }
+ 
 }
+
 
 
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header) 
@@ -489,4 +483,35 @@ void enough_to_node( Custom_cell* pCell, std::string nody, std::string field )
 void color_node(Custom_cell* pCell){
 	std::string node_name = parameters.strings("node_to_visualize");
 	pCell->custom_data[node_name] = pCell->phenotype.intracellular->get_boolean_node_value(node_name);
+}
+
+std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius, double sphere_radius)
+{
+	std::vector<std::vector<double>> cells;
+	int xc=0,yc=0,zc=0;
+	double x_spacing= cell_radius*sqrt(3);
+	double y_spacing= cell_radius*2;
+	double z_spacing= cell_radius*sqrt(3);
+	
+	std::vector<double> tempPoint(3,0.0);
+	// std::vector<double> cylinder_center(3,0.0);
+	
+	for(double z=-sphere_radius;z<sphere_radius;z+=z_spacing, zc++)
+	{
+		for(double x=-sphere_radius;x<sphere_radius;x+=x_spacing, xc++)
+		{
+			for(double y=-sphere_radius;y<sphere_radius;y+=y_spacing, yc++)
+			{
+				tempPoint[0]=x + (zc%2) * 0.5 * cell_radius;
+				tempPoint[1]=y + (xc%2) * cell_radius;
+				tempPoint[2]=z;
+				
+				if(sqrt(norm_squared(tempPoint))< sphere_radius)
+				{ cells.push_back(tempPoint); }
+			}
+			
+		}
+	}
+	return cells;
+	
 }
