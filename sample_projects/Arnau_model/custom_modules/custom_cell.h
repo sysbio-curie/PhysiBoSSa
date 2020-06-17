@@ -94,6 +94,7 @@ public:
 	* */
 	void set_3D_polarized_motility( double dt );
 	void set_motility(double );
+	void set_oxygen_motility(double dt);
     void freezer( int frozen );
 
     /** \brief Calculate repulsion and adhesion between agent and ecm at given voxel index
