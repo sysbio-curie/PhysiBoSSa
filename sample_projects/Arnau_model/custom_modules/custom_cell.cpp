@@ -193,6 +193,16 @@ void Custom_cell::set_3D_polarized_motility( double dt )
     motility *= get_motility_amplitude(pmotility);
 }
 
+void Custom_cell::set_oxygen_motility(double dt){
+
+		phenotype.motility.chemotaxis_index = get_microenvironment()->find_density_index( "oxygen");
+		// bias direction is gradient for the indicated substrate 
+		phenotype.motility.migration_bias_direction = nearest_gradient(phenotype.motility.chemotaxis_index);
+		// move up or down gradient based on this direction 
+		phenotype.motility.migration_bias_direction *= phenotype.motility.chemotaxis_direction * get_motility_amplitude(pmotility); 
+
+};
+
 /**
  * Calculate motility forces according to mode:
  * 0, random; 1, along polarity axis; other: nothing
