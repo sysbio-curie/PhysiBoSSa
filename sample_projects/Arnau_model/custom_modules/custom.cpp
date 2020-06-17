@@ -282,11 +282,11 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 }
 
 void set_input_nodes(Custom_cell* pCell) 
-{	/*
+{	
 	if ( pCell->phenotype.intracellular->has_node( "Oxy" ) ){
-		pCell->phenotype.intracellular->set_boolean_node_value("Oxy", pCell->necrotic_oxygen());
+		pCell->phenotype.intracellular->set_boolean_node_value("Oxy", !pCell->necrotic_oxygen());
 	}
-*/
+
 	// 	nodes[ind] = ( !pCell->necrotic_oxygen() );
 
 	//enough_to_node( pCell, "TGFbR", "tgfb" );
@@ -325,11 +325,31 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		return;
 	}
 	
+	if ( pCell->phenotype.intracellular->has_node( "Autophagy" ) 
+		&& pCell->phenotype.intracellular->get_boolean_node_value( "Autophagy" ) 
+	)
+	{
+		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
+		pCell->start_death(apoptosis_model_index);
+		return;
+	}
+
+	if ( pCell->phenotype.intracellular->has_node( "Hypoxia" ) 
+		&& pCell->phenotype.intracellular->get_boolean_node_value( "Hypoxia" ) 
+	)
+	{
+		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
+		pCell->start_death(apoptosis_model_index);
+		return;
+	}
+
 
 	if ( pCell->phenotype.intracellular->has_node( "Migration" ) )
-		pCell->evolve_motility_coef( pCell->phenotype.intracellular->get_boolean_node_value( "Migration" ), dt );
+		pCell->set_oxygen_motility();
+		
+		// pCell->evolve_motility_coef( pCell->phenotype.intracellular->get_boolean_node_value( "Migration" ), dt );
 
-	 if ( pCell->phenotype.intracellular->has_node( "Cell_growth" ) )
+	 if ( pCell->phenotype.intracellular->has_node( "Cell_growth" ) && pCell->phenotype.intracellular->get_boolean_node_value("Cell_growth") )
 	 	do_proliferation( pCell, phenotype, dt );
 
 	/*if ( pCell->phenotype.intracellular->has_node("CCA") 
