@@ -114,4 +114,5 @@ inline float sphere_volume_from_radius(float radius) {return 4.0/3.0 * PhysiCell
 bool touch_ECM(Custom_cell* pCell);
 void enough_to_node( Custom_cell* pCell, std::string nody, std::string field );
 void color_node(Custom_cell* pCell);
+inline void static_volume_function( Cell* pCell, Phenotype& phenotype, double dt ){return ;}; // do not update volume
 #endif

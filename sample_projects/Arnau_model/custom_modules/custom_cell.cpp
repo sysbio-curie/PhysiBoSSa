@@ -207,25 +207,15 @@ void Custom_cell::set_oxygen_motility(){
  * Calculate motility forces according to mode:
  * 0, random; 1, along polarity axis; other: nothing
  * */
-void Custom_cell::set_motility( double dt )
+void Custom_cell::set_motility( Custom_cell* pCell, double dt )
 {
     // Cell frozen, cannot actively move
     if ( freezed > 2 )
         return;
 	
-    switch( PhysiCell::parameters.ints("mode_motility") )
-    {
-        case 0:
-            set_3D_random_motility(dt);
-            break;
-        case 1:
-            set_oxygen_motility(dt);
-            break;
-        default:
-            return;
-            break;
-    }
-    velocity += motility;
+    pCell->update_motility_vector(dt); 
+	pCell->velocity += phenotype.motility.motility_vector;
+    
 }
 
 /* Update the value of freezing of the cell with bitwise operation
@@ -292,12 +282,17 @@ void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, dou
 		}
 	}
 	
-	pCell->update_motility_vector(dt); 
-	pCell->velocity += phenotype.motility.motility_vector; 
+	if((pCustomCell->ecm_contact) > (pCustomCell->cell_contact * 100)){
+		pCustomCell->padhesion = 0;
+	}
 
-	// // Add active motility term
-	// if ( !(pCustomCell->passive()) )
-	// 	pCustomCell->set_motility(dt);
+	if (pCustomCell->freezed > 2){
+		return ;
+	}
+
+	
+		pCell->update_motility_vector(dt);
+		pCell->velocity += phenotype.motility.motility_vector;
 	
 	return; 
 }
@@ -353,10 +348,10 @@ double Custom_cell::custom_adhesion_function(Cell* pCell, Cell* otherCell, doubl
 }
 
 bool Custom_cell::wait_for_nucleus_growth (Cell* cell, Phenotype& phenotype, double dt) {
-	return relative_diff( 
+	return (relative_diff( 
 		phenotype.volume.total, 
 		pow(PhysiCell::parameters.doubles("cell_radius"), 3.0) * 3.14159 * (4.0/3.0) * 2.0 
-	) > UniformRandom() * 0.1;
+	) > UniformRandom() * 0.1);
 }
 
 bool Custom_cell::waiting_to_remove(Cell* cell, Phenotype& phenotype, double dt) {
