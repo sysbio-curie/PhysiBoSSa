@@ -387,10 +387,18 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 	pCell->freezing( 0 );
 
 	if ( pCell->phenotype.intracellular->has_node( "Quiescence" ) 
-		&& pCell->phenotype.intracellular->get_boolean_node_value( "Quiescence" ) 
-	)
+		&& pCell->phenotype.intracellular->get_boolean_node_value( "Quiescence" ) == 0 
+	){
 		pCell->freezing(1);
-
+		cell_defaults.functions.volume_update_function = static_volume_function;
+	}
+	
+	if ( pCell->phenotype.intracellular->has_node( "Quiescence" ) 
+		&& pCell->phenotype.intracellular->get_boolean_node_value( "Quiescence" ) == 1 
+	){
+		pCell->freezing(1);
+		cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	}
 	if ( pCell->phenotype.intracellular->has_node( "Cell_freeze" ) ){
 		pCell->freezer(3 * pCell->phenotype.intracellular->get_boolean_node_value( "Cell_freeze" ));
 	}

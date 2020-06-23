@@ -93,7 +93,7 @@ public:
 	* Polarity coefficient never reach 1 so there is some noise
 	* */
 	void set_3D_polarized_motility( double dt );
-	void set_motility(double );
+	void set_motility(Custom_cell* pCell, double );
 	void set_oxygen_motility();
     void freezer( int frozen );
 
