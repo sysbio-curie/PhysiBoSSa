@@ -97,7 +97,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>4</omp_num_threads>
+		<omp_num_threads>8</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -128,7 +128,7 @@
 			<Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition>
 		</variable>
 		
-		<variable name="tnf" units="mmol" ID="1">
+		<variable name="tnf" units="TNF/um^3" ID="1">
 			<physical_parameter_set>
 				<diffusion_coefficient units="micron^2/min">1200.0</diffusion_coefficient>
 				<decay_rate units="1/min">.0275</decay_rate> 
@@ -202,22 +202,33 @@
 						<uptake_rate units="1/min">10</uptake_rate>
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
 					</substrate> 
-						
 					<substrate name="tnf">
 						<secretion_rate units="1/min">0</secretion_rate>
 						<secretion_target units="substrate density">0</secretion_target>
-						<uptake_rate units="1/min">0.6109</uptake_rate>
+						<uptake_rate units="1/min">0</uptake_rate>
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
 					</substrate> 	
 				</secretion>
-
 				<molecular />
 			</phenotype>
 			<custom_data>
+				<!-- Time steps for maboss update-->
 				<next_physibossa_run units="dimensionless">10.</next_physibossa_run>
-				<tnf_concentration units="dimensionless">0</tnf_concentration>
+				
+				<!-- Molecular model internal variables-->
+				<TNFR_binding_rate type="double" units="1/min" description="TNF receptor binding rate">0.025</TNFR_binding_rate>
+				<TNFR_endocytosis_rate type="double" units="1/min" description="TNF receptor-TNF endocytosis rate">0.1255555</TNFR_endocytosis_rate>
+				<TNFR_recycling_rate type="double" units="1/min" description="TNF receptor recycling">.5</TNFR_recycling_rate>
+				<TNFR_activation_threshold type="double" units="" description="TNFR threshold to update booleano model input">0.5</TNFR_activation_threshold>
+				<TNFR_receptors_per_cell type="double" units="dimensionless" description="number of TNFR receptors per cell">1.0</TNFR_receptors_per_cell>
+				<TFN_net_production_rate type="double" units="TNF/cell/min" description="The total TNF produced by the cell when NFkB is active">0</TFN_net_production_rate> <!-- 0.5 ng/mL -->
+
+				<!-- Auxiliary variables used to monitorize simulation-->
 				<tnf_node units="dimensionless">0</tnf_node>
 				<fadd_node units="dimensionless">0</fadd_node>
+				<nfkb_node units="dimensionless">0</nfkb_node>
+				<external_tnf units="TNF/um^3">0</external_tnf>
+
 			</custom_data>
 		</cell_definition>
 	</cell_definitions>
@@ -233,23 +244,13 @@
 		<cfg_file type="string" units="">./config/boolean_network/TNF_conf.cfg</cfg_file>
 		<maboss_time_step type="double" units="dimensionless">10.</maboss_time_step>
 
-		<tnf_secretion_rate type="double" units="fg/cell/min">0.76032</tnf_secretion_rate> <!-- 0.1 -->
-
-		<duration_add_tnf type="int" units="min">10</duration_add_tnf> <!-- 10 -->
-		<time_remove_tnf type="int" units="min">8000</time_remove_tnf> <!-- 8000 -->
 		<time_add_tnf type="int" units="min">150</time_add_tnf> <!-- 150 -->
-
-		<tnf_threshold type="double" units="dimensionless">0.25506</tnf_threshold> <!-- 2.8e-05 -->
-		<concentration_tnf type="double" units="ng/mL"> 0.5 </concentration_tnf> <!-- 0.5 -->
+		<duration_add_tnf type="int" units="min">10</duration_add_tnf> <!-- 10 -->
+		<concentration_tnf type="double" units="TNF/um^3"> 0.02 </concentration_tnf> <!-- 0.5 ng/mL -->
+		<time_remove_tnf type="int" units="min">100000</time_remove_tnf> <!-- 8000 -->
 		<membrane_length type="int" units=""> 470 </membrane_length>
 
-		<TNFR_binding_rate type="double" units="molecules/min" description="TNF receptor binding rate">0.1</TNFR_binding_rate> 
-		<TNFR_endocytosis_rate type="double" units="1/min" description="TNF receptor-TNF endocytosis rate">0.25</TNFR_endocytosis_rate> 
-		<TNFR_recycling_rate type="double" units="1/min" description="TNF receptor recycling">0.9</TNFR_recycling_rate> 
-		<TNFR_activation_threshold type="double" units="" description="TNFR threshold to update booleano model input">0.5</TNFR_activation_threshold> 
-		<TNFR_receptors_per_cell type="double" units="dimensionless" description="number of TNFR receptors per cell">1</TNFR_receptors_per_cell>
-		<TFN_net_production_rate  type="double" units="molecules/min" description="The total TNF produced by the cell when NFkB is active">>0.5</TFN_net_production_rate>
-	</user_parameters>
+</user_parameters>
 	
 	
 </PhysiCell_settings>

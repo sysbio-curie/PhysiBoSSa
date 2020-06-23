@@ -321,58 +321,6 @@ std::vector<init_record> read_init_file(std::string filename, char delimiter, bo
 	return result;
 }
 
-/* Go to proliferative if needed */
-void do_proliferation( Cell* pCell, Phenotype& phenotype, double dt )
-{
-	//do nothing as live model only have one phase
-}
-
-void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt)
-{
-	MaBoSSNetwork* maboss = pCell->maboss_cycle_network->get_maboss();
-	std::vector<bool>* nodes = pCell->maboss_cycle_network->get_nodes();
-
-	static double tnf_secretion = parameters.doubles("tnf_secretion_rate");
-
-	int bn_index = maboss->get_node_index( "Survival" );
-	if ( bn_index != -1 && (*nodes)[bn_index])
-		do_proliferation( pCell, phenotype, dt );
-
-	bn_index = maboss->get_node_index( "Apoptosis" );
-	if ( bn_index != -1 && (*nodes)[bn_index] )
-	{
-		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
-		pCell->start_death(apoptosis_model_index);
-		delete pCell->maboss_cycle_network;
-		pCell->maboss_cycle_network = NULL;
-		return;
-	}
-
-	bn_index = maboss->get_node_index( "NonACD" );
-	if ( bn_index != -1 && (*nodes)[bn_index] )
-	{
-		int necrosis_model_index = phenotype.death.find_death_model_index( "Necrosis" );
-		pCell->start_death(necrosis_model_index);
-		delete pCell->maboss_cycle_network;
-		pCell->maboss_cycle_network = NULL;
-		return;
-	}
-
-	// For model with TNF production
-	bn_index = maboss->get_node_index( "NFkB" );
-	if ( bn_index != -1 )
-	{
-		int tnf_substrate_index = microenvironment.find_density_index( "tnf" ); 
-		// produce some TNF
-		if ( (*nodes)[bn_index] )
-		{
-			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = tnf_secretion / microenvironment.voxels(pCell->get_current_voxel_index()).volume;
-		}
-		else
-			pCell->phenotype.secretion.secretion_rates[tnf_substrate_index] = 0;
-		pCell->set_internal_uptake_constants(dt);
-	}
-}
 
 void remove_density( int density_index )
 {	
