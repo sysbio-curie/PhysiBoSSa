@@ -76,7 +76,7 @@ public:
 	double adhesion(Cell* other_cell);
 	double get_adhesion();
 
-	void set_oxygen_motility();
+	void set_oxygen_motility(bool value);
     void freezer( int frozen );
 
     /** \brief Calculate repulsion and adhesion between agent and ecm at given voxel index
