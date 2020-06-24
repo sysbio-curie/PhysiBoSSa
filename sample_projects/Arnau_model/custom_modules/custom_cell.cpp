@@ -130,17 +130,20 @@ double Custom_cell::get_adhesion()
 		return 1;
 }
 
-void Custom_cell::set_oxygen_motility(){
-		phenotype.motility.is_motile = true;
+void Custom_cell::set_oxygen_motility(bool active)
+{	
+	phenotype.motility.is_motile = active;
+		
+	if (active){
 		phenotype.motility.chemotaxis_index = get_microenvironment()->find_density_index( "oxygen");
 		// bias direction is gradient for the indicated substrate 
 		phenotype.motility.migration_bias_direction = nearest_gradient(phenotype.motility.chemotaxis_index);
-		phenotype.motility.migration_bias = 1.0;
+		phenotype.motility.migration_bias = PhysiCell::parameters.doubles("migration_bias");
 		phenotype.motility.chemotaxis_direction = 1.0;
-		phenotype.motility.migration_speed = 1.0;
+		phenotype.motility.migration_speed = PhysiCell::parameters.doubles("migration_speed");
 		// move up or down gradient based on this direction 
 		phenotype.motility.migration_bias_direction *= phenotype.motility.chemotaxis_direction * get_motility_amplitude(pmotility); 
-
+	}
 };
 
 /* Update the value of freezing of the cell with bitwise operation
