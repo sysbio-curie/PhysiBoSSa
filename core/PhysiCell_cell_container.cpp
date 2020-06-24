@@ -70,6 +70,9 @@
 #include "../BioFVM/BioFVM_vector.h"
 #include "PhysiCell_cell.h"
 
+#include <algorithm>
+#include <iterator> 
+
 using namespace BioFVM;
 
 namespace PhysiCell{
@@ -218,6 +221,11 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			{
 				(*all_cells)[i]->functions.custom_cell_rule((*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
 			}
+			
+			if( (*all_cells)[i]->functions.contact_function )
+			{
+				evaluate_interactions( (*all_cells)[i], (*all_cells)[i]->phenotype , time_since_last_mechanics);
+			}
 		}
 		// Calculate new positions
 		#pragma omp parallel for 
@@ -310,9 +318,53 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		// if we need gradients, compute them
 		if( default_microenvironment_options.calculate_gradients ) 
 		{ microenvironment.compute_all_gradient_vectors();  }
-		// end of new in Feb 2018 		
+		// end of new in Feb 2018 
 		
-		// Compute velocities
+		std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "interactions" << std::endl; 
+		// perform interactions -- new in June 2020 
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			if( pC->functions.contact_function && pC->is_out_of_domain == false )
+			{ evaluate_interactions( pC,pC->phenotype,time_since_last_mechanics ); }
+		}
+		
+		// perform custom computations 
+
+		std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "custom" << std::endl; 
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			if( pC->functions.custom_cell_rule && pC->is_out_of_domain == false )
+			{ pC->functions.custom_cell_rule( pC,pC->phenotype,time_since_last_mechanics ); }
+		}
+		
+		// update velocities 
+		
+		std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "velocity" << std::endl; 
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			if( pC->functions.update_velocity && pC->is_out_of_domain == false && pC->is_movable )
+			{ pC->functions.update_velocity( pC,pC->phenotype,time_since_last_mechanics ); }
+		}
+
+		// update positions 
+		
+		std::cout << __FILE__ << " " << __FUNCTION__ << " " << __LINE__ << " " << "position" << std::endl; 
+		#pragma omp parallel for 
+		for( int i=0; i < (*all_cells).size(); i++ )
+		{
+			Cell* pC = (*all_cells)[i]; 
+			if( pC->is_out_of_domain == false && pC->is_movable)
+			{ pC->update_position(time_since_last_mechanics); }
+		}
+		
+/*		
+		// Compute custom functions, interations, and velocities
 		#pragma omp parallel for 
 		for( int i=0; i < (*all_cells).size(); i++ )
 		{
@@ -328,6 +380,14 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 			{
 				(*all_cells)[i]->functions.custom_cell_rule((*all_cells)[i], (*all_cells)[i]->phenotype, time_since_last_mechanics);
 			}
+			
+			// contact interactions 
+			
+			if( (*all_cells)[i]->functions.contact_function )
+			{
+				evaluate_interactions( (*all_cells)[i] , (*all_cells)[i]->phenotype, time_since_last_mechanics );
+			}
+			
 		}
 		// Calculate new positions
 		#pragma omp parallel for 
