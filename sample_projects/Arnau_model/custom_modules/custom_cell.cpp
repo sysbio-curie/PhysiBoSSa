@@ -75,6 +75,18 @@ void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 	}
 }
 
+/** \brief (De)-Activate ECM degradation by the cell */
+void Custom_cell::set_mmp( int activate )
+{ 
+	int ecm_index = get_microenvironment()->find_density_index("ecm");
+
+	if (activate)
+		phenotype.secretion.uptake_rates[ecm_index] = PhysiCell::parameters.doubles("ecm_degradation") * pintegrin;
+		
+	else
+		phenotype.secretion.uptake_rates[ecm_index] = 0;
+	
+}
 
 /* Return value of adhesion strength with ECM according to integrin level */
 double Custom_cell::integrinStrength()
