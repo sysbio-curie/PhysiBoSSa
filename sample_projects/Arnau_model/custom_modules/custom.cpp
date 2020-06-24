@@ -346,7 +346,7 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 	}
 
 
-	if ( pCell->phenotype.intracellular->has_node( "Migration" ) )
+	if ( pCell->phenotype.intracellular->has_node( "Migration" ) && pCell->phenotype.intracellular->get_boolean_node_value("Migration"))
 		pCell->set_oxygen_motility();
 		
 		// pCell->evolve_motility_coef( pCell->phenotype.intracellular->get_boolean_node_value( "Migration" ), dt );
