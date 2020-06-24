@@ -135,8 +135,8 @@ void create_cell_types( void )
 	cell_defaults.functions.custom_cell_rule = Custom_cell::check_passive;
 	cell_defaults.functions.update_velocity = Custom_cell::custom_update_velocity;
 	cell_defaults.functions.custom_adhesion = Custom_cell::custom_adhesion_function;
-	cell_defaults.functions.add_cell_basement_membrane_interactions = Custom_cell::add_cell_basement_membrane_interactions;	
-	cell_defaults.functions.calculate_distance_to_membrane = Custom_cell::distance_to_membrane;
+	// cell_defaults.functions.add_cell_basement_membrane_interactions = Custom_cell::add_cell_basement_membrane_interactions;	
+	// cell_defaults.functions.calculate_distance_to_membrane = Custom_cell::distance_to_membrane;
 	return; 
 }
 
