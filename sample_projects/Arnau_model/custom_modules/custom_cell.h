@@ -84,16 +84,6 @@ public:
 	double adhesion(Cell* other_cell);
 	double get_adhesion();
 
-    /** \brief Motility with random direction, and magnitude of motion given by customed coefficient */
-	void set_3D_random_motility( double dt );
-	/**
-	* Motility in the polarity axis migration
-	* Strength of alignement depends of the polarity parameter, as for division axis
-	* Persistence defined in the polarization direction updating.
-	* Polarity coefficient never reach 1 so there is some noise
-	* */
-	void set_3D_polarized_motility( double dt );
-	void set_motility(Custom_cell* pCell, double );
 	void set_oxygen_motility();
     void freezer( int frozen );
 

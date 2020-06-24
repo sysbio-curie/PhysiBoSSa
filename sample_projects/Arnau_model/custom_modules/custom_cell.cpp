@@ -144,57 +144,7 @@ double Custom_cell::get_adhesion()
 		return 1;
 }
 
-
-/* Motility with random direction, and magnitude of motion given by customed coefficient */
-void Custom_cell::set_3D_random_motility( double dt )
-{
-    double probability = UniformRandom();
-	
-    if ( probability < dt / PhysiCell::parameters.doubles("persistence") )
-    {
-        std::vector<double> tmp;
-        double temp_angle = 2 * M_PI * PhysiCell::UniformRandom();
-        double temp_phi = M_PI * PhysiCell::UniformRandom();
-        tmp[0] = cos( temp_angle ) * sin( temp_phi );
-        tmp[1] = sin( temp_angle ) * sin( temp_phi );
-        tmp[2] = cos( temp_phi );
-        motility = get_motility_amplitude(pmotility) * tmp;
-    }
-}
-
-/*
-* Motility in the polarity axis migration + little noise
-* Persistence in the update polarization
-* */
-void Custom_cell::set_3D_polarized_motility( double dt )
-{
-    // mot = (1-p) * r + p * pol
-    double temp_angle = 2 * M_PI * PhysiCell::UniformRandom();
-    double temp_phi = M_PI * PhysiCell::UniformRandom();
-    motility[0] = cos( temp_angle ) * sin( temp_phi );
-    motility[1] = sin( temp_angle ) * sin( temp_phi );
-    motility[2] = cos( temp_phi );
-    motility *= (1 - PhysiCell::parameters.doubles("polarity_coefficient"));
-    std::vector<double> polarization;
-    polarization.resize(3, 0.0);
-    polarization[0]= state.orientation[0];
-    polarization[1]= state.orientation[1];
-    polarization[2]= state.orientation[2];
-    std::vector<double> pol_dir;
-    pol_dir.resize(3, 0.0);
-    double pol_norm = norm(polarization); //normal to polaization used to calculate the vestor direction for polarization
-    pol_dir[0] = polarization[0]/pol_norm;
-    pol_dir[1] = polarization[1]/pol_norm;
-    pol_dir[2] = polarization[2]/pol_norm;
-    motility += PhysiCell::parameters.doubles("polarity_coefficient") * pol_dir;
-    // Normalized it
-    normalize(motility);
-    // mot = mot_coef * mot_dir
-    motility *= get_motility_amplitude(pmotility);
-}
-
 void Custom_cell::set_oxygen_motility(){
-
 		phenotype.motility.chemotaxis_index = get_microenvironment()->find_density_index( "oxygen");
 		// bias direction is gradient for the indicated substrate 
 		phenotype.motility.migration_bias_direction = nearest_gradient(phenotype.motility.chemotaxis_index);
@@ -202,21 +152,6 @@ void Custom_cell::set_oxygen_motility(){
 		phenotype.motility.migration_bias_direction *= phenotype.motility.chemotaxis_direction * get_motility_amplitude(pmotility); 
 
 };
-
-/**
- * Calculate motility forces according to mode:
- * 0, random; 1, along polarity axis; other: nothing
- * */
-void Custom_cell::set_motility( Custom_cell* pCell, double dt )
-{
-    // Cell frozen, cannot actively move
-    if ( freezed > 2 )
-        return;
-	
-    pCell->update_motility_vector(dt); 
-	pCell->velocity += phenotype.motility.motility_vector;
-    
-}
 
 /* Update the value of freezing of the cell with bitwise operation
 * Do a bitwise-or comparison on freezed and input parameter:
