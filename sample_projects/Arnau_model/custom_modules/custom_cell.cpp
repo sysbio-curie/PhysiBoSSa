@@ -5,7 +5,6 @@ Custom_cell::Custom_cell() {
     pintegrin = 0.5;
 	pmotility = 0.5;
 	padhesion = 0.5;
-	mmped = 0;
 	ecmrad = sqrt(3.0) * get_microenvironment()->mesh.dx / 2.0;
 	motility.resize(3, 0.0);
 	ecm_contact = 0;
@@ -73,31 +72,6 @@ void Custom_cell::add_ecm_interaction( int index_ecm, int index_voxel )
 		tmp_r/=distance;
 
 		velocity += tmp_r * displacement;
-	}
-}
-
-/* Degrade the surrounding ECM 
- *
- * param dt time step */
-void Custom_cell::degrade_ecm( double dt )
-{
-	if ( is_out_of_domain )
-		return;
-	if ( !mmped ) 
-		return;
-
-	// Check if there is ECM material in given voxel
-	int ecm_index = get_microenvironment()->find_density_index("ecm");
-	int current_index = get_current_mechanics_voxel_index();
-	#pragma omp critical
-	{
-		double dens = get_microenvironment()->nearest_density_vector(current_index)[ecm_index];
-		if ( dens > EPSILON )
-		{
-			dens -= (PhysiCell::parameters.ints("ecm_degradation") * pintegrin) * dt; // to change by a rate
-			dens = dens > 0 ? dens : 0;
-			get_microenvironment()->nearest_density_vector(current_index)[ecm_index] = dens;
-		}
 	}
 }
 
@@ -171,15 +145,6 @@ Cell* Custom_cell::create_custom_cell()
 	Custom_cell* pNew; 
 	pNew = new Custom_cell;		
 	return static_cast<Cell*>(pNew); 
-}
-
-// Here I'm hoping that the argument used, time_since_last_mechanics, has the same value
-// as mechanics_dt_. I should probably check later...
-void Custom_cell::check_passive(Cell* cell, Phenotype& phenotype, double dt) {
-	Custom_cell* t_cell = static_cast<Custom_cell*>(cell);
-	if (!(t_cell->passive())) {
-		t_cell->degrade_ecm(dt);
-	}
 }
 
 void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt)

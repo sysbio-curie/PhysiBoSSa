@@ -32,18 +32,11 @@ public:
 	double padhesion;
 	double nucleus_deform;
 	double ecm_contact;
-	int mmped;
 	Custom_cell();
 
 
     /** \brief Amount of contact with other cells */
 	double cell_contact;
-	
-	/** \brief Degrade the surrounding ECM 
-	*
-	* @param dt time step of mechanics, to scale degradation amount
-	* Currently, handle only the case of ECM as a density */
-	void degrade_ecm( double dt );
 	
 	/** \brief (De)-Activate ECM degradation by the cell */
 	inline void set_mmp( int activate )
@@ -56,7 +49,6 @@ public:
 		else
 			phenotype.secretion.uptake_rates[ecm_index] = 0;
 		
-		mmped = activate;
 	}	
 	
 	/** \brief Change the current value of integrin percent coeff, increase or decrease according to up value */
@@ -104,8 +96,6 @@ public:
 	void add_ecm_interaction( int index_ecm, int index_voxel );
 
 	static Cell* create_custom_cell();
-
-	static void check_passive(Cell* cell, Phenotype& phenotype, double dt);
 
 	static void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt);
 	static double custom_repulsion_function(Cell* pCell, Cell* otherCell);
