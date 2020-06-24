@@ -39,17 +39,7 @@ public:
 	double cell_contact;
 	
 	/** \brief (De)-Activate ECM degradation by the cell */
-	inline void set_mmp( int activate )
-	{ 
-		int ecm_index = get_microenvironment()->find_density_index("ecm");
-
-		if (activate)
-			phenotype.secretion.uptake_rates[ecm_index] = PhysiCell::parameters.doubles("ecm_degradation");
-			
-		else
-			phenotype.secretion.uptake_rates[ecm_index] = 0;
-		
-	}	
+	void set_mmp( int activate );
 	
 	/** \brief Change the current value of integrin percent coeff, increase or decrease according to up value */
 	inline void evolve_integrin_coef( int up, double dt )
