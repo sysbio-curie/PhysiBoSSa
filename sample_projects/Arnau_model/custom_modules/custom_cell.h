@@ -43,11 +43,11 @@ public:
 	
 	/** \brief Change the current value of integrin percent coeff, increase or decrease according to up value */
 	inline void evolve_integrin_coef( int up, double dt )
-	{ evolve_coef( up, &pintegrin, dt ); };
+	{ evolve_coef( up, &pintegrin, dt ); custom_data["pintegrin"] = pintegrin; };
 	
 	/** \brief Change the current value of cell cell adhesion percent coeff, increase or decrease according to up value */
 	inline void evolve_cellcell_coef( int up, double dt )
-	{ evolve_coef( up, &padhesion, dt ); };
+	{ evolve_coef( up, &padhesion, dt ); custom_data["padhesion"] = padhesion; };
 	
     /** \brief Return amount of contact with other cells */
 	inline double contact_cell()
