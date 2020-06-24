@@ -127,6 +127,8 @@ void create_cell_types( void )
 	
 	// add custom data here, if any
 	cell_defaults.custom_data.add_variable("ecm_contact", "dimensionless", 0.0); //for paraview visualization
+	cell_defaults.custom_data.add_variable("pintegrin", "dimensionless", 0.5); //for paraview visualization
+	cell_defaults.custom_data.add_variable("padhesion", "dimensionless", 0.5); //for paraview visualization
 	cell_defaults.custom_data.add_variable(parameters.strings("node_to_visualize"), "dimensionless", 0.0 ); //for paraview visualization
 	build_ecm_shape();
 
