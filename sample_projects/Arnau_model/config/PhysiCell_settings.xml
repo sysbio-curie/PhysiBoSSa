@@ -137,6 +137,15 @@
 			</physical_parameter_set>
 		</variable>
 
+		<variable name="TGFbeta" units="dimensionless" ID="2">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1e-85</diffusion_coefficient>
+				<decay_rate units="1/min">0</decay_rate> 
+			<initial_condition units="mmHg">0</initial_condition>
+			<Dirichlet_boundary_condition units="mmHg" enabled="true">0</Dirichlet_boundary_condition>
+			</physical_parameter_set>
+		</variable>
+
 		<options>
 			<calculate_gradients>true</calculate_gradients>
 			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
@@ -217,6 +226,7 @@
     	<motility_amplitude_max type="double" units=""> 0.5 </motility_amplitude_max>
     	<mode_motility type="int" units=""> 1 </mode_motility>
 		<contact_cell_ECM_threshold type="double" units=""> 0.5 </contact_cell_ECM_threshold>
+		<ECM_TGFbeta_ratio type="double" units="">0.5</ECM_TGFbeta_ratio>
 		<contact_cell_cell_threshold type="double" units=""> 0.9 </contact_cell_cell_threshold> <!-- minimal contact necessary to activate ECM pathway-->
 		<homotypic_adhesion_min type="double" units=""> 0.2 </homotypic_adhesion_min>
 		<homotypic_adhesion_max type="double" units=""> 0.8 </homotypic_adhesion_max>
@@ -242,6 +252,7 @@
 		<tgfb_threshold type="double" units="dimensionless">1.</tgfb_threshold>
 		<membrane_shape type="string" units="">sphere</membrane_shape>	
 		<membrane_length type="double" units=""> 10 </membrane_length>
+		<config_radius type="double" units="">100</config_radius>
 		<node_to_visualize type="string" units="">Cell_cell</node_to_visualize> <!-- insert the name of the node you want to visualize in paraview-->
 		<color_function type="int" units="">0</color_function> <!-- 0 for ECM based color, 1 for pMotility based color, 2 for node based color-->
 	</user_parameters>
