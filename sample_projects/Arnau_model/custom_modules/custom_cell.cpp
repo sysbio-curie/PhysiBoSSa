@@ -201,7 +201,7 @@ void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, dou
 		}
 	}
 	
-	if((pCustomCell->ecm_contact) > (pCustomCell->cell_contact * 100)){
+	if((pCustomCell->ecm_contact) > (pCustomCell->cell_contact * 20)){
 		pCustomCell->padhesion = 0;
 	}
 
@@ -413,4 +413,12 @@ bool Custom_cell::necrotic_oxygen()
 	if ( ox >= 0 )	
 		return ( UniformRandom() * 5 < (this->parameters.o2_necrosis_threshold - ox) );
    return false;	
+}
+
+double Custom_cell::contact_TGFbeta(){
+	int ecm_index = BioFVM::microenvironment.find_density_index( "ecm" );
+	int TGFbeta_index = BioFVM::microenvironment.find_density_index( "TGFbeta" );
+	double ecm_amount = this->nearest_density_vector()[ecm_index];
+	double TGFbeta_amount = this->nearest_density_vector()[TGFbeta_index];
+	return ecm_amount/TGFbeta_amount;
 }
