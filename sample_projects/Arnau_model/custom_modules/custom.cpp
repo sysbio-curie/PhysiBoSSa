@@ -167,7 +167,7 @@ void setup_tissue( void )
 	double cell_radius = cell_defaults.phenotype.geometry.radius; 
 	double cell_spacing = 0.95 * 2.0 * cell_radius; 
 	
-	double tumor_radius = 100;
+	double tumor_radius = parameters.doubles("config_radius");
 	std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,tumor_radius);
 
 	for (int i = 0; i < positions.size(); i++)
@@ -305,6 +305,10 @@ void set_input_nodes(Custom_cell* pCell)
 	if ( pCell->phenotype.intracellular->has_node( "ECM_sensing" ) )
 		pCell->phenotype.intracellular->set_boolean_node_value("ECM_sensing", touch_ECM(pCell));
 	
+	// If has enough contact with TGFbeta or not
+	if ( pCell->phenotype.intracellular->has_node( "TGFbeta" ) )
+		pCell->phenotype.intracellular->set_boolean_node_value("TGFbeta", touch_TGFbeta(pCell));
+
 	// If nucleus is deformed, probability of damage
 	// Change to increase proba with deformation ? + put as parameter
 	if ( pCell->phenotype.intracellular->has_node( "DNAdamage" ) )
@@ -413,22 +417,20 @@ void build_ecm_shape() {
  
  // Here we design a spherical shell of ecm
  std::vector<double> center(3, 0);
- double inner_radius = 100;
- double outer_radius = 150;
+ double inner_radius = parameters.doubles("config_radius");
+ //double outer_radius = 150;
  
  for (auto voxel : microenvironment.mesh.voxels) {
  // Compute norm to center
  double t_norm = norm(voxel.center);
  // If norm is in [inner_radius, outer_radius], then we add it
- if (t_norm < outer_radius && t_norm > inner_radius) {
+ if (t_norm > inner_radius ) {
  microenvironment.density_vector(voxel.mesh_index)[microenvironment.find_density_index("ecm")] = 0.3; 
- 
+ microenvironment.density_vector(voxel.mesh_index)[microenvironment.find_density_index("TGFbeta")] = 0.3;
  }
  }
  
 }
-
-
 
 std::vector<init_record> read_init_file(std::string filename, char delimiter, bool header) 
 { 
@@ -498,6 +500,10 @@ return PI4_3 * rad * rad * rad;
 bool touch_ECM(Custom_cell* pCell)
 { 
 	return pCell->contact_ecm() > parameters.doubles("contact_cell_ECM_threshold"); 
+}
+
+bool touch_TGFbeta(Custom_cell* pCell){
+	return pCell->contact_TGFbeta() > parameters.doubles("ECM_TGFbeta_ratio");
 }
 
 void enough_to_node( Custom_cell* pCell, std::string nody, std::string field )
