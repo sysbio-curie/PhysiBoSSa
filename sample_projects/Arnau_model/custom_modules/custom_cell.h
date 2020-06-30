@@ -67,7 +67,7 @@ public:
 
     /** \brief Get the current value of integrin strength */
 	inline double get_integrin_strength( double percent )
-	{ return current_value( PhysiCell::parameters.doubles("ecm_adhesion_min"), PhysiCell::parameters.doubles("ecm_adhesion_min"), percent ); };
+	{ return current_value( PhysiCell::parameters.doubles("ecm_adhesion_min"), PhysiCell::parameters.doubles("ecm_adhesion_max"), percent ); };
 	
 	/** \brief Get the current value of motility coefficient */
 	inline double get_motility_amplitude( double percent )
