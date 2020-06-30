@@ -96,7 +96,7 @@ void setup_microenvironment( void );
 std::vector<std::string> my_coloring_function( Cell* );
 std::vector<std::string> ECM_coloring_function( Cell* );
 std::vector<std::string> pMotility_coloring_function( Cell* );
-std::vector<std::string> migration_coloring_function( Cell* );
+std::vector<std::string> node_coloring_function( Cell* );
 
 // custom cell phenotype functions could go here 
 void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt );
@@ -108,6 +108,7 @@ void build_ecm_shape();
 std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius, double sphere_radius);
 /** \brief Go to proliferative phase if proliferation ON and in G0 phase */
 void do_proliferation(Cell* pCell, Phenotype& phenotype, double dt);
+static bool wait_for_cell_growth(Cell* pCell, Phenotype& phenotype, double dt);
 
 inline float sphere_volume_from_radius(float radius) {return 4.0/3.0 * PhysiCell_constants::pi * std::pow(radius, 3);}
 

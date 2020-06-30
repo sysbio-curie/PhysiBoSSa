@@ -114,6 +114,7 @@ void create_cell_types( void )
 	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; 
 
 	cell_defaults.functions.cycle_model.phase_link(1,2).arrest_function = Custom_cell::wait_for_nucleus_growth;
+	cell_defaults.functions.cycle_model.phase_link(0,1).arrest_function = wait_for_cell_growth;
 
 	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
 	cell_defaults.phenotype.death.models[apoptosis_model_index]->phase_link(0,1).arrest_function = Custom_cell::waiting_to_remove; 
@@ -129,7 +130,8 @@ void create_cell_types( void )
 	cell_defaults.custom_data.add_variable("ecm_contact", "dimensionless", 0.0); //for paraview visualization
 	cell_defaults.custom_data.add_variable("pintegrin", "dimensionless", 0.5); //for paraview visualization
 	cell_defaults.custom_data.add_variable("padhesion", "dimensionless", 0.5); //for paraview visualization
-	cell_defaults.custom_data.add_variable(parameters.strings("node_to_visualize"), "dimensionless", 0.0 ); //for paraview visualization
+	cell_defaults.custom_data.add_variable("cell_contact", "dimensionless", 0.0); //for paraview visualization
+	cell_defaults.custom_data.add_variable("node", "dimensionless", 0.0 ); //for paraview visualization
 	build_ecm_shape();
 
 	//Setting the custom_create_cell pointer to our create_custom_cell
@@ -228,7 +230,7 @@ std::vector<std::string> pMotility_coloring_function( Cell* pCell )
 	return output;
 }
 
-std::vector<std::string> migration_coloring_function( Cell* pCell )
+std::vector<std::string> node_coloring_function( Cell* pCell )
 {
 	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
 	if ( !pCell->phenotype.intracellular->get_boolean_node_value( parameters.strings("node_to_visualize") ) )
@@ -256,7 +258,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	 if (color_number == 1)
 	 	return pMotility_coloring_function(pCell);
 	 else 
-	 	return migration_coloring_function( pCell );
+	 	return node_coloring_function( pCell );
 }
 
 void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
@@ -280,6 +282,7 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 		color_node(pCustomCell);
 	}
 	pCustomCell->custom_data["ecm_contact"] = pCustomCell->ecm_contact;
+	pCustomCell->custom_data["cell_contact"] = pCustomCell->cell_contact;
 	
 }
 
@@ -355,8 +358,9 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		
 		// pCell->evolve_motility_coef( pCell->phenotype.intracellular->get_boolean_node_value( "Migration" ), dt );
 
-	 if ( pCell->phenotype.intracellular->has_node( "Cell_growth" ) && pCell->phenotype.intracellular->get_boolean_node_value("Cell_growth") )
-	 	do_proliferation( pCell, phenotype, dt );
+	 if ( pCell->phenotype.intracellular->has_node( "Cell_growth" ) && pCell->phenotype.intracellular->get_boolean_node_value("Cell_growth") ){
+	 	//do_proliferation( pCell, phenotype, dt );
+	 }
 
 	/*if ( pCell->phenotype.intracellular->has_node("CCA") 
 		&& pCell->phenotype.intracellular->get_boolean_node_value("CCA") )
@@ -393,14 +397,14 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 	pCell->freezing( 0 );
 
 	if ( pCell->phenotype.intracellular->has_node( "Quiescence" ) 
-		&& pCell->phenotype.intracellular->get_boolean_node_value( "Quiescence" ) == 0 
+		&& pCell->phenotype.intracellular->get_boolean_node_value( "Quiescence" )
 	){
 		pCell->freezing(1);
 		cell_defaults.functions.volume_update_function = static_volume_function;
 	}
 	
 	if ( pCell->phenotype.intracellular->has_node( "Quiescence" ) 
-		&& pCell->phenotype.intracellular->get_boolean_node_value( "Quiescence" ) == 1 
+		&& !pCell->phenotype.intracellular->get_boolean_node_value( "Quiescence" )
 	){
 		pCell->freezing(1);
 		cell_defaults.functions.volume_update_function = standard_volume_update_function;
@@ -518,7 +522,7 @@ void enough_to_node( Custom_cell* pCell, std::string nody, std::string field )
 
 void color_node(Custom_cell* pCell){
 	std::string node_name = parameters.strings("node_to_visualize");
-	pCell->custom_data[node_name] = pCell->phenotype.intracellular->get_boolean_node_value(node_name);
+	pCell->custom_data["node"] = pCell->phenotype.intracellular->get_boolean_node_value(node_name);
 }
 
 std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius, double sphere_radius)
@@ -550,4 +554,10 @@ std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius
 	}
 	return cells;
 	
+}
+
+bool wait_for_cell_growth(Cell* pCell, Phenotype& phenotype, double dt){
+
+	return !pCell->phenotype.intracellular->get_boolean_node_value("Cell_growth");
+
 }

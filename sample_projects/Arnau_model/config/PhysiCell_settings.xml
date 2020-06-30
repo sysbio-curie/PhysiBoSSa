@@ -167,7 +167,7 @@
 					<!-- using higher than normal significant digits to match divisions in default code -->
 					<phase_transition_rates units="1/min"> 
 						<!-- - to + -->
-						<rate start_index="0" end_index="1" fixed_duration="true">0.016666667</rate>
+						<rate start_index="0" end_index="1" fixed_duration="true">1e30</rate>
 						<!-- + (pre-mitotic) to + (post-mitotic)  -->
 						<rate start_index="1" end_index="2" fixed_duration="true">1e30</rate>
 						<!-- + (post-mitotic) to - -->
@@ -208,9 +208,16 @@
 					<cfg_filename>./config/boolean_network/CCM_mod4_1.cfg</cfg_filename>
 					<time_step units="min">12</time_step>
 					<initial_values>
-						<initial_value node="ECM_sensing" units="dimensionless">0.5</initial_value>
-						<initial_value node="Apoptosis" units="dimensionless">0.01</initial_value>
+						<initial_value node="GF" units="dimensionless">1</initial_value>
+						<initial_value node="Single" units="dimensionless">1</initial_value>
+						<initial_value node="GF_strains" units="dimensionless">1</initial_value>
+						<initial_value node="Wnt" units="dimensionless">1</initial_value>
 					</initial_values>
+					<mutations>
+						<mutation node="GF" units="dimensionless">1</mutation>
+						<mutation node="Glucose" units="dimensionless">1</mutation>
+						<mutation node="Oxy" units="dimensionless">1</mutation>
+					</mutations>
 				</intracellular>			
 			</phenotype>
 			<custom_data/>
