@@ -117,6 +117,7 @@ void create_cell_types( void )
 	cell_defaults.functions.cycle_model.phase_link(0,1).arrest_function = wait_for_cell_growth;
 
 	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
+	cell_defaults.phenotype.death.rates[apoptosis_model_index] = 0.0;
 	cell_defaults.phenotype.death.models[apoptosis_model_index]->phase_link(0,1).arrest_function = Custom_cell::waiting_to_remove; 
 	
 	/*
@@ -233,14 +234,14 @@ std::vector<std::string> pMotility_coloring_function( Cell* pCell )
 std::vector<std::string> node_coloring_function( Cell* pCell )
 {
 	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
-	if ( !pCell->phenotype.intracellular->get_boolean_node_value( parameters.strings("node_to_visualize") ) )
+	if ( !pCell->phenotype.intracellular->get_boolean_node_value( parameters.strings("node_to_visualize") ) ) //node off
 	{
-		output[0] = "rgb(0,0,255)";
+		output[0] = "rgb(0,0,255)"; //blue
 		output[2] = "rgb(0,0,125)";
 		
 	}
 	else{
-		output[0] = "rgb(255,0,0)";
+		output[0] = "rgb(255,0,0)"; //red
 		output[2] = "rgb(125,0,0)";
 	}
 	
@@ -291,7 +292,7 @@ void set_input_nodes(Custom_cell* pCell)
 	if ( pCell->phenotype.intracellular->has_node( "Oxy" ) ){
 		pCell->phenotype.intracellular->set_boolean_node_value("Oxy", !pCell->necrotic_oxygen());
 	}
-
+	
 	// 	nodes[ind] = ( !pCell->necrotic_oxygen() );
 
 	//enough_to_node( pCell, "TGFbR", "tgfb" );
@@ -314,12 +315,14 @@ void set_input_nodes(Custom_cell* pCell)
 
 	// If nucleus is deformed, probability of damage
 	// Change to increase proba with deformation ? + put as parameter
+	
 	if ( pCell->phenotype.intracellular->has_node( "DNAdamage" ) )
 		pCell->phenotype.intracellular->set_boolean_node_value("DNAdamage", 
 			( pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0
 		);
 		
 	/// example
+	
 }
 
 void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
@@ -331,6 +334,7 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
+		//std::cout << "died for apoptosis!"<< std::endl;
 		return;
 	}
 	
@@ -340,6 +344,7 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
 		pCell->start_death(apoptosis_model_index);
+		//std::cout << "died for autophagy!"<< std::endl;
 		return;
 	}
 
@@ -400,14 +405,6 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		&& pCell->phenotype.intracellular->get_boolean_node_value( "Quiescence" )
 	){
 		pCell->freezing(1);
-		cell_defaults.functions.volume_update_function = static_volume_function;
-	}
-	
-	if ( pCell->phenotype.intracellular->has_node( "Quiescence" ) 
-		&& !pCell->phenotype.intracellular->get_boolean_node_value( "Quiescence" )
-	){
-		pCell->freezing(1);
-		cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	}
 	if ( pCell->phenotype.intracellular->has_node( "Cell_freeze" ) ){
 		pCell->freezer(3 * pCell->phenotype.intracellular->get_boolean_node_value( "Cell_freeze" ));
