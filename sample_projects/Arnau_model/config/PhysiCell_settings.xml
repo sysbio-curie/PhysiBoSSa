@@ -177,7 +177,7 @@
 				
 				<death>  
 					<model code="100" name="apoptosis"> 
-						<death_rate units="1/min">5.31667e-05</death_rate>
+						<death_rate units="1/min">0.0</death_rate>
 						<phase_transition_rates units="1/min">
 							<rate start_index="0" end_index="1" fixed_duration="true">1e30</rate>
 						</phase_transition_rates>
@@ -208,15 +208,12 @@
 					<cfg_filename>./config/boolean_network/CCM_mod4_1.cfg</cfg_filename>
 					<time_step units="min">12</time_step>
 					<initial_values>
-						<initial_value node="GF" units="dimensionless">1</initial_value>
-						<initial_value node="Single" units="dimensionless">1</initial_value>
-						<initial_value node="GF_strains" units="dimensionless">1</initial_value>
-						<initial_value node="Wnt" units="dimensionless">1</initial_value>
 					</initial_values>
 					<mutations>
 						<mutation node="GF" units="dimensionless">1</mutation>
 						<mutation node="Glucose" units="dimensionless">1</mutation>
-						<mutation node="Oxy" units="dimensionless">1</mutation>
+						<mutation node="DNAdamage" units="dimensionless">0</mutation>
+						<mutation node="TGFbeta" units="dimensionless">0</mutation>
 					</mutations>
 				</intracellular>			
 			</phenotype>
