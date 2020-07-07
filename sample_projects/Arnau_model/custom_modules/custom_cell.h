@@ -85,7 +85,6 @@ public:
 	 * @param index_ecm index of the ECM density in the microenv vector of densities
 	 * @param index_voxel index of the current ECM voxel  */
 	void add_ecm_interaction( int index_ecm, int index_voxel );
-	void TGFbeta_interaction(int index_TGFbeta, int index_voxel);
 	static Cell* create_custom_cell();
 
 	static void custom_update_velocity( Cell* pCell, Phenotype& phenotype, double dt);
@@ -103,7 +102,7 @@ public:
 	inline double contact_ecm()
 	{ return ecm_contact / phenotype.geometry.radius ; };
 
-	double contact_TGFbeta();
+	void contact_TGFbeta(int index_voxel);
 
 	inline std::string get_shape()
 	{return PhysiCell::parameters.strings("membrane_shape");}
