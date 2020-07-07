@@ -8,6 +8,7 @@ Custom_cell::Custom_cell() {
 	ecmrad = sqrt(3.0) * get_microenvironment()->mesh.dx / 2.0;
 	motility.resize(3, 0.0);
 	ecm_contact = 0;
+	TGFbeta_contact = 0;
 	cell_contact = 0;
 	nucleus_deform = 0;
 }
@@ -169,6 +170,7 @@ void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, dou
 	pCustomCell->ecm_contact = 0;
 	pCustomCell->nucleus_deform = 0;
 	pCustomCell->cell_contact = 0;
+	pCustomCell->TGFbeta_contact = 0;
 	
 	if( pCell->functions.add_cell_basement_membrane_interactions )
 	{
@@ -186,6 +188,7 @@ void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, dou
 	int ecm_index = BioFVM::microenvironment.find_density_index("ecm");
 	if ( ecm_index >= 0 )
 		pCustomCell->add_ecm_interaction( ecm_index, pCell->get_current_mechanics_voxel_index() );
+		pCustomCell->contact_TGFbeta(pCell->get_current_mechanics_voxel_index());
 
 	for (auto neighbor_voxel_index : pCell->get_container()->underlying_mesh.moore_connected_voxel_indices[pCell->get_current_mechanics_voxel_index()])
 	{
@@ -194,7 +197,7 @@ void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, dou
 
 		if ( ecm_index >= 0 )
 			pCustomCell->add_ecm_interaction( ecm_index, neighbor_voxel_index );
-	
+			pCustomCell->contact_TGFbeta(pCell->get_current_mechanics_voxel_index());
 		for( auto other_neighbor : pCell->get_container()->agent_grid[neighbor_voxel_index] )
 		{
 			pCell->add_potentials(other_neighbor);
@@ -415,10 +418,27 @@ bool Custom_cell::necrotic_oxygen()
    return false;	
 }
 
-double Custom_cell::contact_TGFbeta(){
-	int ecm_index = BioFVM::microenvironment.find_density_index( "ecm" );
+void Custom_cell::contact_TGFbeta(int index_voxel){
 	int TGFbeta_index = BioFVM::microenvironment.find_density_index( "TGFbeta" );
-	double ecm_amount = this->nearest_density_vector()[ecm_index];
-	double TGFbeta_amount = this->nearest_density_vector()[TGFbeta_index];
-	return ecm_amount/TGFbeta_amount;
+	double dens = get_microenvironment()->nearest_density_vector(index_voxel)[TGFbeta_index];
+	//if(dens > 0.1)
+	//std::cout << "dens =" << dens << std::endl;
+	dens = std::min( dens, 1.0 );
+	//std::cout << "dens =" << dens << std::endl; 
+	if ( dens > EPSILON )
+	{
+		// Distance between agent center and ECM voxel center
+		displacement = position - get_container()->underlying_mesh.voxels[index_voxel].center;
+		double distance = norm(displacement);
+		// Make sure that the distance is not zero
+		distance = std::max(distance, EPSILON);
+
+		double max_interactive_distance = (PhysiCell::parameters.doubles("max_interaction_factor")*phenotype.geometry.radius) + ecmrad;
+		if ( distance < max_interactive_distance ) 
+		{	
+			TGFbeta_contact += dens * (max_interactive_distance-distance);
+			//std::cout << "TGFbeta =" << TGFbeta_contact << std::endl; 
+		}
+	}
+	
 }
