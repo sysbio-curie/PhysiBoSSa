@@ -212,8 +212,6 @@
 					<mutations>
 						<mutation node="GF" units="dimensionless">1</mutation>
 						<mutation node="Glucose" units="dimensionless">1</mutation>
-						<mutation node="DNAdamage" units="dimensionless">0</mutation>
-						<mutation node="TGFbeta" units="dimensionless">0</mutation>
 					</mutations>
 				</intracellular>			
 			</phenotype>

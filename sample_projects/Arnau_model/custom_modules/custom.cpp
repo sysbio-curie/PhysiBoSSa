@@ -132,6 +132,7 @@ void create_cell_types( void )
 	cell_defaults.custom_data.add_variable("pintegrin", "dimensionless", 0.5); //for paraview visualization
 	cell_defaults.custom_data.add_variable("padhesion", "dimensionless", 0.5); //for paraview visualization
 	cell_defaults.custom_data.add_variable("cell_contact", "dimensionless", 0.0); //for paraview visualization
+	cell_defaults.custom_data.add_variable("TGFbeta", "dimensionless", 0.0); //for paraview visualization
 	cell_defaults.custom_data.add_variable("node", "dimensionless", 0.0 ); //for paraview visualization
 	build_ecm_shape();
 
@@ -197,6 +198,7 @@ void setup_tissue( void )
 			//pC->phenotype.cycle.pCycle_Model->phases[1].entry_function(pC, pC->phenotype, 0);
 
 		pC->custom_data["ecm_contact"] = pC->ecm_contact;
+		pC->custom_data["TGFbeta"] = pC->TGFbeta_contact;
 		color_node(pC);
 	}
 	std::cout << "tissue created" << std::endl;
@@ -284,6 +286,7 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 	}
 	pCustomCell->custom_data["ecm_contact"] = pCustomCell->ecm_contact;
 	pCustomCell->custom_data["cell_contact"] = pCustomCell->cell_contact;
+	pCustomCell->custom_data["TGFbeta"] = pCustomCell->TGFbeta_contact;
 	
 }
 
@@ -315,12 +318,12 @@ void set_input_nodes(Custom_cell* pCell)
 
 	// If nucleus is deformed, probability of damage
 	// Change to increase proba with deformation ? + put as parameter
-	
+	/*
 	if ( pCell->phenotype.intracellular->has_node( "DNAdamage" ) )
 		pCell->phenotype.intracellular->set_boolean_node_value("DNAdamage", 
 			( pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0
 		);
-		
+	*/	
 	/// example
 	
 }
@@ -366,13 +369,6 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 	 if ( pCell->phenotype.intracellular->has_node( "Cell_growth" ) && pCell->phenotype.intracellular->get_boolean_node_value("Cell_growth") ){
 	 	//do_proliferation( pCell, phenotype, dt );
 	 }
-
-	/*if ( pCell->phenotype.intracellular->has_node("CCA") 
-		&& pCell->phenotype.intracellular->get_boolean_node_value("CCA") )
-	{
-		pCell->freezing(1);
-	}	
-	*/
 
 	/*if ( pCell->phenotype.intracellular->has_node( "Polarization" ) )
 		pCell->evolve_polarity_coef( 
@@ -504,7 +500,8 @@ bool touch_ECM(Custom_cell* pCell)
 }
 
 bool touch_TGFbeta(Custom_cell* pCell){
-	return pCell->contact_TGFbeta() > parameters.doubles("ECM_TGFbeta_ratio");
+	double TGFbeta_ratio = pCell->ecm_contact / pCell->TGFbeta_contact;
+	return TGFbeta_ratio > parameters.doubles("ECM_TGFbeta_ratio");
 }
 
 void enough_to_node( Custom_cell* pCell, std::string nody, std::string field )
