@@ -208,7 +208,7 @@
 					<cfg_filename>./config/boolean_network/CCM_mod4_1.cfg</cfg_filename>
 					<time_step units="min">12</time_step>
 					<initial_values>
-						<initial_value node="Single" units="dimensionless">0.5</initial_value>
+						<initial_value node="Single" units="dimensionless">0</initial_value>
 					</initial_values>
 					<mutations>
 						<mutation node="GF" units="dimensionless">1</mutation>
@@ -221,35 +221,35 @@
 	</cell_definitions>	
 	
 	<user_parameters>
-		<random_seed type="int" units="dimensionless">0</random_seed> 
+		<random_seed type="int" units="dimensionless" description="change seed of the simulation">0</random_seed> 
 		<!-- example parameters from the template --> 
-		<polarity_coefficient type="double" units="">0.5</polarity_coefficient>
-		<Single_cell_bias type="double" units=""> 0.998 </Single_cell_bias>
-		<migration_bias type='double' units="">0.99</migration_bias>
-		<migration_speed type='double' units="">0.7</migration_speed>
-		<persistence type="double" units="">5</persistence>
-    	<motility_amplitude_min type="double" units=""> 0.1 </motility_amplitude_min>
-    	<motility_amplitude_max type="double" units=""> 0.5 </motility_amplitude_max>
-    	<mode_motility type="int" units=""> 1 </mode_motility>
-		<contact_cell_ECM_threshold type="double" units=""> 0.5 </contact_cell_ECM_threshold>
-		<contact_TGFB_threshold type="double" units=""> 0.2 </contact_TGFB_threshold>
-		<ECM_TGFbeta_ratio type="double" units="">0.75</ECM_TGFbeta_ratio>
-		<contact_cell_cell_threshold type="double" units=""> 0.9 </contact_cell_cell_threshold> <!-- minimal contact necessary to activate ECM pathway-->
-		<homotypic_adhesion_min type="double" units=""> 0.2 </homotypic_adhesion_min>
-		<homotypic_adhesion_max type="double" units=""> 0.8 </homotypic_adhesion_max>
-		<heterotypic_adhesion_min type="double" units=""> 0.2 </heterotypic_adhesion_min>
-		<heterotypic_adhesion_max type="double" units=""> 0.8 </heterotypic_adhesion_max>
-		<ecm_adhesion_min type="double" units=""> 1 </ecm_adhesion_min>
-		<ecm_adhesion_max type="double" units=""> 2 </ecm_adhesion_max>
-		<cell_ecm_repulsion type="double" units=""> 10.0 </cell_ecm_repulsion>
-		<ecm_degradation type="double" units=""> 0.5 </ecm_degradation>
-		<TGFbeta_degradation type="double" units=""> 0.0015 </TGFbeta_degradation>
-		<cell_radius type="double" units=""> 8.413 </cell_radius>
-		<max_interaction_factor type="double" units=""> 1.3 </max_interaction_factor>
-		<config_radius type="double" units="">100</config_radius>
-		<tgfbeta_radius type="double" units="">80</tgfbeta_radius>
-		<node_to_visualize type="string" units="">Single</node_to_visualize> <!-- insert the name of the node you want to visualize in paraview-->
-		<color_function type="int" units="">1</color_function> <!-- 0 for ECM based color, 1 for phase based color, 2 for node based color-->
+		<polarity_coefficient type="double" units="" description="not used yet">0.5</polarity_coefficient>
+		<Single_cell_bias type="double" units="" description="change bias value for cells with Single node active"> 0.998 </Single_cell_bias>
+		<migration_bias type='double' units="" description="change value of migration bias for cells with migration node active">0.99</migration_bias>
+		<migration_speed type='double' units="" description="change value of migration speed for cells with migration node active">0.7</migration_speed>
+		<persistence type="double" units="" description="change value of persistence for cells with migration node active">5</persistence>
+    	<motility_amplitude_min type="double" units="" description="change the min value of motility amplitude"> 0.1 </motility_amplitude_min>
+    	<motility_amplitude_max type="double" units="" description="change the max value of motility amplitude"> 0.5 </motility_amplitude_max>
+    	<mode_motility type="int" units="" description="not used yet"> 1 </mode_motility>
+		<contact_cell_ECM_threshold type="double" units="" description="change the threshold needed to trigger ECM interaction"> 0.5 </contact_cell_ECM_threshold>
+		<contact_TGFB_threshold type="double" units="" description="change the threshold needed to trigger TGFbeta interaction"> 0.2 </contact_TGFB_threshold>
+		<ECM_TGFbeta_ratio type="double" units="" description="change the threshold needed to start sensing TGFbeta inside a voxel with ECM (cell must degrades a certain amount of ECM before sensing TGFbeta)">0.75</ECM_TGFbeta_ratio>
+		<contact_cell_cell_threshold type="double" units="" description="change the treshold needed to trigger Neighbours and Neigh2 node"> 0.9 </contact_cell_cell_threshold>
+		<homotypic_adhesion_min type="double" units="" description="not used yet"> 0.2 </homotypic_adhesion_min>
+		<homotypic_adhesion_max type="double" units="" description="not used yet"> 0.8 </homotypic_adhesion_max>
+		<heterotypic_adhesion_min type="double" units="" description="used to set the min adhesion between cells of the same type"> 0.2 </heterotypic_adhesion_min>
+		<heterotypic_adhesion_max type="double" units="" description="used to set the max adhesion between cells of the same type"> 0.8 </heterotypic_adhesion_max>
+		<ecm_adhesion_min type="double" units="" description="used to set the min adhesion between cells and ECM"> 1 </ecm_adhesion_min>
+		<ecm_adhesion_max type="double" units="" description="used to set the min adhesion between cells and ECM"> 2 </ecm_adhesion_max>
+		<cell_ecm_repulsion type="double" units="" description="change the value of ECM repulsion"> 10.0 </cell_ecm_repulsion>
+		<ecm_degradation type="double" units="" description="chenage the amount of ECM degraded by the cells with Matrix_modifcation ON"> 0.5 </ecm_degradation>
+		<TGFbeta_degradation type="double" units="" description="chenage the amount of TGFbeta degraded by the cells"> 0.0015 </TGFbeta_degradation>
+		<cell_radius type="double" units="" description="initial radius of the cells"> 8.413 </cell_radius>
+		<max_interaction_factor type="double" units="" description="used to set the max distance of interaction"> 1.3 </max_interaction_factor>
+		<config_radius type="double" units="" description="change the initial radius of the tumor">100</config_radius>
+		<tgfbeta_radius type="double" units="" description="change radius of the tgfbeta substrate">90</tgfbeta_radius>
+		<node_to_visualize type="string" units="" description="change the node to visualize in the plot tab when coloring cells by custom data value">Single</node_to_visualize> <!-- insert the name of the node you want to visualize in paraview-->
+		<color_function type="int" units="" description="change the basic color function: 0 for ECM based color, 1 for phase based color, 2 for node based color">1</color_function> 
 	</user_parameters>
 	
 	
