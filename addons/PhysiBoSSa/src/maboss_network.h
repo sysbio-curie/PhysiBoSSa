@@ -135,9 +135,9 @@ class MaBoSSNetwork
 		 * \param node_values Boolean vector mapping a boolean network
 		 */
 		void print_nodes();
-		
-		
 
+		void set_state(NetworkState _state) { state = NetworkState(_state.getState()); }	
+		NetworkState get_maboss_state() { return state;}
 };
 
 #endif

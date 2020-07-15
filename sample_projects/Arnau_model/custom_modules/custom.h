@@ -95,7 +95,7 @@ void setup_microenvironment( void );
 // custom pathology coloring function 
 std::vector<std::string> my_coloring_function( Cell* );
 std::vector<std::string> ECM_coloring_function( Cell* );
-std::vector<std::string> pMotility_coloring_function( Cell* );
+std::vector<std::string> phase_coloring_function( Cell* );
 std::vector<std::string> node_coloring_function( Cell* );
 
 // custom cell phenotype functions could go here 
