@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">3300</max_time>
+		<max_time units="min">4500</max_time>
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 
@@ -193,8 +193,8 @@
 				</death>					
 
 				<motility>  
-					<speed units="micron/min">1</speed>
-					<persistence_time units="min">1</persistence_time>
+					<speed units="micron/min">0.3</speed>
+					<persistence_time units="min">10</persistence_time>
 					<migration_bias units="dimensionless">0</migration_bias>
 					
 					<options>
@@ -208,6 +208,7 @@
 					<cfg_filename>./config/boolean_network/CCM_mod4_1.cfg</cfg_filename>
 					<time_step units="min">12</time_step>
 					<initial_values>
+						<initial_value node="Single" units="dimensionless">0.5</initial_value>
 					</initial_values>
 					<mutations>
 						<mutation node="GF" units="dimensionless">1</mutation>
@@ -223,40 +224,32 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 
 		<polarity_coefficient type="double" units="">0.5</polarity_coefficient>
-		<persistence type="double" units="">0.5</persistence>
+		<Single_cell_bias type="double" units=""> 0.998 </Single_cell_bias>
+		<migration_bias type='double' units="">0.99</migration_bias>
+		<migration_speed type='double' units="">0.7</migration_speed>
+		<persistence type="double" units="">5</persistence>
     	<motility_amplitude_min type="double" units=""> 0.1 </motility_amplitude_min>
     	<motility_amplitude_max type="double" units=""> 0.5 </motility_amplitude_max>
     	<mode_motility type="int" units=""> 1 </mode_motility>
 		<contact_cell_ECM_threshold type="double" units=""> 0.5 </contact_cell_ECM_threshold>
-		<ECM_TGFbeta_ratio type="double" units="">0.5</ECM_TGFbeta_ratio>
+		<contact_TGFB_threshold type="double" units=""> 0.2 </contact_TGFB_threshold>
+		<ECM_TGFbeta_ratio type="double" units="">0.75</ECM_TGFbeta_ratio>
 		<contact_cell_cell_threshold type="double" units=""> 0.9 </contact_cell_cell_threshold> <!-- minimal contact necessary to activate ECM pathway-->
 		<homotypic_adhesion_min type="double" units=""> 0.2 </homotypic_adhesion_min>
 		<homotypic_adhesion_max type="double" units=""> 0.8 </homotypic_adhesion_max>
 		<heterotypic_adhesion_min type="double" units=""> 0.2 </heterotypic_adhesion_min>
 		<heterotypic_adhesion_max type="double" units=""> 0.8 </heterotypic_adhesion_max>
-		<cell_basement_membrane_repulsion type="double" units="">10.0</cell_basement_membrane_repulsion>
-		<cell_basement_membrane_adhesion type="double" units="">1.70577155519015</cell_basement_membrane_adhesion>
 		<ecm_adhesion_min type="double" units=""> 1 </ecm_adhesion_min>
 		<ecm_adhesion_max type="double" units=""> 2 </ecm_adhesion_max>
 		<cell_ecm_repulsion type="double" units=""> 10.0 </cell_ecm_repulsion>
 		<ecm_degradation type="double" units=""> 0.5 </ecm_degradation>
+		<TGFbeta_degradation type="double" units=""> 0.0015 </TGFbeta_degradation>
 		<cell_radius type="double" units=""> 8.413 </cell_radius>
-		<migration_bias type="double" units="">0.9</migration_bias>
 		<max_interaction_factor type="double" units=""> 1.3 </max_interaction_factor>
-		<migration_speed type="double" units="">0.5</migration_speed>
-		<nucleus_radius type="double" units=""> 5.052 </nucleus_radius>
-		<fluid_fraction type="double" units=""> 0.75 </fluid_fraction>
-		<solid_nuclear type="double" units=""> 135 </solid_nuclear>
-		<solid_cytoplasmic type="double" units=""> 486 </solid_cytoplasmic>
-		<protein_threshold type="int" units=""> 1 </protein_threshold>
-		<init_cells_filename type="string" units="">./config/init.txt</init_cells_filename>
-		<init_ecm_filename type="string" units="">./config/ecm.txt</init_ecm_filename>
-		<tgfb_threshold type="double" units="dimensionless">1.</tgfb_threshold>
-		<membrane_shape type="string" units="">sphere</membrane_shape>	
-		<membrane_length type="double" units=""> 10 </membrane_length>
 		<config_radius type="double" units="">100</config_radius>
-		<node_to_visualize type="string" units="">Cell_cell</node_to_visualize> <!-- insert the name of the node you want to visualize in paraview-->
-		<color_function type="int" units="">0</color_function> <!-- 0 for ECM based color, 1 for pMotility based color, 2 for node based color-->
+		<tgfbeta_radius type="double" units="">80</tgfbeta_radius>
+		<node_to_visualize type="string" units="">Single</node_to_visualize> <!-- insert the name of the node you want to visualize in paraview-->
+		<color_function type="int" units="">1</color_function> <!-- 0 for ECM based color, 1 for phase based color, 2 for node based color-->
 	</user_parameters>
 	
 	

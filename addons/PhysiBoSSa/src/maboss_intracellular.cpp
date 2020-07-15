@@ -36,6 +36,7 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 		maboss.set_discrete_time(copy->discrete_time, copy->time_tick);
 		maboss.set_scaling(copy->scaling);
 		maboss.restart_node_values();
+		//maboss.set_state(copy->maboss.get_maboss_state());
 	}	
 }
 

@@ -102,7 +102,10 @@ public:
 	inline double contact_ecm()
 	{ return ecm_contact / phenotype.geometry.radius ; };
 
-	void contact_TGFbeta(int index_voxel);
+	inline double contact_TGFB()
+	{ return TGFbeta_contact / phenotype.geometry.radius ; };
+
+	void add_TGFbeta_interaction(int index_voxel);
 
 	inline std::string get_shape()
 	{return PhysiCell::parameters.strings("membrane_shape");}

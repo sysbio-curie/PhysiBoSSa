@@ -120,9 +120,9 @@ class MaBoSSNetwork
 		
 		/** \brief Print current state of all the nodes of the network */
 		void print_nodes();
-		
-		
 
+		void set_state(NetworkState _state) { state = NetworkState(_state.getState()); }	
+		NetworkState get_maboss_state() { return state;}
 };
 
 #endif
