@@ -253,6 +253,7 @@ std::vector<std::string> phase_coloring_function( Cell* pCell )
 std::vector<std::string> node_coloring_function( Cell* pCell )
 {
 	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
+	//std::cout << pCell->phenotype.intracellular->get_boolean_node_value( parameters.strings("node_to_visualize"));
 	if ( !pCell->phenotype.intracellular->get_boolean_node_value( parameters.strings("node_to_visualize") ) ) //node off
 	{
 		output[0] = "rgb(0,0,255)"; //blue
@@ -391,7 +392,7 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		pCell->padhesion = 0;
 		pCell->phenotype.motility.migration_bias = parameters.doubles("Single_cell_bias");
 	}
-	
+
 	}
 	 if ( pCell->phenotype.intracellular->has_node( "Cell_growth" ) && pCell->phenotype.intracellular->get_boolean_node_value("Cell_growth") ){
 	 	//do_proliferation( pCell, phenotype, dt );
