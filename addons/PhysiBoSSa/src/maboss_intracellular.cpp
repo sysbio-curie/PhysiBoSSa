@@ -37,6 +37,7 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 		maboss.set_scaling(copy->scaling);
 		maboss.restart_node_values();
 		//maboss.set_state(copy->maboss.get_maboss_state());
+		//std::cout << get_state();
 	}	
 }
 
