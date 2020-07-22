@@ -46,7 +46,7 @@ class MaBoSSNetwork
 		std::map< std::string, Node*> nodesByName;
 		std::map< std::string, const Symbol*> parametersByName;
 	
-		inline void set_time_to_update(){this->time_to_update = (PhysiCell::UniformRandom()+0.5) * this->get_update_time_step();}
+		inline void set_time_to_update(){this->time_to_update = this->get_update_time_step();}
 
 	
 	public:
