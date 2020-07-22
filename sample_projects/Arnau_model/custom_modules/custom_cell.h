@@ -26,7 +26,7 @@ public:
 		); 
 	};
 	
-    std::vector<double> motility;
+
 	double pintegrin;
 	double pmotility;
 	double padhesion;

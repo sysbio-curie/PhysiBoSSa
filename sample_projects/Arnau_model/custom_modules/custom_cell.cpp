@@ -6,10 +6,9 @@ Custom_cell::Custom_cell() {
 	pmotility = 0.5;
 	padhesion = 0.5;
 	ecmrad = sqrt(3.0) * get_microenvironment()->mesh.dx / 2.0;
-	motility.resize(3, 0.0);
 	ecm_contact = 0;
 	TGFbeta_contact = 0;
-	cell_contact = 0;
+	cell_contact = PhysiCell::parameters.doubles("initial_cell_contact_parameter");
 	nucleus_deform = 0;
 }
 
@@ -133,7 +132,7 @@ double Custom_cell::get_adhesion()
 
 void Custom_cell::set_oxygen_motility(bool active)
 {	
-	phenotype.motility.is_motile = active;
+	//phenotype.motility.is_motile = active;
 		
 	if (active){
 		phenotype.motility.chemotaxis_index = get_microenvironment()->find_density_index( "oxygen");
@@ -146,6 +145,15 @@ void Custom_cell::set_oxygen_motility(bool active)
 		// move up or down gradient based on this direction 
 		phenotype.motility.migration_bias_direction *= phenotype.motility.chemotaxis_direction * get_motility_amplitude(pmotility); 
 	}
+	else{
+		//restore to default
+		phenotype.motility.chemotaxis_index = cell_defaults.phenotype.motility.chemotaxis_index; 
+		phenotype.motility.migration_bias_direction = cell_defaults.phenotype.motility.migration_bias_direction;
+		phenotype.motility.migration_bias = cell_defaults.phenotype.motility.migration_bias;
+		phenotype.motility.chemotaxis_direction = cell_defaults.phenotype.motility.chemotaxis_direction;
+		phenotype.motility.migration_speed = cell_defaults.phenotype.motility.migration_speed;
+		phenotype.motility.persistence_time = cell_defaults.phenotype.motility.persistence_time;
+	 	}
 };
 
 /* Update the value of freezing of the cell with bitwise operation
@@ -170,8 +178,8 @@ void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, dou
 
 	pCustomCell->ecm_contact = 0;
 	pCustomCell->nucleus_deform = 0;
-	pCustomCell->cell_contact = 0;
 	pCustomCell->TGFbeta_contact = 0;
+	pCustomCell->cell_contact = 0;
 	
 	if( pCell->functions.add_cell_basement_membrane_interactions )
 	{
@@ -205,16 +213,19 @@ void Custom_cell::custom_update_velocity( Cell* pCell, Phenotype& phenotype, dou
 		}
 	}
 	
-	if((pCustomCell->ecm_contact) > (pCustomCell->cell_contact * 20)){
+	//std::cout << pCustomCell->cell_contact << "  ";
+	/*
+	if((pCustomCell->ecm_contact) > (pCustomCell->cell_contact * PhysiCell::parameters.doubles("ecm_cell_contact_factor"))){
 		pCustomCell->padhesion = 0;
 	}
-
+*/
 	if (pCustomCell->freezed > 2){
 		return ;
 	}
 
 	
 		pCell->update_motility_vector(dt);
+		//std::cout << phenotype.motility.motility_vector << "  ";
 		pCell->velocity += phenotype.motility.motility_vector;
 	
 	return; 
@@ -262,8 +273,10 @@ double Custom_cell::custom_adhesion_function(Cell* pCell, Cell* otherCell, doubl
 			// active, active
 			else
 			{
+				//std::cout << distance << "  ";
 				custom_pCell->cell_contact += distance;
 				adh = custom_pCell->adhesion(custom_otherCell);
+				custom_pCell->custom_data["adh"] = adh;
 			}
 		}
 	}

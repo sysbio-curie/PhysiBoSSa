@@ -121,7 +121,7 @@
 	<microenvironment_setup>
 		<variable name="oxygen" units="mmHg" ID="0">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
+				<diffusion_coefficient units="micron^2/min">4000.0</diffusion_coefficient>
 				<decay_rate units="1/min">.1</decay_rate> 
 			</physical_parameter_set>
 			<initial_condition units="mmHg">38.0</initial_condition>
@@ -193,12 +193,12 @@
 				</death>					
 
 				<motility>  
-					<speed units="micron/min">0.3</speed>
-					<persistence_time units="min">10</persistence_time>
-					<migration_bias units="dimensionless">0</migration_bias>
+					<speed units="micron/min">1</speed>
+					<persistence_time units="min">1</persistence_time>
+					<migration_bias units="dimensionless">0.3</migration_bias>
 					
 					<options>
-						<enabled>false</enabled>
+						<enabled>true</enabled>
 						<use_2D>false</use_2D>
 					</options>
 				</motility>
@@ -208,7 +208,7 @@
 					<cfg_filename>./config/boolean_network/CCM_mod4_1.cfg</cfg_filename>
 					<time_step units="min">12</time_step>
 					<initial_values>
-						<initial_value node="Single" units="dimensionless">0</initial_value>
+						<initial_value node="Single" units="dimensionless">0.1</initial_value>
 					</initial_values>
 					<mutations>
 						<mutation node="GF" units="dimensionless">1</mutation>
@@ -223,9 +223,7 @@
 	<user_parameters>
 		<random_seed type="int" units="dimensionless" description="change seed of the simulation">0</random_seed> 
 		<!-- example parameters from the template --> 
-		<polarity_coefficient type="double" units="" description="not used yet">0.5</polarity_coefficient>
-		<Single_cell_bias type="double" units="" description="change bias value for cells with Single node active"> 0.998 </Single_cell_bias>
-		<migration_bias type='double' units="" description="change value of migration bias for cells with migration node active">0.99</migration_bias>
+		<migration_bias type='double' units="" description="change value of migration bias for cells with migration node active">0.95</migration_bias>
 		<migration_speed type='double' units="" description="change value of migration speed for cells with migration node active">0.7</migration_speed>
 		<persistence type="double" units="" description="change value of persistence for cells with migration node active">5</persistence>
     	<motility_amplitude_min type="double" units="" description="change the min value of motility amplitude"> 0.1 </motility_amplitude_min>
@@ -235,14 +233,16 @@
 		<contact_TGFB_threshold type="double" units="" description="change the threshold needed to trigger TGFbeta interaction"> 0.2 </contact_TGFB_threshold>
 		<ECM_TGFbeta_ratio type="double" units="" description="change the threshold needed to start sensing TGFbeta inside a voxel with ECM (cell must degrades a certain amount of ECM before sensing TGFbeta)">0.75</ECM_TGFbeta_ratio>
 		<contact_cell_cell_threshold type="double" units="" description="change the treshold needed to trigger Neighbours and Neigh2 node"> 0.9 </contact_cell_cell_threshold>
-		<homotypic_adhesion_min type="double" units="" description="not used yet"> 0.2 </homotypic_adhesion_min>
+		<homotypic_adhesion_min type="double" units="" description="not used yet"> 0 </homotypic_adhesion_min>
 		<homotypic_adhesion_max type="double" units="" description="not used yet"> 0.8 </homotypic_adhesion_max>
-		<heterotypic_adhesion_min type="double" units="" description="used to set the min adhesion between cells of the same type"> 0.2 </heterotypic_adhesion_min>
+		<heterotypic_adhesion_min type="double" units="" description="used to set the min adhesion between cells of the same type"> 0 </heterotypic_adhesion_min>
 		<heterotypic_adhesion_max type="double" units="" description="used to set the max adhesion between cells of the same type"> 0.8 </heterotypic_adhesion_max>
 		<ecm_adhesion_min type="double" units="" description="used to set the min adhesion between cells and ECM"> 1 </ecm_adhesion_min>
 		<ecm_adhesion_max type="double" units="" description="used to set the min adhesion between cells and ECM"> 2 </ecm_adhesion_max>
-		<cell_ecm_repulsion type="double" units="" description="change the value of ECM repulsion"> 10.0 </cell_ecm_repulsion>
-		<ecm_degradation type="double" units="" description="chenage the amount of ECM degraded by the cells with Matrix_modifcation ON"> 0.5 </ecm_degradation>
+		<cell_ecm_repulsion type="double" units="" description="change the value of ECM repulsion"> 5.0 </cell_ecm_repulsion>
+		<ecm_cell_contact_factor type="double" units="" description="change the amount of ecm_contact needed to a cell to detach from the others">100</ecm_cell_contact_factor>
+		<initial_cell_contact_parameter type= "double" units="" description="set the initial amount of cell_contact allowing the immediate activation of Neighbours/Nei2 nodes in the boolean network">20</initial_cell_contact_parameter>
+		<ecm_degradation type="double" units="" description="chenage the amount of ECM degraded by the cells with Matrix_modifcation ON"> 0.7 </ecm_degradation>
 		<TGFbeta_degradation type="double" units="" description="chenage the amount of TGFbeta degraded by the cells"> 0.0015 </TGFbeta_degradation>
 		<cell_radius type="double" units="" description="initial radius of the cells"> 8.413 </cell_radius>
 		<max_interaction_factor type="double" units="" description="used to set the max distance of interaction"> 1.3 </max_interaction_factor>

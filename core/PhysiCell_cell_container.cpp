@@ -270,7 +270,7 @@ void Cell_Container::update_all_cells(double t, double phenotype_dt_ , double me
 		{
 			time_since_last_cycle = phenotype_dt_;
 		}
-		
+
 		// new as of 1.2.1 -- bundles cell phenotype parameter update, volume update, geometry update, 
 		// checking for death, and advancing the cell cycle. Not motility, though. (that's in mechanics)
 		#pragma omp parallel for 
