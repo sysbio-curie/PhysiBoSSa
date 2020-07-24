@@ -221,6 +221,7 @@
 	</cell_definitions>	
 	
 	<user_parameters>
+		<choose_adhesion_function type="int" units="dimensionless" description="switch between default adhesion function or custom">0</choose_adhesion_function>
 		<random_seed type="int" units="dimensionless" description="change seed of the simulation">0</random_seed> 
 		<!-- example parameters from the template --> 
 		<migration_bias type='double' units="" description="change value of migration bias for cells with migration node active">0.95</migration_bias>

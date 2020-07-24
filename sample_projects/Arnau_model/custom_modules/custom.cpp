@@ -396,14 +396,14 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		
 		pCell->evolve_motility_coef( pCell->phenotype.intracellular->get_boolean_node_value( "Migration" ), dt );
 
-				
+		/*		
 	if ( pCell->phenotype.intracellular->has_node( "Single" ) 
 		&& pCell->phenotype.intracellular->get_boolean_node_value( "Single" ) 
 	)
 	{
 		pCell->padhesion = 0;
 	}
-
+	*/
 	}
 	 if ( pCell->phenotype.intracellular->has_node( "Cell_growth" ) && pCell->phenotype.intracellular->get_boolean_node_value("Cell_growth") ){
 	 	//do_proliferation( pCell, phenotype, dt );

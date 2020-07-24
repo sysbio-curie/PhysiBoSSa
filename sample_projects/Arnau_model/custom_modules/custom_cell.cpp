@@ -113,11 +113,48 @@ double Custom_cell::adhesion( Cell* other_cell )
     Custom_cell* custom_other_cell = static_cast<Custom_cell*>(other_cell);
 	
 	double adh = 0;
-	if ( this->type == other_cell->type )
-		adh = std::min( get_homotypic_strength(padhesion), custom_other_cell->get_homotypic_strength(padhesion) );
-	else
-		adh = std::min( get_heterotypic_strength(padhesion), custom_other_cell->get_heterotypic_strength(padhesion) );
 
+	if (PhysiCell::parameters.ints("choose_adhesion_function") == 0){
+		bool my_cell_cell = phenotype.intracellular->get_boolean_node_value("Cell_cell");
+		bool your_cell_cell = custom_other_cell->phenotype.intracellular->get_boolean_node_value("Cell_cell");
+		bool my_single = phenotype.intracellular->get_boolean_node_value("Single");
+		bool your_single = custom_other_cell->phenotype.intracellular->get_boolean_node_value("Single");
+		bool my_mig = phenotype.intracellular->get_boolean_node_value("Migration");
+		bool your_mig = custom_other_cell->phenotype.intracellular->get_boolean_node_value("Migration");
+		if (my_single || your_single )
+			return adh;
+		else if (my_cell_cell && my_mig && your_cell_cell && your_mig){
+			adh = PhysiCell::parameters.doubles("homotypic_adhesion_max") * padhesion;
+			return adh;
+			}	
+		else if(my_cell_cell && !my_mig && your_cell_cell && your_mig){
+			adh = 0.3 * padhesion;
+			return adh;
+		}
+		else if(my_cell_cell && my_mig && your_cell_cell && !your_mig){
+			adh = 0.3 * padhesion;
+			return adh;
+		}
+		else if (!my_cell_cell || !your_cell_cell){
+			adh = std::min( get_homotypic_strength(padhesion), custom_other_cell->get_homotypic_strength(padhesion) );
+			return adh;
+		}
+		else if (my_cell_cell && !my_mig && your_cell_cell && !your_mig){
+			adh = sqrt(get_homotypic_strength(padhesion) * custom_other_cell->get_homotypic_strength(padhesion));
+			return adh;
+		}
+
+	}
+	else{
+		if(phenotype.intracellular->get_boolean_node_value("Single") || custom_other_cell->phenotype.intracellular->get_boolean_node_value("Single"))
+			return adh;
+	
+		if ( this->type == other_cell->type )
+			adh = std::min( get_homotypic_strength(padhesion), custom_other_cell->get_homotypic_strength(padhesion) );
+		else
+			adh = std::min( get_heterotypic_strength(padhesion), custom_other_cell->get_heterotypic_strength(padhesion) );
+	}
+	
 	return adh;
 }
 
