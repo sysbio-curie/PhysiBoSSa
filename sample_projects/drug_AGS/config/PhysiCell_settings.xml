@@ -118,6 +118,10 @@
 		</legacy_data>
 	</save>
 	
+	<options>
+		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
+	</options>	
+
 	<microenvironment_setup>
 		<variable name="oxygen" units="mmHg" ID="0">
 			<physical_parameter_set>
@@ -146,8 +150,10 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<!-- example parameters from the template --> 
 		
-		<bnd_file type="string" units="">./config/boolean_network/AGS_nodes.bnd</bnd_file>
-		<cfg_file type="string" units="">./config/boolean_network/AGS_conf.cfg</cfg_file>
+		<!-- <bnd_file type="string" units="">./config/boolean_network/AGS_nodes.bnd</bnd_file> -->
+		<!-- <cfg_file type="string" units="">./config/boolean_network/AGS_conf.cfg</cfg_file> -->
+		<bnd_file type="string" units="">./config/boolean_network/AGSred_nodes.bnd</bnd_file>
+		<cfg_file type="string" units="">./config/boolean_network/AGSred_conf.cfg</cfg_file> 
 
 		<x_threshold type="double" units="dimensionless">1.</x_threshold>
 	</user_parameters>

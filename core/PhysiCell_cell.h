@@ -79,7 +79,9 @@
 
 #include "./PhysiCell_standard_models.h" 
 
+#ifdef ADDON_PHYSIBOSS
 #include "../addons/PhysiBoSSa/src/boolean_network.h"
+#endif
 
 using namespace BioFVM; 
 
@@ -165,7 +167,9 @@ class Cell : public Basic_Agent
 	Cell_State state; 
 	Phenotype phenotype; 
 	
+#ifdef ADDON_PHYSIBOSS
 	BooleanNetwork boolean_network;
+#endif
 
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 
@@ -256,6 +260,9 @@ Cell_Definition& get_cell_definition( int search_type );
 Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node ); 
 void initialize_cell_definitions_from_pugixml( pugi::xml_node root ); 
 void initialize_cell_definitions_from_pugixml( void );
+
+extern std::vector<double> (*cell_division_orientation)(void);
+
 
 };
 

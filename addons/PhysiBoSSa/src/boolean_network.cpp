@@ -1,10 +1,12 @@
 #include "boolean_network.h"
 
+/* Initialize a MaBoSS Network instance */
 void BooleanNetwork::initialize_boolean_network(std::string bnd_file, std::string cfg_file, double time_step){
 	this->maboss.init_maboss(bnd_file, cfg_file);
 	this->maboss.set_update_time_step(time_step);
 }
 
+/* Set nodes to an initial state */
 void BooleanNetwork::restart_nodes() 
 {
 	this->maboss.restart_node_values(&(this->nodes));
@@ -18,6 +20,7 @@ void BooleanNetwork::run_maboss()
 	this->set_time_to_update();
 }
 
+/* Get value given a node name */
 bool BooleanNetwork::get_node_value( std::string name )
 {
 	try
@@ -31,6 +34,7 @@ bool BooleanNetwork::get_node_value( std::string name )
 	}
 }
 
+/* Set value given a node name */
 void BooleanNetwork::set_node_value( std::string name, bool value )
 {
 	try
@@ -44,6 +48,7 @@ void BooleanNetwork::set_node_value( std::string name, bool value )
 	}
 }
 
+/* Get node index given a node name */
 int BooleanNetwork::get_node_index( std::string name ) 
 {
 	try 

@@ -118,6 +118,10 @@
 		</legacy_data>
 	</save>
 	
+	<options>
+		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
+	</options>	
+
 	<microenvironment_setup>
 		<variable name="oxygen" units="mmHg" ID="0">
 			<physical_parameter_set>
@@ -205,8 +209,8 @@
 						
 					<substrate name="tnf">
 						<secretion_rate units="1/min">0</secretion_rate>
-						<secretion_target units="substrate density">1</secretion_target>
-						<uptake_rate units="1/min">0.6109</uptake_rate>
+						<secretion_target units="substrate density">0.05</secretion_target> <!-- 1.0 -->
+						<uptake_rate units="1/min">0.0025</uptake_rate> <!-- 0.0025 -->
 						<net_export_rate units="total substrate/min">0</net_export_rate> 
 					</substrate> 	
 				</secretion>
@@ -233,13 +237,13 @@
 		<cfg_file type="string" units="">./config/boolean_network/TNF_conf.cfg</cfg_file>
 		<maboss_time_step type="double" units="dimensionless">10.</maboss_time_step>
 
-		<tnf_secretion_rate type="double" units="fg/cell/min">0.76032</tnf_secretion_rate> <!-- 0.1 -->
+		<tnf_secretion_rate type="double" units="fg/cell/min">0.1</tnf_secretion_rate> <!-- 0.1 -->
 
 		<duration_add_tnf type="int" units="min">10</duration_add_tnf> <!-- 10 -->
 		<time_remove_tnf type="int" units="min">8000</time_remove_tnf> <!-- 8000 -->
 		<time_add_tnf type="int" units="min">150</time_add_tnf> <!-- 150 -->
 
-		<tnf_threshold type="double" units="dimensionless">0.25506</tnf_threshold> <!-- 2.8e-05 -->
+		<tnf_threshold type="double" units="dimensionless">0.14</tnf_threshold> <!-- 2.8e-05 -->
 		<concentration_tnf type="double" units="ng/mL"> 0.5 </concentration_tnf> <!-- 0.5 -->
 		<membrane_length type="int" units=""> 470 </membrane_length>
 	</user_parameters>
