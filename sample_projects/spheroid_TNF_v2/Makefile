@@ -20,12 +20,17 @@ endif
 # MaBoSS directory
 MABOSS_DIR = addons/PhysiBoSSa/MaBoSS-env-2.0/engine
 CUR_DIR = $(shell pwd)
-LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS -ldl
-INC := -I$(CUR_DIR)/$(MABOSS_DIR)/include -DMAXNODES=$(MABOSS_MAX_NODES)
+
+ifneq ($(OS), Windows_NT)
+	LDL_FLAG = -ldl
+endif
+
+LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS $(LDL_FLAG)
+INC := -DADDON_PHYSIBOSS -I$(CUR_DIR)/$(MABOSS_DIR)/include -DMAXNODES=$(MABOSS_MAX_NODES)
 
 # If max nodes > 64, change lib path 
 ifeq ($(shell expr $(MABOSS_MAX_NODES) '>' 64), 1)
-LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS_$(MABOSS_MAX_NODES)n -ldl
+LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS_$(MABOSS_MAX_NODES)n $(LDL_FLAG)
 endif
 
 ARCH := native # best auto-tuning
@@ -69,7 +74,6 @@ PhysiCell_custom_module_OBJECTS := custom.o custom_main.o submodel_data_structur
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-
 ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(PhysiBoSSa_OBJECTS)
 
 # compile the project 
@@ -156,7 +160,8 @@ PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
 	
-# Compile MaBoSS engine libs
+# user-defined PhysiCell modules
+
 MaBoSS:
 	cd $(MABOSS_DIR)/src && make MAXNODES=$(MABOSS_MAX_NODES) install_alib
 

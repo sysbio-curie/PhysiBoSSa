@@ -165,6 +165,7 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 MaBoSS:
 	cd $(MABOSS_DIR)/src && make MAXNODES=$(MABOSS_MAX_NODES) install_alib
 
+# Compile PhysiBoSSA
 maboss_network.o: ./addons/PhysiBoSSa/src/maboss_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/maboss_network.cpp
 
@@ -173,6 +174,8 @@ utils.o: ./addons/PhysiBoSSa/src/utils.cpp
 
 boolean_network.o: ./addons/PhysiBoSSa/src/boolean_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/boolean_network.cpp
+
+# user-defined PhysiCell modules
 
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom.cpp
