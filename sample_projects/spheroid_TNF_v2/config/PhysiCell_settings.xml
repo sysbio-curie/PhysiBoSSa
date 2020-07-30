@@ -91,9 +91,9 @@
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 
-		<dt_diffusion units="min">0.02</dt_diffusion>
-		<dt_mechanics units="min">0.1</dt_mechanics>
-		<dt_phenotype units="min">2</dt_phenotype>	
+			<dt_diffusion units="min">0.02</dt_diffusion>
+			<dt_mechanics units="min">0.1</dt_mechanics>
+			<dt_phenotype units="min">2</dt_phenotype>	
 	</overall>
 	
 	<parallel>

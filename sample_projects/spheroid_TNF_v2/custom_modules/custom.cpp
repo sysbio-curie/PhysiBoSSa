@@ -213,11 +213,11 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 		return;
 	}
 
+	tnf_dynamics_model(pCell, phenotype, dt );
+	update_boolean_model_input(pCell, phenotype, dt );
+
 	if (PhysiCell_globals.current_time >= pCell->custom_data[index_next_physibossa_run])
 	{
-		
-		tnf_dynamics_model(pCell, phenotype, dt );
-		update_boolean_model_input(pCell, phenotype, dt );
 		pCell->boolean_network.run_maboss();
 		update_cell_state_model_based(pCell, phenotype, dt);
 
