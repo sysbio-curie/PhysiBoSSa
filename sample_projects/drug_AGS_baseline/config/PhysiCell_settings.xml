@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*
+###############################################################################
+# If you use PhysiCell in your project, please cite PhysiCell and the version #
+# number, such as below:                                                      #
+#                                                                             #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1].    #
+#                                                                             #
+# [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
+#                                                                             #
+# See VERSION.txt or call get_PhysiCell_version() to get the current version  #
+#     x.y.z. Call display_citations() to get detailed information on all cite-#
+#     able software used in your PhysiCell application.                       #
+#                                                                             #
+# Because PhysiCell extensively uses BioFVM, we suggest you also cite BioFVM  #
+#     as below:                                                               #
+#                                                                             #
+# We implemented and solved the model using PhysiCell (Version x.y.z) [1],    #
+# with BioFVM [2] to solve the transport equations.                           #
+#                                                                             #
+# [1] A Ghaffarizadeh, R Heiland, SH Friedman, SM Mumenthaler, and P Macklin, #
+#     PhysiCell: an Open Source Physics-Based Cell Simulator for Multicellu-  #
+#     lar Systems, PLoS Comput. Biol. 14(2): e1005991, 2018                   #
+#     DOI: 10.1371/journal.pcbi.1005991                                       #
+#                                                                             #
+# [2] A Ghaffarizadeh, SH Friedman, and P Macklin, BioFVM: an efficient para- #
+#     llelized diffusive transport solver for 3-D biological simulations,     #
+#     Bioinformatics 32(8): 1256-8, 2016. DOI: 10.1093/bioinformatics/btv730  #
+#                                                                             #
+###############################################################################
+#                                                                             #
+# BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
+#                                                                             #
+# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# All rights reserved.                                                        #
+#                                                                             #
+# Redistribution and use in source and binary forms, with or without          #
+# modification, are permitted provided that the following conditions are met: #
+#                                                                             #
+# 1. Redistributions of source code must retain the above copyright notice,   #
+# this list of conditions and the following disclaimer.                       #
+#                                                                             #
+# 2. Redistributions in binary form must reproduce the above copyright        #
+# notice, this list of conditions and the following disclaimer in the         #
+# documentation and/or other materials provided with the distribution.        #
+#                                                                             #
+# 3. Neither the name of the copyright holder nor the names of its            #
+# contributors may be used to endorse or promote products derived from this   #
+# software without specific prior written permission.                         #
+#                                                                             #
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" #
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE   #
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE  #
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE   #
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR         #
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF        #
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS    #
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN     #
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)     #
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE  #
+# POSSIBILITY OF SUCH DAMAGE.                                                 #
+#                                                                             #
+###############################################################################
+*/
+--> 
+
+<!--
+<user_details />
+-->
+
+<PhysiCell_settings version="devel-version">
+	<domain>
+		<x_min>-500</x_min>
+		<x_max>500</x_max>
+		<y_min>-500</y_min>
+		<y_max>500</y_max>
+		<z_min>-500</z_min>
+		<z_max>500</z_max>
+		<dx>15</dx>
+		<dy>15</dy>
+		<dz>15</dz>
+		<use_2D>false</use_2D>
+	</domain>
+	
+	<overall>
+		<max_time units="min">1440</max_time>
+		<!-- <max_time units="min">43200</max_time> -->
+		<time_units>min</time_units>
+		<space_units>micron</space_units>
+
+		<dt_diffusion units="min">0.02</dt_diffusion>
+		<dt_mechanics units="min">0.1</dt_mechanics>
+		<dt_phenotype units="min">2</dt_phenotype>	
+	</overall>
+	
+	<parallel>
+		<omp_num_threads>4</omp_num_threads>
+	</parallel> 
+	
+	<save>
+		<folder>output</folder> <!-- use . for root --> 
+
+		<full_data>
+			<interval units="min">30</interval>
+			<enable>true</enable>
+		</full_data>
+		
+		<SVG>
+			<interval units="min">30</interval>
+			<enable>false</enable>
+		</SVG>
+		
+		<legacy_data>
+			<enable>false</enable>
+		</legacy_data>
+	</save>
+	
+	<options>
+		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
+	</options>	
+
+	<microenvironment_setup>
+		<variable name="oxygen" units="mmHg" ID="0">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate> 
+			</physical_parameter_set>
+			<!-- <initial_condition units="mmHg">10000000000.0</initial_condition> -->
+			<!-- <Dirichlet_boundary_condition units="mmHg" enabled="false">20.0</Dirichlet_boundary_condition> -->
+			<!-- <initial_condition units="mmHg">38.0</initial_condition> -->
+			<!-- <Dirichlet_boundary_condition units="mmHg" enabled="true">38.0</Dirichlet_boundary_condition> -->
+			<initial_condition units="mmHg">60.0</initial_condition>
+			<Dirichlet_boundary_condition units="mmHg" enabled="true">60.0</Dirichlet_boundary_condition>
+		</variable>
+		
+<!-- 		<variable name="tnf" units="mmol" ID="1">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1200.0</diffusion_coefficient>
+				<decay_rate units="1/min">.0275</decay_rate> 
+			</physical_parameter_set>
+			<initial_condition units="mmol">0.0</initial_condition>
+			<Dirichlet_boundary_condition units="mmol" enabled="false">0.0</Dirichlet_boundary_condition>
+		</variable>-->
+ 		<variable name="AKTi" units="mmol" ID="1">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1200.0</diffusion_coefficient>
+				<decay_rate units="1/min">.0275</decay_rate> 
+			</physical_parameter_set>
+			<initial_condition units="mmol">0.0</initial_condition>
+			<Dirichlet_boundary_condition units="mmol" enabled="false">0.0</Dirichlet_boundary_condition>
+		</variable>
+
+		<variable name="TAKi" units="mmol" ID="2">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1200.0</diffusion_coefficient>
+				<decay_rate units="1/min">.0275</decay_rate> 
+			</physical_parameter_set>
+			<initial_condition units="mmol">0.0</initial_condition>
+			<Dirichlet_boundary_condition units="mmol" enabled="false">0.0</Dirichlet_boundary_condition>
+		</variable>
+
+		<!-- <variable name="BCATi" units="mmol" ID="7"> -->
+			<!-- <physical_parameter_set> -->
+				<!-- <diffusion_coefficient units="micron^2/min">1200.0</diffusion_coefficient> -->
+				<!-- <decay_rate units="1/min">.0275</decay_rate>  -->
+			<!-- </physical_parameter_set> -->
+			<!-- <initial_condition units="mmol">0.0</initial_condition> -->
+			<!-- <Dirichlet_boundary_condition units="mmol" enabled="false">0.0</Dirichlet_boundary_condition> -->
+		<!-- </variable> -->
+
+		<!-- <variable name="GSK3i" units="mmol" ID="3"> -->
+			<!-- <physical_parameter_set> -->
+				<!-- <diffusion_coefficient units="micron^2/min">1200.0</diffusion_coefficient> -->
+				<!-- <decay_rate units="1/min">.0275</decay_rate>  -->
+			<!-- </physical_parameter_set> -->
+			<!-- <initial_condition units="mmol">0.0</initial_condition> -->
+			<!-- <Dirichlet_boundary_condition units="mmol" enabled="false">0.0</Dirichlet_boundary_condition> -->
+		<!-- </variable> -->
+
+		<!-- <variable name="MEKi" units="mmol" ID="4"> -->
+			<!-- <physical_parameter_set> -->
+				<!-- <diffusion_coefficient units="micron^2/min">1200.0</diffusion_coefficient> -->
+				<!-- <decay_rate units="1/min">.0275</decay_rate>  -->
+			<!-- </physical_parameter_set> -->
+			<!-- <initial_condition units="mmol">0.0</initial_condition> -->
+			<!-- <Dirichlet_boundary_condition units="mmol" enabled="false">0.0</Dirichlet_boundary_condition> -->
+		<!-- </variable> -->
+
+		<!-- <variable name="p38i" units="mmol" ID="5"> -->
+			<!-- <physical_parameter_set> -->
+				<!-- <diffusion_coefficient units="micron^2/min">1200.0</diffusion_coefficient> -->
+				<!-- <decay_rate units="1/min">.0275</decay_rate>  -->
+			<!-- </physical_parameter_set> -->
+			<!-- <initial_condition units="mmol">0.0</initial_condition> -->
+			<!-- <Dirichlet_boundary_condition units="mmol" enabled="false">0.0</Dirichlet_boundary_condition> -->
+		<!-- </variable> -->
+
+		<!-- <variable name="PI3Ki" units="mmol" ID="6"> -->
+			<!-- <physical_parameter_set> -->
+				<!-- <diffusion_coefficient units="micron^2/min">1200.0</diffusion_coefficient> -->
+				<!-- <decay_rate units="1/min">.0275</decay_rate>  -->
+			<!-- </physical_parameter_set> -->
+			<!-- <initial_condition units="mmol">0.0</initial_condition> -->
+			<!-- <Dirichlet_boundary_condition units="mmol" enabled="false">0.0</Dirichlet_boundary_condition> -->
+		<!-- </variable> -->
+
+		<options>
+			<calculate_gradients>true</calculate_gradients>
+			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
+			<!-- not yet supported --> 
+			<initial_condition type="matlab" enabled="false">
+				<filename>./config/initial.mat</filename>
+			</initial_condition>
+			<!-- not yet supported --> 
+			<dirichlet_nodes type="matlab" enabled="false">
+				<filename>./config/dirichlet.mat</filename>
+			</dirichlet_nodes>
+		</options>
+	</microenvironment_setup>		
+	
+	<cell_definitions>
+		<cell_definition name="default" ID="0">
+			<phenotype>
+				<cycle code="5" name="live_cells_cycle_model">  
+					<phase_transition_rates units="1/min">
+						<rate start_index="0" end_index="0" fixed_duration="false">0.00072‬</rate>
+					</phase_transition_rates>
+				</cycle>
+					<!-- Default live rates -->
+					<!-- <rate start_index="0" end_index="0" fixed_duration="false">0.00072‬</rate> -->
+					<!-- using higher than normal significant digits to match divisions in default code -->
+					<!-- live.transition_rate(0,0) = 0.0432 / 60.0; // MCF10A have ~0.04 1/hr net birth rate (=0.00072‬)-->
+					<!-- però en la sim és de 0.0001102 -->
+
+				<!-- <cycle code="1" name="basic_Ki67_cycle_model">  
+					<phase_transition_rates units="1/min">
+						<rate start_index="0" end_index="1" fixed_duration="false">0.003631</rate>
+						<rate start_index="1" end_index="0" fixed_duration="false">0.001075</rate>
+					</phase_transition_rates>
+				</cycle> -->
+					<!-- Default Ki67 rates -->
+					<!-- <rate start_index="0" end_index="1" fixed_duration="false">1.0/(4.59*60.0)</rate> -->
+					<!-- <rate start_index="1" end_index="0" fixed_duration="false">1.0/(15.5*60.0)</rate> -->
+					<!-- Ki67_basic.transition_rate(0,1) = 1.0/(4.59*60.0); // MCF10A cells are ~4.59 hours in Ki67- state (1/‭275.4‬=0.003631)-->
+					<!-- però en la sim és de 0.0005253, que equival a 31.7 hores -->
+					<!-- Ki67_basic.transition_rate(1,0) = 1.0/(15.5*60.0); // length of Ki67+ states in advanced model (1/930=0.001075) -->
+					<!-- però en la sim és de 0.001075 -->
+					<!-- Ki67_basic.phase_link(1,0).fixed_duration = true;  -->
+				
+				<death>
+					<model code="100" name="apoptosis">
+						<rate units="1/min">5.31667e-05</rate>
+						<transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="true">0.00193798</rate>
+						</transition_rates>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+
+					<model code="101" name="necrosis">
+						<rate units="1/min">0.0</rate>
+						<transition_rates units="1/min">
+							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
+							<rate start_index="1" end_index="2" fixed_duration="true">1.15741e-5</rate>
+						</transition_rates>
+						<parameters>
+							<unlysed_fluid_change_rate units="1/min">0.05</unlysed_fluid_change_rate>
+							<lysed_fluid_change_rate units="1/min">0</lysed_fluid_change_rate>
+							<cytoplasmic_biomass_change_rate units="1/min">1.66667e-02</cytoplasmic_biomass_change_rate>
+							<nuclear_biomass_change_rate units="1/min">5.83333e-03</nuclear_biomass_change_rate>
+							<calcification_rate units="1/min">0</calcification_rate>
+							<relative_rupture_volume units="dimensionless">2.0</relative_rupture_volume>
+						</parameters>
+					</model> 
+				</death>					
+
+				<secretion>
+					<substrate name="oxygen">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">38</secretion_target>
+						<uptake_rate units="1/min">10</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+						
+					<!-- <substrate name="tnf">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">0.05</secretion_target>
+						<uptake_rate units="1/min">0.0025</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate>  -->
+
+					<substrate name="AKTi">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0.0025</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate>  
+					
+					<substrate name="TAKi">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0.0025</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate> 
+
+					<!-- <substrate name="BCATi">
+						<secretion_rate units="1/min">0</secretion_rate>
+						<secretion_target units="substrate density">1</secretion_target>
+						<uptake_rate units="1/min">0.0025</uptake_rate>
+						<net_export_rate units="total substrate/min">0</net_export_rate> 
+					</substrate>   -->
+
+				</secretion>
+
+				<molecular />
+			</phenotype>
+			<custom_data>
+				<next_physibossa_run units="dimensionless">10.</next_physibossa_run>
+				<!-- <tnf_concentration units="dimensionless">0</tnf_concentration>
+				<tnf_node units="dimensionless">0</tnf_node> -->
+				<akti_concentration units="dimensionless">0</akti_concentration>
+				<akti_node units="dimensionless">0</akti_node>
+				<taki_concentration units="dimensionless">0</taki_concentration>
+				<taki_node units="dimensionless">0</taki_node>
+				<!-- <bcati_concentration units="dimensionless">0</bcati_concentration> -->
+				<!-- <bcati_node units="dimensionless">0</bcati_node> -->
+				<!-- <fadd_node units="dimensionless">0</fadd_node> -->
+				<o2_extern units="mmHg">0.0</o2_extern>
+				<o2_intern units="mmHg">0.0</o2_intern>
+				<!-- <dirich_value units="mmHg">0.0</dirich_value> -->
+			</custom_data>
+		</cell_definition>
+	</cell_definitions>
+
+	<user_parameters>
+		<random_seed type="int" units="dimensionless">0</random_seed> 
+		<!-- example parameters from the template --> 
+
+		<!-- <init_cells_filename type="string" units="">./config/init.txt</init_cells_filename> -->
+		<init_cells_filename type="string" units="">./config/init_5k.txt</init_cells_filename>
+
+		<bnd_file type="string" units="">./config/boolean_network/AGS_nodes.bnd</bnd_file>
+		<cfg_file type="string" units="">./config/boolean_network/AGS_conf.cfg</cfg_file>
+		<!-- <bnd_file type="string" units="">./config/boolean_network/AGSred_nodes.bnd</bnd_file> -->
+		<!-- <cfg_file type="string" units="">./config/boolean_network/AGSred_conf.cfg</cfg_file>  -->
+		<maboss_time_step type="double" units="dimensionless">10.</maboss_time_step>
+
+		<!-- <tnf_secretion_rate type="double" units="fg/cell/min">0.1</tnf_secretion_rate>
+		<duration_add_tnf type="int" units="min">8000</duration_add_tnf>
+		<time_remove_tnf type="int" units="min">8000</time_remove_tnf> 
+		<time_add_tnf type="int" units="min">0</time_add_tnf>
+		<tnf_threshold type="double" units="dimensionless">0.14</tnf_threshold>
+		<concentration_tnf type="double" units="ng/mL"> 0.5 </concentration_tnf>  -->
+
+		<!-- <akti_uptake_rate type="double" units="">0.0025</akti_uptake_rate> -->
+		<!-- <akti_secretion_rate type="double" units="fg/cell/min">0.1</akti_secretion_rate> -->
+		<duration_add_akti type="int" units="min">0</duration_add_akti> <!-- 10 -->
+		<time_remove_akti type="int" units="min">0</time_remove_akti> <!-- 8000 -->
+		<time_add_akti type="int" units="min">0</time_add_akti> <!-- 150 -->
+		<akti_threshold type="double" units="dimensionless">0</akti_threshold> <!-- 2.8e-05 -->
+		<concentration_akti type="double" units="ng/mL"> 0 </concentration_akti> <!-- 0.5 -->
+		
+		<!-- <taki_uptake_rate type="double" units="">0.0025</taki_uptake_rate> -->
+		<!-- <taki_secretion_rate type="double" units="fg/cell/min">0.1</taki_secretion_rate> -->
+		<duration_add_taki type="int" units="min">0</duration_add_taki> <!-- 10 -->
+		<time_remove_taki type="int" units="min">0</time_remove_taki> <!-- 8000 -->
+		<time_add_taki type="int" units="min">0</time_add_taki> <!-- 150 -->
+		<taki_threshold type="double" units="dimensionless">0</taki_threshold> <!-- 2.8e-05 -->
+		<concentration_taki type="double" units="ng/mL"> 0 </concentration_taki> <!-- 0.5 -->
+
+		<!-- <bcati_uptake_rate type="double" units="">0.0025</bcati_uptake_rate> -->
+		<!-- <bcati_secretion_rate type="double" units="fg/cell/min">0.1</bcati_secretion_rate> -->
+		<!-- <duration_add_bcati type="int" units="min">8000</duration_add_bcati>
+		<time_remove_bcati type="int" units="min">8000</time_remove_bcati> 
+		<time_add_bcati type="int" units="min">0</time_add_bcati> 
+		<bcati_threshold type="double" units="dimensionless">0.14</bcati_threshold> 
+		<concentration_bcati type="double" units="ng/mL"> 0.5 </concentration_bcati> -->
+		
+		<!-- o2 no dirichlet -->
+		<!-- <duration_add_o2 type="int" units="min">10</duration_add_o2>
+		<time_remove_o2 type="int" units="min">420</time_remove_o2>
+		<time_add_o2 type="int" units="min">0.0</time_add_o2>
+		<concentration_o2 type="double" units="mmHg"> 10000000000.0 </concentration_o2> -->
+
+		<!-- o2 change dirichlet -->
+		<time_o2_change_dirich type="int" units="min">1000</time_o2_change_dirich>
+		<new_o2_dirich type="double" units="concentration">1</new_o2_dirich>
+
+		<membrane_length type="int" units=""> 470 </membrane_length>
+
+	</user_parameters>
+	
+	
+</PhysiCell_settings>

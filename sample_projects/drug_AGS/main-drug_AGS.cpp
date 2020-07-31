@@ -79,7 +79,8 @@
 // put custom code modules here! 
 
 #include "./custom_modules/custom.h" 
-	
+#include "./custom_modules/custom_main.h"
+
 using namespace BioFVM;
 using namespace PhysiCell;
 
@@ -94,12 +95,12 @@ int main( int argc, char* argv[] )
 	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
 	if( !XML_status )
 	{ exit(-1); }
-	
+
 	// OpenMP setup
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
 	// PNRG setup 
-	SeedRandom(); 
+	SeedRandom( parameters.ints("random_seed") ); // or specify a seed here
 	
 	// time setup 
 	std::string time_units = "min"; 
@@ -107,6 +108,40 @@ int main( int argc, char* argv[] )
 	/* Microenvironment setup */ 
 	
 	setup_microenvironment(); // modify this in the custom code 
+
+	// User parameters
+	double time_add_tnf = parameters.ints("time_add_tnf");
+	double time_put_tnf = 0;
+	double duration_add_tnf = parameters.ints("duration_add_tnf");
+	double time_tnf_next = 0;
+	double time_remove_tnf = parameters.ints("time_remove_tnf");
+	double concentration_tnf = parameters.doubles("concentration_tnf") * microenvironment.voxels(0).volume * 0.000001;
+	double time_add_akti = parameters.ints("time_add_akti");
+	double time_put_akti = 0;
+	double duration_add_akti = parameters.ints("duration_add_akti");
+	double time_akti_next = 0;
+	double time_remove_akti = parameters.ints("time_remove_akti");
+	double concentration_akti = parameters.doubles("concentration_akti") * microenvironment.voxels(0).volume * 0.000001;
+	double time_add_taki = parameters.ints("time_add_taki");
+	double time_put_taki = 0;
+	double duration_add_taki = parameters.ints("duration_add_taki");
+	double time_taki_next = 0;
+	double time_remove_taki = parameters.ints("time_remove_taki");
+	double concentration_taki = parameters.doubles("concentration_taki") * microenvironment.voxels(0).volume * 0.000001;
+	double membrane_lenght = parameters.ints("membrane_length");
+	double time_add_bcati = parameters.ints("time_add_bcati");
+	double time_put_bcati = 0;
+	double duration_add_bcati = parameters.ints("duration_add_bcati");
+	double time_bcati_next = 0;
+	double time_remove_bcati = parameters.ints("time_remove_bcati");
+	double concentration_bcati = parameters.doubles("concentration_bcati") * microenvironment.voxels(0).volume * 0.000001;
+
+	// do small diffusion steps alone to initialize densities
+	int k = microenvironment.find_density_index("tnf");
+	if ( k >= 0 ) 
+		inject_density_sphere(k, concentration_tnf, membrane_lenght);
+	for ( int i = 0; i < 25; i ++ )
+		microenvironment.simulate_diffusion_decay( 5*diffusion_dt );
 	
 	/* PhysiCell setup */ 
  	
@@ -202,15 +237,103 @@ int main( int argc, char* argv[] )
 				}
 			}
 
+			/*
+			  Custom add-ons could potentially go here. 
+			*/			
+			// TNF 
+			// if ( PhysiCell_globals.current_time >= time_put_tnf )
+			// {
+			// 	time_tnf_next = PhysiCell_globals.current_time + duration_add_tnf;
+			// 	time_put_tnf += time_add_tnf;
+			// }
+
+			// if ( PhysiCell_globals.current_time >= time_remove_tnf )
+			// {
+			// 	int k = microenvironment.find_density_index("tnf");
+			// 	if ( k >= 0 )
+			// 		remove_density(k);
+			// 	time_remove_tnf += PhysiCell_settings.max_time;
+			// }
+
+			// if ( PhysiCell_globals.current_time <= time_tnf_next )
+			// {
+			// 	int k = microenvironment.find_density_index("tnf");
+			// 	if ( k >= 0 ) 
+			// 		inject_density_sphere(k, concentration_tnf, membrane_lenght);
+			// }
+				
+			//AKTi
+			if ( PhysiCell_globals.current_time >= time_put_akti )
+			{
+				time_akti_next = PhysiCell_globals.current_time + duration_add_akti;
+				time_put_akti += time_add_akti;
+			}
+
+			if ( PhysiCell_globals.current_time >= time_remove_akti )
+			{
+				int k = microenvironment.find_density_index("AKTi");
+				if ( k >= 0 )
+					remove_density(k);
+				time_remove_akti += PhysiCell_settings.max_time;
+			}
+
+			if ( PhysiCell_globals.current_time <= time_akti_next )
+			{
+				int k = microenvironment.find_density_index("AKTi");
+				if ( k >= 0 )
+					inject_density_sphere(k, concentration_akti, membrane_lenght);
+			}
+			
+			//TAKi
+			if ( PhysiCell_globals.current_time >= time_put_taki )
+			{
+				time_taki_next = PhysiCell_globals.current_time + duration_add_taki;
+				time_put_taki += time_add_taki;
+			}
+
+			if ( PhysiCell_globals.current_time >= time_remove_taki )
+			{
+				int k = microenvironment.find_density_index("TAKi");
+				if ( k >= 0 )
+					remove_density(k);
+				time_remove_taki += PhysiCell_settings.max_time;
+			}
+
+			if ( PhysiCell_globals.current_time <= time_taki_next )
+			{
+				int k = microenvironment.find_density_index("TAKi");
+				if ( k >= 0 ) 
+					inject_density_sphere(k, concentration_taki, membrane_lenght);
+			}
+			
+			//BCATi
+			// if ( PhysiCell_globals.current_time >= time_put_bcati )
+			// {
+			// 	time_bcati_next = PhysiCell_globals.current_time + duration_add_bcati;
+			// 	time_put_bcati += time_put_bcati;
+			// }
+
+			// if ( PhysiCell_globals.current_time >= time_remove_bcati )
+			// {
+			// 	int k = microenvironment.find_density_index("BCATi");
+			// 	if ( k >= 0 )
+			// 		remove_density(k);
+			// 	time_remove_bcati += PhysiCell_settings.max_time;
+			// }
+
+			// if ( PhysiCell_globals.current_time <= time_bcati_next )
+			// {
+			// 	int k = microenvironment.find_density_index("BCATi");
+			// 	if ( k >= 0 )
+			// 		inject_density_sphere(k, concentration_bcati, membrane_lenght);
+			// }
+			
+
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
-			
-			/*
-			  Custom add-ons could potentially go here. 
-			*/
 			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}

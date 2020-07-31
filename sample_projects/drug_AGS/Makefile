@@ -57,6 +57,8 @@ ARCH := native # best auto-tuning
 
 # CFLAGS := -march=$(ARCH) -Ofast -s -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
 CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
+# debug:
+# CFLAGS := -march=$(ARCH) -O0 -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
 
 COMPILE_COMMAND := $(CC) $(CFLAGS) 
 
@@ -73,7 +75,7 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 PhysiBoSSa_OBJECTS := utils.o maboss_network.o boolean_network.o
 
-PhysiCell_custom_module_OBJECTS := custom.o
+PhysiCell_custom_module_OBJECTS := custom.o custom_main.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -181,6 +183,9 @@ boolean_network.o: ./addons/PhysiBoSSa/src/boolean_network.cpp
 custom.o: ./custom_modules/custom.cpp 
 	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom.cpp
 
+custom_main.o: ./custom_modules/custom_main.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./custom_modules/custom_main.cpp
+
 # cleanup
 
 reset:
@@ -205,7 +210,8 @@ data-cleanup:
 	rm -f *.mat
 	rm -f *.xml
 	rm -f *.svg
-	rm -f ./output/*
+	rm -rf ./output
+	mkdir ./output
 	touch ./output/empty.txt
 	
 # archival 
