@@ -13,9 +13,10 @@
  * 
  *	\details The MaBOSS network class contains network configs to handel the initialization and run the simulations given an input.
  *
- *	\date 06/08/2020
+ *	\date 03/08/2020
  *	\author Gaelle Letort, Institut Curie
  *	\author Gerard Pradas, BSC-CNS
+ *	\author Vincent Noel, Institut Curie
  */
 class MaBoSSNetwork
 {
