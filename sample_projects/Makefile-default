@@ -184,7 +184,7 @@ drug-AGS:
 drug-AGS-baseline: 	
 	cp ./sample_projects/drug_AGS_baseline/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/drug_AGS_baseline/main-drug_AGS_baseline.cpp ./main.cpp 
+	cp ./sample_projects/drug_AGS_baseline/main-drug_AGS.cpp ./main.cpp 
 	cp Makefile Makefile-backup
 	cp ./sample_projects/drug_AGS_baseline/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
