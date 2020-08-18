@@ -63,7 +63,7 @@ all:
 # sample projects 	
 list-projects:
 	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
-	@echo "                 cancer-immune-sample virus-macrophage-sample template spheroid-TNF spheroid-TNF-v2 drug-AGS"
+	@echo "                 cancer-immune-sample virus-macrophage-sample template spheroid-TNF spheroid-TNF-v2 drug-AGS drug-AGS-baseline"
 	
 template2D: 
 	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
@@ -180,7 +180,18 @@ drug-AGS:
 	cp -r ./sample_projects/drug_AGS/config/* ./config/
 	mkdir ./scripts/
 	cp ./sample_projects/drug_AGS/scripts/* ./scripts/
-	
+
+drug-AGS-baseline: 	
+	cp ./sample_projects/drug_AGS_baseline/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/drug_AGS_baseline/main-drug_AGS_baseline.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/drug_AGS_baseline/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/drug_AGS_baseline/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/drug_AGS_baseline/scripts/* ./scripts/
+
 # early examples for convergence testing 
 
 physicell_test_mech1: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp 
