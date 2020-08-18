@@ -190,7 +190,7 @@ drug-AGS-baseline:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp -r ./sample_projects/drug_AGS_baseline/config/* ./config/
 	mkdir ./scripts/
-	cp .-r /sample_projects/drug_AGS_baseline/scripts/* ./scripts/
+	cp -r ./sample_projects/drug_AGS_baseline/scripts/* ./scripts/
 
 # early examples for convergence testing 
 
