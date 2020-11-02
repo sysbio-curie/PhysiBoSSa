@@ -63,8 +63,7 @@ all:
 # sample projects 	
 list-projects:
 	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
-	@echo "                 cancer-immune-sample virus-macrophage-sample template spheroid-TNF spheroid-TNF-v2"
-	@echo "                 drug-AGS ecm-try arnau-model sorting physiboss-cell-lines mycovid19"
+	@echo "                 cancer-immune-sample virus-macrophage-sample template ecm-motility"
 	
 template2D: 
 	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
@@ -149,104 +148,17 @@ beta-testing:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/beta_testing/config/* ./config/
 
-spheroid-TNF: 	
-	cp ./sample_projects/spheroid_TNF/custom_modules/* ./custom_modules/
+ecm-motility: 	
+	cp -r ./sample_projects/ECM_motility/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/spheroid_TNF/main-spheroid_TNF.cpp ./main.cpp 
+	cp ./sample_projects/ECM_motility/main_ECM_motility.cpp ./main.cpp 
 	cp Makefile Makefile-backup
-	cp ./sample_projects/spheroid_TNF/Makefile .
+	cp ./sample_projects/ECM_motility/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp -r ./sample_projects/spheroid_TNF/config/* ./config/
+	cp -r ./sample_projects/ECM_motility/config/* ./config/
 	mkdir ./scripts/
-	cp ./sample_projects/spheroid_TNF/scripts/* ./scripts/
-
-spheroid-TNF-v2: 	
-	cp ./sample_projects/spheroid_TNF_v2/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/spheroid_TNF_v2/main-spheroid_TNF.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/spheroid_TNF_v2/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp -r ./sample_projects/spheroid_TNF_v2/config/* ./config/
-	mkdir ./scripts/
-	cp ./sample_projects/spheroid_TNF_v2/scripts/* ./scripts/
+	cp ./sample_projects/ECM_motility/scripts/* ./scripts/
 	
-ecm-try: 	
-	cp -r ./sample_projects/ECM_try/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/ECM_try/main_ECM_try.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/ECM_try/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp -r ./sample_projects/ECM_try/config/* ./config/
-	mkdir ./scripts/
-	cp ./sample_projects/ECM_try/scripts/* ./scripts/
-
-arnau-model: 	
-	cp -r ./sample_projects/Arnau_model/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/Arnau_model/main_arnau_model.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/Arnau_model/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp -r ./sample_projects/Arnau_model/config/* ./config/
-	mkdir ./scripts/
-	cp ./sample_projects/Arnau_model/scripts/* ./scripts/
-
-sorting: 	
-	cp -r ./sample_projects/sorting/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/sorting/main_sorting.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/sorting/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp -r ./sample_projects/sorting/config/* ./config/
-	mkdir ./scripts/
-	cp ./sample_projects/sorting/scripts/* ./scripts/
-
-physiboss-cell-lines:
-	cp -r ./sample_projects/physiboss_cell_lines/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/physiboss_cell_lines/main.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/physiboss_cell_lines/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp -r ./sample_projects/physiboss_cell_lines/config/* ./config/
-	mkdir ./scripts/
-	cp ./sample_projects/physiboss_cell_lines/scripts/* ./scripts/
-
-covid19:
-	cp -r ./sample_projects/covid19/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/covid19/main.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/covid19/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp -r ./sample_projects/covid19/config/* ./config/
-	mkdir -p ./scripts/
-	cp ./sample_projects/covid19/scripts/* ./scripts/
-
-mycovid19:
-	cp -r ./sample_projects/mycovid19/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/mycovid19/main.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/mycovid19/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp -r ./sample_projects/mycovid19/config/* ./config/
-	mkdir -p ./scripts/
-	cp ./sample_projects/mycovid19/scripts/* ./scripts/
-
-drug-AGS: 	
-	cp ./sample_projects/drug_AGS/custom_modules/* ./custom_modules/
-	touch main.cpp && cp main.cpp main-backup.cpp
-	cp ./sample_projects/drug_AGS/main-drug_AGS.cpp ./main.cpp 
-	cp Makefile Makefile-backup
-	cp ./sample_projects/drug_AGS/Makefile .
-	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
-	cp -r ./sample_projects/drug_AGS/config/* ./config/
-	mkdir ./scripts/
-	cp ./sample_projects/drug_AGS/scripts/* ./scripts/
 	
 # early examples for convergence testing 
 
