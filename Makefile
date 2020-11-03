@@ -148,6 +148,17 @@ beta-testing:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/beta_testing/config/* ./config/
 	
+physiboss-cell-lines:
+	cp -r ./sample_projects/physiboss_cell_lines/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/physiboss_cell_lines/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/physiboss_cell_lines/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/physiboss_cell_lines/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/physiboss_cell_lines/scripts/* ./scripts/
+
 # early examples for convergence testing 
 
 physicell_test_mech1: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp 
