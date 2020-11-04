@@ -9,10 +9,12 @@
 #include "../../../modules/PhysiCell_pugixml.h"
 #include "maboss_network.h"
 
+static std::string PhysiBoSS_Version = "2.0.0"; 
+
 class MaBoSSIntracellular : public PhysiCell::Intracellular {
  private:
  public:
-	
+
 	static long counter;
 	
 	std::string bnd_filename;
