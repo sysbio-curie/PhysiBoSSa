@@ -60,6 +60,7 @@
 #define MAXNODES 64
 #endif
 
+#define _POSIX_C_SOURCE 200809L
 // To be defined only when comparing bitset with ulong implementation
 //#define COMPARE_BITSET_AND_ULONG
 
