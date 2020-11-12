@@ -1,0 +1,27 @@
+name: Tests MacOSX
+
+on:
+  push:
+  pull_request:
+    
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run : |
+        brew install flex bison gcc@10
+        
+    - name: Build PhysiBoSS cell lines project
+      run: |
+        g++ --version
+        make physiboss-cell-lines
+        make PHYSICELL_CPP=g++-10
+        
+    - name: Run PhysiBoSS cell lines project
+      run: |
+        ./PhysiBoSS_Cell_Lines
