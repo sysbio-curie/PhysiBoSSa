@@ -558,13 +558,19 @@ class Intracellular
 	virtual bool need_update() = 0;
 	
 	// This function checks if a node exists
-	virtual bool has_node(std::string name) = 0; 
+	virtual bool has_variable(std::string name) = 0; 
 	
-	// Access value for boolean model
-	virtual bool get_boolean_node_value(std::string name) = 0;
+	// Access value for boolean variable
+	virtual bool get_boolean_variable_value(std::string name) = 0;
 	
-	// Set value for boolean model
-	virtual void set_boolean_node_value(std::string name, bool value) = 0;
+	// Set value for boolean variable
+	virtual void set_boolean_variable_value(std::string name, bool value) = 0;
+	
+	// Access value for double variable
+	virtual double get_double_variable_value(std::string name) = 0;
+	
+	// Set value for read double variable
+	virtual void set_double_variable_value(std::string name, double value) = 0;
 	
 	// Get value for maboss model parameter
 	virtual double get_parameter_value(std::string name) = 0;
