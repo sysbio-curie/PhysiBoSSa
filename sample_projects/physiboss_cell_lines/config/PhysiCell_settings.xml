@@ -237,7 +237,7 @@
 	</cell_definitions>	
 	
 	<user_parameters>
-		<random_seed type="int" units="dimensionless">0</random_seed> 
+		<random_seed type="int" units="dimensionless">100</random_seed> 
 		<node_to_visualize type="string" units="">C</node_to_visualize> <!-- insert the name of the node you want to visualize in paraview-->
 	</user_parameters>
 	
