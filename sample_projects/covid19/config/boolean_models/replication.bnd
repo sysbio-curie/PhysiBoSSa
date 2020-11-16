@@ -1,0 +1,1391 @@
+Node csa430 {
+
+	logic = (sa1462 & sa2040 & sa2178);
+	rate_up = @logic ? $u_csa430 : 0;
+	rate_down = @logic ? 0 : $d_csa430;
+}
+Node csa352 {
+
+	logic = (csa352);
+	rate_up = @logic ? $u_csa352 : 0;
+	rate_down = @logic ? 0 : $d_csa352;
+}
+
+Node csa357 {
+
+	logic = (csa430);
+	rate_up = @logic ? $u_csa357 : 0;
+	rate_down = @logic ? 0 : $d_csa357;
+}
+
+Node csa365 {
+
+	logic = (csa365);
+	rate_up = @logic ? $u_csa365 : 0;
+	rate_down = @logic ? 0 : $d_csa365;
+}
+
+Node csa366 {
+
+	logic = (csa366);
+	rate_up = @logic ? $u_csa366 : 0;
+	rate_down = @logic ? 0 : $d_csa366;
+}
+
+Node csa370 {
+
+	logic = (csa370);
+	rate_up = @logic ? $u_csa370 : 0;
+	rate_down = @logic ? 0 : $d_csa370;
+}
+
+Node csa368 {
+
+	logic = (sa1545 & sa2009 & sa2173);
+	rate_up = @logic ? $u_csa368 : 0;
+	rate_down = @logic ? 0 : $d_csa368;
+}
+
+Node csa369 {
+
+	logic = (!csa365 & csa374 & sa1601 & sa2023 & sa2024 & sa2025) | (csa365 & !csa374 & sa2060 & sa2061 & sa2062 & sa2052) | (csa365 & csa374 & !sa1601 & sa2060 & sa2061 & sa2062 & sa2052) | (csa365 & csa374 & sa1601 & !sa2023 & sa2060 & sa2061 & sa2062 & sa2052) | (csa365 & csa374 & sa1601 & sa2023 & !sa2024 & sa2060 & sa2061 & sa2062 & sa2052) | (csa365 & csa374 & sa1601 & sa2023 & sa2024 & !sa2025 & sa2060 & sa2061 & sa2062 & sa2052) | (csa365 & csa374 & sa1601 & sa2023 & sa2024 & sa2025);
+	rate_up = @logic ? $u_csa369 : 0;
+	rate_down = @logic ? 0 : $d_csa369;
+}
+
+Node csa371 {
+
+	logic = (csa371);
+	rate_up = @logic ? $u_csa371 : 0;
+	rate_down = @logic ? 0 : $d_csa371;
+}
+
+Node csa374 {
+
+	logic = (csa374);
+	rate_up = @logic ? $u_csa374 : 0;
+	rate_down = @logic ? 0 : $d_csa374;
+}
+
+Node csa398 {
+
+	logic = (!csa410 & sa1887) | (csa410);
+	rate_up = @logic ? $u_csa398 : 0;
+	rate_down = @logic ? 0 : $d_csa398;
+}
+
+Node csa387 {
+
+	logic = (csa389);
+	rate_up = @logic ? $u_csa387 : 0;
+	rate_down = @logic ? 0 : $d_csa387;
+}
+
+Node csa389 {
+
+	logic = (csa391);
+	rate_up = @logic ? $u_csa389 : 0;
+	rate_down = @logic ? 0 : $d_csa389;
+}
+
+Node csa391 {
+
+	logic = (csa397);
+	rate_up = @logic ? $u_csa391 : 0;
+	rate_down = @logic ? 0 : $d_csa391;
+}
+
+Node csa397 {
+
+	logic = (csa398 & sa2153);
+	rate_up = @logic ? $u_csa397 : 0;
+	rate_down = @logic ? 0 : $d_csa397;
+}
+
+Node csa410 {
+
+	logic = (!csa440 & sa2197 & sa2198 & sa2199 & sa2200 & sa2201 & sa2202 & sa2203 & sa2204 & sa2205 & sa2206 & sa2222 & sa2228 & sa2217 & sa2357 & sa2360 & sa2361 & sa2362 & sa2363 & sa2367) | (csa440);
+	rate_up = @logic ? $u_csa410 : 0;
+	rate_down = @logic ? 0 : $d_csa410;
+}
+
+Node csa427 {
+
+	logic = (csa427);
+	rate_up = @logic ? $u_csa427 : 0;
+	rate_down = @logic ? 0 : $d_csa427;
+}
+
+Node csa428 {
+
+	logic = (csa428);
+	rate_up = @logic ? $u_csa428 : 0;
+	rate_down = @logic ? 0 : $d_csa428;
+}
+
+Node csa429 {
+
+	logic = (csa429);
+	rate_up = @logic ? $u_csa429 : 0;
+	rate_down = @logic ? 0 : $d_csa429;
+}
+
+Node csa431 {
+
+	logic = (csa431);
+	rate_up = @logic ? $u_csa431 : 0;
+	rate_down = @logic ? 0 : $d_csa431;
+}
+
+Node csa432 {
+
+	logic = (csa432);
+	rate_up = @logic ? $u_csa432 : 0;
+	rate_down = @logic ? 0 : $d_csa432;
+}
+
+Node csa438 {
+
+	logic = (csa439 & !sa2204 & !sa2222 & !sa2228 & sa2367) | (csa439 & !sa2204 & !sa2222 & sa2228) | (csa439 & !sa2204 & sa2222) | (csa439 & sa2204);
+	rate_up = @logic ? $u_csa438 : 0;
+	rate_down = @logic ? 0 : $d_csa438;
+}
+
+Node csa439 {
+
+	logic = (csa439);
+	rate_up = @logic ? $u_csa439 : 0;
+	rate_down = @logic ? 0 : $d_csa439;
+}
+
+Node csa440 {
+
+	logic = (csa398 & sa2153);
+	rate_up = @logic ? $u_csa440 : 0;
+	rate_down = @logic ? 0 : $d_csa440;
+}
+
+Node sa1462 {
+
+	logic = (sa1462);
+	rate_up = @logic ? $u_sa1462 : 0;
+	rate_down = @logic ? 0 : $d_sa1462;
+}
+
+Node sa1516 {
+
+	logic = (csa431 & !sa1524 & sa1525) | (csa431 & sa1524);
+	rate_up = @logic ? $u_sa1516 : 0;
+	rate_down = @logic ? 0 : $d_sa1516;
+}
+
+Node sa1524 {
+
+	logic = (sa1524);
+	rate_up = @logic ? $u_sa1524 : 0;
+	rate_down = @logic ? 0 : $d_sa1524;
+}
+
+Node sa1525 {
+
+	logic = (sa1525);
+	rate_up = @logic ? $u_sa1525 : 0;
+	rate_down = @logic ? 0 : $d_sa1525;
+}
+
+Node sa1537 {
+
+	logic = (sa1537);
+	rate_up = @logic ? $u_sa1537 : 0;
+	rate_down = @logic ? 0 : $d_sa1537;
+}
+
+Node sa1539 {
+
+	logic = (csa368 & !sa1537 & !sa1544 & sa1921) | (csa368 & sa1537 & !sa1544);
+	rate_up = @logic ? $u_sa1539 : 0;
+	rate_down = @logic ? 0 : $d_sa1539;
+}
+
+Node sa1544 {
+
+	logic = (sa1544);
+	rate_up = @logic ? $u_sa1544 : 0;
+	rate_down = @logic ? 0 : $d_sa1544;
+}
+
+Node sa1545 {
+
+	logic = (sa1545);
+	rate_up = @logic ? $u_sa1545 : 0;
+	rate_down = @logic ? 0 : $d_sa1545;
+}
+
+Node sa1601 {
+
+	logic = (sa2063);
+	rate_up = @logic ? $u_sa1601 : 0;
+	rate_down = @logic ? 0 : $d_sa1601;
+}
+
+Node sa1675 {
+
+	logic = (csa369);
+	rate_up = @logic ? $u_sa1675 : 0;
+	rate_down = @logic ? 0 : $d_sa1675;
+}
+
+Node sa1685 {
+
+	logic = (csa429 & sa1962);
+	rate_up = @logic ? $u_sa1685 : 0;
+	rate_down = @logic ? 0 : $d_sa1685;
+}
+
+Node sa1686 {
+
+	logic = (csa428 & sa2113);
+	rate_up = @logic ? $u_sa1686 : 0;
+	rate_down = @logic ? 0 : $d_sa1686;
+}
+
+Node sa1687 {
+
+	logic = (csa428 & sa2111);
+	rate_up = @logic ? $u_sa1687 : 0;
+	rate_down = @logic ? 0 : $d_sa1687;
+}
+
+Node sa1688 {
+
+	logic = (csa428 & sa2112);
+	rate_up = @logic ? $u_sa1688 : 0;
+	rate_down = @logic ? 0 : $d_sa1688;
+}
+
+Node sa1789 {
+
+	logic = (csa427 & sa1675);
+	rate_up = @logic ? $u_sa1789 : 0;
+	rate_down = @logic ? 0 : $d_sa1789;
+}
+
+Node sa1790 {
+
+	logic = (csa427 & sa1675);
+	rate_up = @logic ? $u_sa1790 : 0;
+	rate_down = @logic ? 0 : $d_sa1790;
+}
+
+Node sa1857 {
+
+	logic = (sa1891);
+	rate_up = @logic ? $u_sa1857 : 0;
+	rate_down = @logic ? 0 : $d_sa1857;
+}
+
+Node sa1858 {
+
+	logic = (sa1892);
+	rate_up = @logic ? $u_sa1858 : 0;
+	rate_down = @logic ? 0 : $d_sa1858;
+}
+
+Node sa1859 {
+
+	logic = (sa1893);
+	rate_up = @logic ? $u_sa1859 : 0;
+	rate_down = @logic ? 0 : $d_sa1859;
+}
+
+Node sa1667 {
+
+	logic = (csa369);
+	rate_up = @logic ? $u_sa1667 : 0;
+	rate_down = @logic ? 0 : $d_sa1667;
+}
+
+Node sa1873 {
+
+	logic = (csa428 & sa2104);
+	rate_up = @logic ? $u_sa1873 : 0;
+	rate_down = @logic ? 0 : $d_sa1873;
+}
+
+Node sa1874 {
+
+	logic = (csa428 & sa2108);
+	rate_up = @logic ? $u_sa1874 : 0;
+	rate_down = @logic ? 0 : $d_sa1874;
+}
+
+Node sa1875 {
+
+	logic = (csa428 & sa2105);
+	rate_up = @logic ? $u_sa1875 : 0;
+	rate_down = @logic ? 0 : $d_sa1875;
+}
+
+Node sa1876 {
+
+	logic = (csa428 & sa2106);
+	rate_up = @logic ? $u_sa1876 : 0;
+	rate_down = @logic ? 0 : $d_sa1876;
+}
+
+Node sa1877 {
+
+	logic = (csa428 & sa2110);
+	rate_up = @logic ? $u_sa1877 : 0;
+	rate_down = @logic ? 0 : $d_sa1877;
+}
+
+Node sa1878 {
+
+	logic = (csa428 & sa2109);
+	rate_up = @logic ? $u_sa1878 : 0;
+	rate_down = @logic ? 0 : $d_sa1878;
+}
+
+Node sa1879 {
+
+	logic = (csa428 & sa2107);
+	rate_up = @logic ? $u_sa1879 : 0;
+	rate_down = @logic ? 0 : $d_sa1879;
+}
+
+Node sa1887 {
+
+	logic = (sa1685);
+	rate_up = @logic ? $u_sa1887 : 0;
+	rate_down = @logic ? 0 : $d_sa1887;
+}
+
+Node sa1891 {
+
+	logic = (sa1686);
+	rate_up = @logic ? $u_sa1891 : 0;
+	rate_down = @logic ? 0 : $d_sa1891;
+}
+
+Node sa1892 {
+
+	logic = (sa1687);
+	rate_up = @logic ? $u_sa1892 : 0;
+	rate_down = @logic ? 0 : $d_sa1892;
+}
+
+Node sa1893 {
+
+	logic = (sa1688);
+	rate_up = @logic ? $u_sa1893 : 0;
+	rate_down = @logic ? 0 : $d_sa1893;
+}
+
+Node sa1921 {
+
+	logic = (sa1921);
+	rate_up = @logic ? $u_sa1921 : 0;
+	rate_down = @logic ? 0 : $d_sa1921;
+}
+
+Node sa1962 {
+
+	logic = (sa2354);
+	rate_up = @logic ? $u_sa1962 : 0;
+	rate_down = @logic ? 0 : $d_sa1962;
+}
+
+Node sa1986 {
+
+	logic = (sa2245);
+	rate_up = @logic ? $u_sa1986 : 0;
+	rate_down = @logic ? 0 : $d_sa1986;
+}
+
+Node sa1996 {
+
+	logic = (sa1996);
+	rate_up = @logic ? $u_sa1996 : 0;
+	rate_down = @logic ? 0 : $d_sa1996;
+}
+
+Node sa1997 {
+
+	logic = (sa1997);
+	rate_up = @logic ? $u_sa1997 : 0;
+	rate_down = @logic ? 0 : $d_sa1997;
+}
+
+Node sa1998 {
+
+	logic = (sa1998);
+	rate_up = @logic ? $u_sa1998 : 0;
+	rate_down = @logic ? 0 : $d_sa1998;
+}
+
+Node sa1999 {
+
+	logic = (sa1999);
+	rate_up = @logic ? $u_sa1999 : 0;
+	rate_down = @logic ? 0 : $d_sa1999;
+}
+
+Node sa2001 {
+
+	logic = (sa2001);
+	rate_up = @logic ? $u_sa2001 : 0;
+	rate_down = @logic ? 0 : $d_sa2001;
+}
+
+Node sa2002 {
+
+	logic = (sa2002);
+	rate_up = @logic ? $u_sa2002 : 0;
+	rate_down = @logic ? 0 : $d_sa2002;
+}
+
+Node sa2003 {
+
+	logic = (sa2003);
+	rate_up = @logic ? $u_sa2003 : 0;
+	rate_down = @logic ? 0 : $d_sa2003;
+}
+
+Node sa2004 {
+
+	logic = (sa2004);
+	rate_up = @logic ? $u_sa2004 : 0;
+	rate_down = @logic ? 0 : $d_sa2004;
+}
+
+Node sa2006 {
+
+	logic = (sa2006);
+	rate_up = @logic ? $u_sa2006 : 0;
+	rate_down = @logic ? 0 : $d_sa2006;
+}
+
+Node sa2007 {
+
+	logic = (sa2007);
+	rate_up = @logic ? $u_sa2007 : 0;
+	rate_down = @logic ? 0 : $d_sa2007;
+}
+
+Node sa2008 {
+
+	logic = (sa2008);
+	rate_up = @logic ? $u_sa2008 : 0;
+	rate_down = @logic ? 0 : $d_sa2008;
+}
+
+Node sa2009 {
+
+	logic = (sa2009);
+	rate_up = @logic ? $u_sa2009 : 0;
+	rate_down = @logic ? 0 : $d_sa2009;
+}
+
+Node sa2011 {
+
+	logic = (sa2011);
+	rate_up = @logic ? $u_sa2011 : 0;
+	rate_down = @logic ? 0 : $d_sa2011;
+}
+
+Node sa2013 {
+
+	logic = (sa2013);
+	rate_up = @logic ? $u_sa2013 : 0;
+	rate_down = @logic ? 0 : $d_sa2013;
+}
+
+Node sa2019 {
+
+	logic = (sa2019);
+	rate_up = @logic ? $u_sa2019 : 0;
+	rate_down = @logic ? 0 : $d_sa2019;
+}
+
+Node sa2020 {
+
+	logic = (sa2020);
+	rate_up = @logic ? $u_sa2020 : 0;
+	rate_down = @logic ? 0 : $d_sa2020;
+}
+
+Node sa2021 {
+
+	logic = (sa2021);
+	rate_up = @logic ? $u_sa2021 : 0;
+	rate_down = @logic ? 0 : $d_sa2021;
+}
+
+Node sa2023 {
+
+	logic = (sa2023);
+	rate_up = @logic ? $u_sa2023 : 0;
+	rate_down = @logic ? 0 : $d_sa2023;
+}
+
+Node sa2024 {
+
+	logic = (sa2024);
+	rate_up = @logic ? $u_sa2024 : 0;
+	rate_down = @logic ? 0 : $d_sa2024;
+}
+
+Node sa2025 {
+
+	logic = (sa2025);
+	rate_up = @logic ? $u_sa2025 : 0;
+	rate_down = @logic ? 0 : $d_sa2025;
+}
+
+Node sa2038 {
+
+	logic = (sa2038);
+	rate_up = @logic ? $u_sa2038 : 0;
+	rate_down = @logic ? 0 : $d_sa2038;
+}
+
+Node sa2039 {
+
+	logic = (sa2039);
+	rate_up = @logic ? $u_sa2039 : 0;
+	rate_down = @logic ? 0 : $d_sa2039;
+}
+
+Node sa2040 {
+
+	logic = (sa2040);
+	rate_up = @logic ? $u_sa2040 : 0;
+	rate_down = @logic ? 0 : $d_sa2040;
+}
+
+Node sa2044 {
+
+	logic = (sa2044);
+	rate_up = @logic ? $u_sa2044 : 0;
+	rate_down = @logic ? 0 : $d_sa2044;
+}
+
+Node sa2045 {
+
+	logic = (sa2045);
+	rate_up = @logic ? $u_sa2045 : 0;
+	rate_down = @logic ? 0 : $d_sa2045;
+}
+
+Node sa2046 {
+
+	logic = (sa2046);
+	rate_up = @logic ? $u_sa2046 : 0;
+	rate_down = @logic ? 0 : $d_sa2046;
+}
+
+Node sa2048 {
+
+	logic = (sa2048);
+	rate_up = @logic ? $u_sa2048 : 0;
+	rate_down = @logic ? 0 : $d_sa2048;
+}
+
+Node sa2049 {
+
+	logic = (sa2049);
+	rate_up = @logic ? $u_sa2049 : 0;
+	rate_down = @logic ? 0 : $d_sa2049;
+}
+
+Node sa2050 {
+
+	logic = (sa2050);
+	rate_up = @logic ? $u_sa2050 : 0;
+	rate_down = @logic ? 0 : $d_sa2050;
+}
+
+Node sa2060 {
+
+	logic = (sa2060);
+	rate_up = @logic ? $u_sa2060 : 0;
+	rate_down = @logic ? 0 : $d_sa2060;
+}
+
+Node sa2061 {
+
+	logic = (sa2061);
+	rate_up = @logic ? $u_sa2061 : 0;
+	rate_down = @logic ? 0 : $d_sa2061;
+}
+
+Node sa2062 {
+
+	logic = (sa2062);
+	rate_up = @logic ? $u_sa2062 : 0;
+	rate_down = @logic ? 0 : $d_sa2062;
+}
+
+Node sa2063 {
+
+	logic = (csa368 & !sa1537 & !sa1544 & sa1921) | (csa368 & sa1537 & !sa1544);
+	rate_up = @logic ? $u_sa2063 : 0;
+	rate_down = @logic ? 0 : $d_sa2063;
+}
+
+Node sa2065 {
+
+	logic = (csa374 & sa1601 & sa2023 & sa2024 & sa2025);
+	rate_up = @logic ? $u_sa2065 : 0;
+	rate_down = @logic ? 0 : $d_sa2065;
+}
+
+Node sa2066 {
+
+	logic = (csa374 & sa1601 & sa2023 & sa2024 & sa2025);
+	rate_up = @logic ? $u_sa2066 : 0;
+	rate_down = @logic ? 0 : $d_sa2066;
+}
+
+Node sa2067 {
+
+	logic = (csa374 & sa1601 & sa2023 & sa2024 & sa2025);
+	rate_up = @logic ? $u_sa2067 : 0;
+	rate_down = @logic ? 0 : $d_sa2067;
+}
+
+Node sa2105 {
+
+	logic = (sa2346);
+	rate_up = @logic ? $u_sa2105 : 0;
+	rate_down = @logic ? 0 : $d_sa2105;
+}
+
+Node sa2106 {
+
+	logic = (sa2352);
+	rate_up = @logic ? $u_sa2106 : 0;
+	rate_down = @logic ? 0 : $d_sa2106;
+}
+
+Node sa2107 {
+
+	logic = (sa2349);
+	rate_up = @logic ? $u_sa2107 : 0;
+	rate_down = @logic ? 0 : $d_sa2107;
+}
+
+Node sa2109 {
+
+	logic = (sa2350);
+	rate_up = @logic ? $u_sa2109 : 0;
+	rate_down = @logic ? 0 : $d_sa2109;
+}
+
+Node sa2110 {
+
+	logic = (sa2351);
+	rate_up = @logic ? $u_sa2110 : 0;
+	rate_down = @logic ? 0 : $d_sa2110;
+}
+
+Node sa2111 {
+
+	logic = (sa2344);
+	rate_up = @logic ? $u_sa2111 : 0;
+	rate_down = @logic ? 0 : $d_sa2111;
+}
+
+Node sa2112 {
+
+	logic = (sa2345);
+	rate_up = @logic ? $u_sa2112 : 0;
+	rate_down = @logic ? 0 : $d_sa2112;
+}
+
+Node sa2113 {
+
+	logic = (sa2343);
+	rate_up = @logic ? $u_sa2113 : 0;
+	rate_down = @logic ? 0 : $d_sa2113;
+}
+
+Node sa2114 {
+
+	logic = (csa365 & sa2060 & sa2061 & sa2062 & sa2052);
+	rate_up = @logic ? $u_sa2114 : 0;
+	rate_down = @logic ? 0 : $d_sa2114;
+}
+
+Node sa2116 {
+
+	logic = (csa365 & sa2060 & sa2061 & sa2062 & sa2052);
+	rate_up = @logic ? $u_sa2116 : 0;
+	rate_down = @logic ? 0 : $d_sa2116;
+}
+
+Node sa2153 {
+
+	logic = (sa2342);
+	rate_up = @logic ? $u_sa2153 : 0;
+	rate_down = @logic ? 0 : $d_sa2153;
+}
+
+Node sa2037 {
+
+	logic = (sa2037);
+	rate_up = @logic ? $u_sa2037 : 0;
+	rate_down = @logic ? 0 : $d_sa2037;
+}
+
+Node sa2171 {
+
+	logic = (sa2171);
+	rate_up = @logic ? $u_sa2171 : 0;
+	rate_down = @logic ? 0 : $d_sa2171;
+}
+
+Node sa2115 {
+
+	logic = (csa365 & sa2060 & sa2061 & sa2062 & sa2052);
+	rate_up = @logic ? $u_sa2115 : 0;
+	rate_down = @logic ? 0 : $d_sa2115;
+}
+
+Node sa2052 {
+
+	logic = (sa2188);
+	rate_up = @logic ? $u_sa2052 : 0;
+	rate_down = @logic ? 0 : $d_sa2052;
+}
+
+Node sa2173 {
+
+	logic = (sa2173);
+	rate_up = @logic ? $u_sa2173 : 0;
+	rate_down = @logic ? 0 : $d_sa2173;
+}
+
+Node sa2178 {
+
+	logic = (sa2178);
+	rate_up = @logic ? $u_sa2178 : 0;
+	rate_down = @logic ? 0 : $d_sa2178;
+}
+
+Node sa2183 {
+
+	logic = (sa2183);
+	rate_up = @logic ? $u_sa2183 : 0;
+	rate_down = @logic ? 0 : $d_sa2183;
+}
+
+Node sa2184 {
+
+	logic = (sa2184);
+	rate_up = @logic ? $u_sa2184 : 0;
+	rate_down = @logic ? 0 : $d_sa2184;
+}
+
+Node sa2185 {
+
+	logic = (sa2185);
+	rate_up = @logic ? $u_sa2185 : 0;
+	rate_down = @logic ? 0 : $d_sa2185;
+}
+
+Node sa2188 {
+
+	logic = (csa431 & !sa1524 & sa1525) | (csa431 & sa1524);
+	rate_up = @logic ? $u_sa2188 : 0;
+	rate_down = @logic ? 0 : $d_sa2188;
+}
+
+Node sa2197 {
+
+	logic = (sa2229 & sa2241);
+	rate_up = @logic ? $u_sa2197 : 0;
+	rate_down = @logic ? 0 : $d_sa2197;
+}
+
+Node sa2198 {
+
+	logic = (sa2229 & sa2241);
+	rate_up = @logic ? $u_sa2198 : 0;
+	rate_down = @logic ? 0 : $d_sa2198;
+}
+
+Node sa2199 {
+
+	logic = (sa2229 & sa2241);
+	rate_up = @logic ? $u_sa2199 : 0;
+	rate_down = @logic ? 0 : $d_sa2199;
+}
+
+Node sa2200 {
+
+	logic = (sa2229 & sa2241);
+	rate_up = @logic ? $u_sa2200 : 0;
+	rate_down = @logic ? 0 : $d_sa2200;
+}
+
+Node sa2201 {
+
+	logic = (sa2229 & sa2241);
+	rate_up = @logic ? $u_sa2201 : 0;
+	rate_down = @logic ? 0 : $d_sa2201;
+}
+
+Node sa2202 {
+
+	logic = (sa2229 & sa2241);
+	rate_up = @logic ? $u_sa2202 : 0;
+	rate_down = @logic ? 0 : $d_sa2202;
+}
+
+Node sa2203 {
+
+	logic = (sa2229 & sa2241);
+	rate_up = @logic ? $u_sa2203 : 0;
+	rate_down = @logic ? 0 : $d_sa2203;
+}
+
+Node sa2204 {
+
+	logic = (sa2229 & sa2241);
+	rate_up = @logic ? $u_sa2204 : 0;
+	rate_down = @logic ? 0 : $d_sa2204;
+}
+
+Node sa2205 {
+
+	logic = (sa2229 & sa2241);
+	rate_up = @logic ? $u_sa2205 : 0;
+	rate_down = @logic ? 0 : $d_sa2205;
+}
+
+Node sa2206 {
+
+	logic = (sa2229 & sa2241);
+	rate_up = @logic ? $u_sa2206 : 0;
+	rate_down = @logic ? 0 : $d_sa2206;
+}
+
+Node sa2220 {
+
+	logic = (sa1789);
+	rate_up = @logic ? $u_sa2220 : 0;
+	rate_down = @logic ? 0 : $d_sa2220;
+}
+
+Node sa2221 {
+
+	logic = (sa1790);
+	rate_up = @logic ? $u_sa2221 : 0;
+	rate_down = @logic ? 0 : $d_sa2221;
+}
+
+Node sa2224 {
+
+	logic = (sa2240);
+	rate_up = @logic ? $u_sa2224 : 0;
+	rate_down = @logic ? 0 : $d_sa2224;
+}
+
+Node sa2222 {
+
+	logic = (!sa2243 & sa2365) | (sa2243);
+	rate_up = @logic ? $u_sa2222 : 0;
+	rate_down = @logic ? 0 : $d_sa2222;
+}
+
+Node sa2228 {
+
+	logic = (!sa2243 & sa2365) | (sa2243);
+	rate_up = @logic ? $u_sa2228 : 0;
+	rate_down = @logic ? 0 : $d_sa2228;
+}
+
+Node sa2229 {
+
+	logic = (sa2244);
+	rate_up = @logic ? $u_sa2229 : 0;
+	rate_down = @logic ? 0 : $d_sa2229;
+}
+
+Node sa2237 {
+
+	logic = (!sa2216);
+	rate_up = @logic ? $u_sa2237 : 0;
+	rate_down = @logic ? 0 : $d_sa2237;
+}
+
+Node sa2238 {
+
+	logic = (csa368 & !sa1537 & !sa1544 & sa1921) | (csa368 & sa1537 & !sa1544);
+	rate_up = @logic ? $u_sa2238 : 0;
+	rate_down = @logic ? 0 : $d_sa2238;
+}
+
+Node sa2239 {
+
+	logic = (csa368 & !sa1537 & !sa1544 & sa1921) | (csa368 & sa1537 & !sa1544);
+	rate_up = @logic ? $u_sa2239 : 0;
+	rate_down = @logic ? 0 : $d_sa2239;
+}
+
+Node sa2240 {
+
+	logic = (sa2220);
+	rate_up = @logic ? $u_sa2240 : 0;
+	rate_down = @logic ? 0 : $d_sa2240;
+}
+
+Node sa2241 {
+
+	logic = (sa2244);
+	rate_up = @logic ? $u_sa2241 : 0;
+	rate_down = @logic ? 0 : $d_sa2241;
+}
+
+Node sa2242 {
+
+	logic = (sa2244);
+	rate_up = @logic ? $u_sa2242 : 0;
+	rate_down = @logic ? 0 : $d_sa2242;
+}
+
+Node sa2243 {
+
+	logic = (sa2242);
+	rate_up = @logic ? $u_sa2243 : 0;
+	rate_down = @logic ? 0 : $d_sa2243;
+}
+
+Node sa2244 {
+
+	logic = (sa2221);
+	rate_up = @logic ? $u_sa2244 : 0;
+	rate_down = @logic ? 0 : $d_sa2244;
+}
+
+Node sa2245 {
+
+	logic = (sa1875);
+	rate_up = @logic ? $u_sa2245 : 0;
+	rate_down = @logic ? 0 : $d_sa2245;
+}
+
+Node sa2246 {
+
+	logic = (sa1874);
+	rate_up = @logic ? $u_sa2246 : 0;
+	rate_down = @logic ? 0 : $d_sa2246;
+}
+
+Node sa2247 {
+
+	logic = (sa1873);
+	rate_up = @logic ? $u_sa2247 : 0;
+	rate_down = @logic ? 0 : $d_sa2247;
+}
+
+Node sa2248 {
+
+	logic = (sa1879);
+	rate_up = @logic ? $u_sa2248 : 0;
+	rate_down = @logic ? 0 : $d_sa2248;
+}
+
+Node sa2249 {
+
+	logic = (sa1878);
+	rate_up = @logic ? $u_sa2249 : 0;
+	rate_down = @logic ? 0 : $d_sa2249;
+}
+
+Node sa2250 {
+
+	logic = (sa1877);
+	rate_up = @logic ? $u_sa2250 : 0;
+	rate_down = @logic ? 0 : $d_sa2250;
+}
+
+Node sa2251 {
+
+	logic = (sa1876);
+	rate_up = @logic ? $u_sa2251 : 0;
+	rate_down = @logic ? 0 : $d_sa2251;
+}
+
+Node sa2108 {
+
+	logic = (sa2347);
+	rate_up = @logic ? $u_sa2108 : 0;
+	rate_down = @logic ? 0 : $d_sa2108;
+}
+
+Node sa2104 {
+
+	logic = (sa2348);
+	rate_up = @logic ? $u_sa2104 : 0;
+	rate_down = @logic ? 0 : $d_sa2104;
+}
+
+Node sa2291 {
+
+	logic = (!sa2205);
+	rate_up = @logic ? $u_sa2291 : 0;
+	rate_down = @logic ? 0 : $d_sa2291;
+}
+
+Node sa2292 {
+
+	logic = (sa2343);
+	rate_up = @logic ? $u_sa2292 : 0;
+	rate_down = @logic ? 0 : $d_sa2292;
+}
+
+Node sa2294 {
+
+	logic = (sa2344);
+	rate_up = @logic ? $u_sa2294 : 0;
+	rate_down = @logic ? 0 : $d_sa2294;
+}
+
+Node sa2295 {
+
+	logic = (sa2345);
+	rate_up = @logic ? $u_sa2295 : 0;
+	rate_down = @logic ? 0 : $d_sa2295;
+}
+
+Node sa2296 {
+
+	logic = (sa2346);
+	rate_up = @logic ? $u_sa2296 : 0;
+	rate_down = @logic ? 0 : $d_sa2296;
+}
+
+Node sa2297 {
+
+	logic = (sa2347);
+	rate_up = @logic ? $u_sa2297 : 0;
+	rate_down = @logic ? 0 : $d_sa2297;
+}
+
+Node sa2298 {
+
+	logic = (sa2348);
+	rate_up = @logic ? $u_sa2298 : 0;
+	rate_down = @logic ? 0 : $d_sa2298;
+}
+
+Node sa2299 {
+
+	logic = (sa2349);
+	rate_up = @logic ? $u_sa2299 : 0;
+	rate_down = @logic ? 0 : $d_sa2299;
+}
+
+Node sa2300 {
+
+	logic = (sa2350);
+	rate_up = @logic ? $u_sa2300 : 0;
+	rate_down = @logic ? 0 : $d_sa2300;
+}
+
+Node sa2301 {
+
+	logic = (sa2351);
+	rate_up = @logic ? $u_sa2301 : 0;
+	rate_down = @logic ? 0 : $d_sa2301;
+}
+
+Node sa2302 {
+
+	logic = (sa2352);
+	rate_up = @logic ? $u_sa2302 : 0;
+	rate_down = @logic ? 0 : $d_sa2302;
+}
+
+Node sa2314 {
+
+	logic = (sa2342);
+	rate_up = @logic ? $u_sa2314 : 0;
+	rate_down = @logic ? 0 : $d_sa2314;
+}
+
+Node sa2318 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2318 : 0;
+	rate_down = @logic ? 0 : $d_sa2318;
+}
+
+Node sa2319 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2319 : 0;
+	rate_down = @logic ? 0 : $d_sa2319;
+}
+
+Node sa2320 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2320 : 0;
+	rate_down = @logic ? 0 : $d_sa2320;
+}
+
+Node sa2321 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2321 : 0;
+	rate_down = @logic ? 0 : $d_sa2321;
+}
+
+Node sa2322 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2322 : 0;
+	rate_down = @logic ? 0 : $d_sa2322;
+}
+
+Node sa2323 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2323 : 0;
+	rate_down = @logic ? 0 : $d_sa2323;
+}
+
+Node sa2324 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2324 : 0;
+	rate_down = @logic ? 0 : $d_sa2324;
+}
+
+Node sa2325 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2325 : 0;
+	rate_down = @logic ? 0 : $d_sa2325;
+}
+
+Node sa2326 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2326 : 0;
+	rate_down = @logic ? 0 : $d_sa2326;
+}
+
+Node sa2327 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2327 : 0;
+	rate_down = @logic ? 0 : $d_sa2327;
+}
+
+Node sa2342 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2342 : 0;
+	rate_down = @logic ? 0 : $d_sa2342;
+}
+
+Node sa2343 {
+
+	logic = (csa410 & sa2327);
+	rate_up = @logic ? $u_sa2343 : 0;
+	rate_down = @logic ? 0 : $d_sa2343;
+}
+
+Node sa2344 {
+
+	logic = (csa410 & sa2326);
+	rate_up = @logic ? $u_sa2344 : 0;
+	rate_down = @logic ? 0 : $d_sa2344;
+}
+
+Node sa2345 {
+
+	logic = (csa410 & sa2325);
+	rate_up = @logic ? $u_sa2345 : 0;
+	rate_down = @logic ? 0 : $d_sa2345;
+}
+
+Node sa2346 {
+
+	logic = (csa410 & sa2324);
+	rate_up = @logic ? $u_sa2346 : 0;
+	rate_down = @logic ? 0 : $d_sa2346;
+}
+
+Node sa2347 {
+
+	logic = (csa410 & sa2323);
+	rate_up = @logic ? $u_sa2347 : 0;
+	rate_down = @logic ? 0 : $d_sa2347;
+}
+
+Node sa2348 {
+
+	logic = (csa410 & sa2322);
+	rate_up = @logic ? $u_sa2348 : 0;
+	rate_down = @logic ? 0 : $d_sa2348;
+}
+
+Node sa2349 {
+
+	logic = (csa410 & sa2321);
+	rate_up = @logic ? $u_sa2349 : 0;
+	rate_down = @logic ? 0 : $d_sa2349;
+}
+
+Node sa2350 {
+
+	logic = (csa410 & sa2320);
+	rate_up = @logic ? $u_sa2350 : 0;
+	rate_down = @logic ? 0 : $d_sa2350;
+}
+
+Node sa2351 {
+
+	logic = (csa410 & sa2319);
+	rate_up = @logic ? $u_sa2351 : 0;
+	rate_down = @logic ? 0 : $d_sa2351;
+}
+
+Node sa2352 {
+
+	logic = (csa410 & sa2318);
+	rate_up = @logic ? $u_sa2352 : 0;
+	rate_down = @logic ? 0 : $d_sa2352;
+}
+
+Node sa2354 {
+
+	logic = (csa410 & sa2353);
+	rate_up = @logic ? $u_sa2354 : 0;
+	rate_down = @logic ? 0 : $d_sa2354;
+}
+
+Node sa2355 {
+
+	logic = (sa2354);
+	rate_up = @logic ? $u_sa2355 : 0;
+	rate_down = @logic ? 0 : $d_sa2355;
+}
+
+Node sa2216 {
+
+	logic = (sa1790);
+	rate_up = @logic ? $u_sa2216 : 0;
+	rate_down = @logic ? 0 : $d_sa2216;
+}
+
+Node sa2217 {
+
+	logic = (sa1790);
+	rate_up = @logic ? $u_sa2217 : 0;
+	rate_down = @logic ? 0 : $d_sa2217;
+}
+
+Node sa2356 {
+
+	logic = (sa1789);
+	rate_up = @logic ? $u_sa2356 : 0;
+	rate_down = @logic ? 0 : $d_sa2356;
+}
+
+Node sa2357 {
+
+	logic = (sa1789);
+	rate_up = @logic ? $u_sa2357 : 0;
+	rate_down = @logic ? 0 : $d_sa2357;
+}
+
+Node sa2358 {
+
+	logic = (!sa2356);
+	rate_up = @logic ? $u_sa2358 : 0;
+	rate_down = @logic ? 0 : $d_sa2358;
+}
+
+Node sa2359 {
+
+	logic = (sa2240);
+	rate_up = @logic ? $u_sa2359 : 0;
+	rate_down = @logic ? 0 : $d_sa2359;
+}
+
+Node sa2360 {
+
+	logic = (sa2224 & sa2366);
+	rate_up = @logic ? $u_sa2360 : 0;
+	rate_down = @logic ? 0 : $d_sa2360;
+}
+
+Node sa2361 {
+
+	logic = (sa2224 & sa2366);
+	rate_up = @logic ? $u_sa2361 : 0;
+	rate_down = @logic ? 0 : $d_sa2361;
+}
+
+Node sa2362 {
+
+	logic = (sa2224 & sa2366);
+	rate_up = @logic ? $u_sa2362 : 0;
+	rate_down = @logic ? 0 : $d_sa2362;
+}
+
+Node sa2363 {
+
+	logic = (sa2224 & sa2366);
+	rate_up = @logic ? $u_sa2363 : 0;
+	rate_down = @logic ? 0 : $d_sa2363;
+}
+
+Node sa2364 {
+
+	logic = (sa2224 & sa2366);
+	rate_up = @logic ? $u_sa2364 : 0;
+	rate_down = @logic ? 0 : $d_sa2364;
+}
+
+Node sa2365 {
+
+	logic = (sa2359);
+	rate_up = @logic ? $u_sa2365 : 0;
+	rate_down = @logic ? 0 : $d_sa2365;
+}
+
+Node sa2366 {
+
+	logic = (sa2240);
+	rate_up = @logic ? $u_sa2366 : 0;
+	rate_down = @logic ? 0 : $d_sa2366;
+}
+
+Node sa2367 {
+
+	logic = (sa2224 & sa2366);
+	rate_up = @logic ? $u_sa2367 : 0;
+	rate_down = @logic ? 0 : $d_sa2367;
+}
+
+Node sa2353 {
+
+	logic = (csa410 & sa2328);
+	rate_up = @logic ? $u_sa2353 : 0;
+	rate_down = @logic ? 0 : $d_sa2353;
+}
+
+Node sa2328 {
+
+	logic = (csa410 & sa1675);
+	rate_up = @logic ? $u_sa2328 : 0;
+	rate_down = @logic ? 0 : $d_sa2328;
+}

@@ -40,3 +40,7 @@ jobs:
     - name: Run PhysiBoSS cell lines project
       run: |
         .\\PhysiBoSS_Cell_Lines.exe
+        
+    - name: Test PhysiBoSS cell lines project results
+      run: |
+        bash tests\\physiboss\\physiboss-cell-lines\\test.sh
