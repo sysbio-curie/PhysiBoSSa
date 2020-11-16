@@ -91,11 +91,12 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 		return this->maboss.get_state();
 	}
 	
-	static void save_PhysiBoSS(std::string path, std::string index);
-
 	void print_current_nodes(){
 		this->maboss.print_nodes();
 	};
+	
+	static void save(std::string filename, std::vector<PhysiCell::Cell*>& cells);
+
 };
 
 #endif

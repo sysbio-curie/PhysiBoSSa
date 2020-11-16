@@ -130,17 +130,15 @@ MaBoSSIntracellular* getMaBoSSModel(PhysiCell::Phenotype& phenotype) {
 	return static_cast<MaBoSSIntracellular*>(phenotype.intracellular);
 }
 
-void MaBoSSIntracellular::save_PhysiBoSS(std::string path, std::string index)
+void MaBoSSIntracellular::save(std::string filename, std::vector<PhysiCell::Cell*>& cells)
 {
-
-	std::string state_file_name = path + "/states_" + index + ".csv";
 					
-	std::ofstream state_file( state_file_name );
+	std::ofstream state_file( filename );
 	
 	state_file << "ID,state" << std::endl;
 
-	for( auto cell : *PhysiCell::all_cells )
-		state_file << cell->ID << "," << cell->phenotype.intracellular->get_state() << std::endl;
+	for( auto cell : cells )
+		state_file << cell->ID << "," << static_cast<MaBoSSIntracellular*>(cell->phenotype.intracellular)->get_state() << std::endl;
 		
 	state_file.close();
 
