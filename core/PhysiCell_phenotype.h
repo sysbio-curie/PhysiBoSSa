@@ -572,11 +572,8 @@ class Intracellular
 	// Set value for maboss model parameter
 	virtual void set_parameter_value(std::string name, double value) = 0;
 
-	virtual void print_current_nodes() = 0;
-	
-	virtual std::string get_state() = 0;
-	
 	virtual Intracellular* clone() = 0;
+	
 	virtual ~Intracellular() {};
 	
 };
