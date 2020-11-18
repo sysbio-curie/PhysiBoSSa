@@ -70,7 +70,9 @@
 #include "../BioFVM/BioFVM.h"
 #include "./PhysiCell_constants.h"
 #include "./PhysiCell_utilities.h"
-
+#ifdef ADDON_PHYSIBOSS
+#include "../addons/PhysiBoSS/src/maboss_intracellular.h"
+#endif
 using namespace BioFVM; 
 
 namespace PhysiCell{
@@ -1055,6 +1057,14 @@ Phenotype::Phenotype()
 	intracellular = NULL;
 	
 	return; 
+}
+
+Phenotype::~Phenotype() 
+{
+#ifdef ADDON_PHYSIBOSS
+	if (intracellular->type == "maboss")
+		delete static_cast<MaBoSSIntracellular*>(intracellular);
+#endif
 }
 
 void Phenotype::operator=(const Phenotype &p ) { 
