@@ -948,25 +948,23 @@ Cell* create_cell( void )
 // In that "create_cell()" uses "create_cell( cell_defaults )" 
 Cell* create_cell( Cell_Definition& cd )
 {
-	Cell* pNew = create_cell(); 
+	Cell* pNew; 
+	pNew = new Cell(cd);		
+	(*all_cells).push_back( pNew ); 
+	pNew->index=(*all_cells).size()-1;
 	
-	// use the cell defaults; 
-	pNew->type = cd.type; 
-	pNew->type_name = cd.name; 
+	// new usability enhancements in May 2017 
 	
-	pNew->custom_data = cd.custom_data; 
-	pNew->parameters = cd.parameters; 
-	pNew->functions = cd.functions; 
-	
-	pNew->phenotype = cd.phenotype; 
-	pNew->is_movable = true;
-	pNew->is_out_of_domain = false;
-	pNew->displacement.resize(3,0.0); // state? 
-	
-	pNew->assign_orientation();
+	if( BioFVM::get_default_microenvironment() )
+	{
+		pNew->register_microenvironment( BioFVM::get_default_microenvironment() );
+	}
+
+	// All the phenotype and other data structures are already set 
+	// by virtue of the default Cell constructor. 
 	
 	pNew->set_total_volume( pNew->phenotype.volume.total ); 
-	
+
 	return pNew; 
 }
 
