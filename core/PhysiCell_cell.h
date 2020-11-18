@@ -184,6 +184,7 @@ class Cell : public Basic_Agent
 	void die( void );
 	void step(double dt);
 	Cell();
+	Cell(Cell_Definition& cd);
 	
 	bool assign_position(std::vector<double> new_position);
 	bool assign_position(double, double, double);

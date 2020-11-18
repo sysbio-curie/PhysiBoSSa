@@ -357,6 +357,40 @@ Cell::Cell()
 	return; 
 }
 
+Cell::Cell(Cell_Definition& cd)
+{
+	// use the cell defaults; 
+	
+	type = cd.type; 
+	type_name = cd.name; 
+	
+	custom_data = cd.custom_data; 
+	parameters = cd.parameters; 
+	functions = cd.functions; 
+	
+	phenotype = cd.phenotype; 
+	
+	phenotype.molecular.sync_to_cell( this ); 
+	
+	// cell state should be fine by the default constructor 
+	
+	current_mechanics_voxel_index=-1;
+	
+	updated_current_mechanics_voxel_index = 0;
+	
+	is_movable = true;
+	is_out_of_domain = false;
+	displacement.resize(3,0.0); // state? 
+	
+	assign_orientation();
+	container = NULL;
+	
+	set_total_volume( phenotype.volume.total ); 
+	
+	return; 
+}
+
+
 void Cell::flag_for_division( void )
 {
 	get_container()->flag_cell_for_division( this );
