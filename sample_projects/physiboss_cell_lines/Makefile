@@ -86,7 +86,7 @@ all: MaBoSS main.cpp $(ALL_OBJECTS)
 # PhysiCell core components	
 
 PhysiCell_phenotype.o: ./core/PhysiCell_phenotype.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_phenotype.cpp
+	$(COMPILE_COMMAND) $(INC) -c ./core/PhysiCell_phenotype.cpp
 	
 PhysiCell_digital_cell_line.o: ./core/PhysiCell_digital_cell_line.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_digital_cell_line.cpp
