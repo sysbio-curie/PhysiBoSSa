@@ -580,6 +580,8 @@ class Intracellular
 
 	virtual Intracellular* clone() = 0;
 	
+	virtual ~Intracellular() = 0;
+	
 };
 
 class Phenotype
