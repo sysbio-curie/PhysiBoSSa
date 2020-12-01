@@ -455,8 +455,7 @@ Cell* Cell::divide( )
 {
 	// phenotype.flagged_for_division = false; 
 	// phenotype.flagged_for_removal = false; 
-	
-	Cell* child = create_cell();
+	Cell* child = create_cell(*find_cell_definition(this->type));
 	child->copy_data( this );	
 	child->copy_function_pointers(this);
 	child->parameters = parameters;
@@ -527,7 +526,7 @@ Cell* Cell::divide( )
 	set_total_volume(phenotype.volume.total);
 	
 	// child->set_phenotype( phenotype ); 
-	child->phenotype = phenotype; 
+	// child->phenotype = phenotype; 
 	
 	return child;
 }
