@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -66,108 +64,153 @@
 #                                                                             #
 ###############################################################################
 */
---> 
 
-<!--
-<user_details />
--->
+#include "custom.h"
+#include "../BioFVM/BioFVM.h"  
+using namespace BioFVM;
 
-<PhysiCell_settings version="devel-version">
-	<domain>
-		<x_min>-100</x_min>
-		<x_max>100</x_max>
-		<y_min>-100</y_min>
-		<y_max>100</y_max>
-		<z_min>-20</z_min>
-		<z_max>20</z_max>
-		<dx>10</dx>
-		<dy>10</dy>
-		<dz>10</dz>
-		<use_2D>false</use_2D>
-	</domain>
+// declare cell definitions here 
+
+std::vector<bool> nodes;
+
+void create_cell_types( void )
+{
+	// set the random seed 
+	SeedRandom( parameters.ints("random_seed") );  
 	
-	<overall>
-		<max_time units="min">1000</max_time>
-		<time_units>min</time_units>
-		<space_units>micron</space_units>
-
-		<dt_diffusion units="min">0.5</dt_diffusion>
-		<dt_mechanics units="min">1</dt_mechanics>
-		<dt_phenotype units="min">1</dt_phenotype>	
-	</overall>
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
 	
-	<parallel>
-		<omp_num_threads>6</omp_num_threads>
-	</parallel> 
-	
-	<save>
-		<folder>output</folder> <!-- use . for root --> 
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = NULL;
 
-		<full_data>
-			<interval units="min">100</interval>
-			<enable>false</enable>
-		</full_data>
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; // update_cell_and_death_parameters_O2_based; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
+	
+	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	
+	cell_defaults.custom_data.add_variable(parameters.strings("node_to_visualize"), "dimensionless", 0.0 ); //for paraview visualization
+
+	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
+	
+	initialize_cell_definitions_from_pugixml(); 
+	
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
+	
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+
+	build_cell_definitions_maps(); 
+	
+	display_cell_definitions( std::cout ); 
+	
+	return; 
+}
+
+void setup_microenvironment( void )
+{
+	// set domain parameters 
+	
+	// put any custom code to set non-homogeneous initial conditions or 
+	// extra Dirichlet nodes here. 
+	
+	// initialize BioFVM 
+	
+	initialize_microenvironment(); 	
+	
+	return; 
+}
+
+void setup_tissue( void )
+{
+	Cell* pC;
+	for (int i=0; i < 4; i++) {	
+		pC = create_cell(get_cell_definition("default")); 
+		pC->assign_position(10.0*(i%2), 10.0*(i%2), 0.0 );
+		// pC->phenotype.intracellular->start();
+	}
 		
-		<SVG>
-			<interval units="min">1000</interval>
-			<enable>false</enable>
-		</SVG>
-		
-		<legacy_data>
-			<enable>false</enable>
-		</legacy_data>
-	</save>
-	
-		
-	<cell_definitions>
-		<cell_definition name="default" ID="0">
-			<phenotype>
-				<cycle code="2" name="live">  
-					<!-- using higher than normal significant digits to match divisions in default code -->
-					<transition_rates units="1/min"> 
-						<rate start_index="0" end_index="0" fixed_duration="true">0.0</rate>
-					</transition_rates>
-				</cycle>
-				
-				<death>  
-					<model code="100" name="apoptosis"> 
-						<death_rate units="1/min">0.001</death_rate>
-					</model> 
+	return; 
+}
 
-					<model code="101" name="necrosis">
-						<death_rate units="1/min">0.0</death_rate>
-					</model> 
-				</death>					
-				
-				<volume>  
-					<total units="micron^3">1000</total>
-					
-					<fluid_change_rate units="1/min">0.0</fluid_change_rate>
-					<cytoplasmic_biomass_change_rate units="1/min">0.0</cytoplasmic_biomass_change_rate>
-					<nuclear_biomass_change_rate units="1/min">0.0</nuclear_biomass_change_rate>
-				</volume> 				
-				
-				<motility>  
-					<options>
-						<enabled>false</enabled>
-						<use_2D>false</use_2D>
-					</options>
-				</motility>
-				<intracellular type="maboss">
-					<bnd_filename>./config/boolean_network/sizek.bnd</bnd_filename>
-					<cfg_filename>./config/boolean_network/sizek.cfg</cfg_filename>
-					<scaling>10</scaling>
-					<time_step>1</time_step>
-				</intracellular>
-			</phenotype>
-			<custom_data/>
-		</cell_definition>
-	</cell_definitions>	
+
+void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
+{
 	
-	<user_parameters>
-		<random_seed type="int" units="dimensionless">100</random_seed> 
-		<node_to_visualize type="string" units="">A_Kinetochores</node_to_visualize> <!-- insert the name of the node you want to visualize in paraview-->
-	</user_parameters>
+	if (pCell->phenotype.intracellular->need_update())
+	{	
+		// std::cout << "Updating at t=" << PhysiCell_globals.current_time << std::endl;
+		// if (
+		// 	pCell->type == get_cell_definition("last_one").type
+		// 	&& PhysiCell::PhysiCell_globals.current_time >= 100.0 
+		// 	&& pCell->phenotype.intracellular->get_parameter_value("$time_scale") == 0.0
+		// )
+		// 	pCell->phenotype.intracellular->set_parameter_value("$time_scale", 0.1);
+
+		set_input_nodes(pCell);
+
+		pCell->phenotype.intracellular->update();
+		
+		from_nodes_to_cell(pCell, phenotype, dt);
+		color_node(pCell);
+	}	
+}
+
+
+void set_input_nodes(Cell* pCell) {
+	// pCell->phenotype.intracellular->start();
+}
+
+void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt) {
+	if (!pCell->phenotype.death.dead){
+		if (pCell->phenotype.intracellular->get_boolean_variable_value("Casp9")) {
+			
+			pCell->start_death(pCell->phenotype.death.find_death_model_index("Apoptosis"));
+			std::cout << "Dying of apoptosis" << std::endl;
+		} else if (pCell->phenotype.intracellular->get_boolean_variable_value("U_Kinetochores")) {
+			// std::cout << "Dividing" << std::endl;
+			pCell->phenotype.intracellular->start();
+			pCell->flag_for_division();
+		}
+		//  else { 
+		// 	pCell->phenotype.intracellular->start();
+		// }
+	}
+}
+
+
+std::vector<std::string> my_coloring_function( Cell* pCell )
+{
+	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
 	
+	if ( !pCell->phenotype.intracellular->get_boolean_variable_value( parameters.strings("node_to_visualize") ) )
+	{
+		output[0] = "rgb(255,0,0)";
+		output[2] = "rgb(125,0,0)";
+		
+	}
+	else{
+		output[0] = "rgb(0, 255,0)";
+		output[2] = "rgb(0, 125,0)";
+	}
 	
-</PhysiCell_settings>
+	return output;
+}
+
+void color_node(Cell* pCell){
+	std::string node_name = parameters.strings("node_to_visualize");
+	pCell->custom_data[node_name] = pCell->phenotype.intracellular->get_boolean_variable_value(node_name);
+}
