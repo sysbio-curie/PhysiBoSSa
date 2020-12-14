@@ -260,7 +260,12 @@ class Node {
 
  public:
   Node(const std::string& label, const std::string& description, NodeIndex index);
-
+  Node(const Node& node, Network& network);
+  
+  // Node& operator=(const Node& node);
+ 
+  Node* clone(Network& network) const { return new Node(*this, network); }
+  
   void setIndex(NodeIndex new_index) {
     index = new_index;
 #if !defined(USE_BITSET) && !defined(USE_BOOST_BITSET)
@@ -446,6 +451,14 @@ class Symbol {
 
 public:
   Symbol(const std::string& symb, SymbolIndex symb_idx) : symb(symb), symb_idx(symb_idx) { }
+  Symbol(const Symbol& symbol) {
+    *this = symbol;
+  }
+  Symbol& operator=(const Symbol& symbol) {
+    symb = symbol.getName();
+    symb_idx = symbol.getIndex();
+    return *this;
+  }
   const std::string& getName() const {return symb;}
   SymbolIndex getIndex() const {return symb_idx;}
 };
@@ -551,16 +564,18 @@ public:
   Network(const Network& network);
   Network& operator=(const Network& network);
 
+  Network* clone() { return new Network(*this); }
+
   int parse(const char* file = NULL, std::map<std::string, NodeIndex>* nodes_indexes = NULL);
   int parseExpression(const char* content = NULL, std::map<std::string, NodeIndex>* nodes_indexes = NULL);
 
-  std::vector<IStateGroup*>* getIStateGroup() {
+  std::vector<IStateGroup*>* getIStateGroup() const {
     return istate_group_list;
   }
 
   void cloneIStateGroup(std::vector<IStateGroup*>* _istate_group_list);
 
-  SymbolTable* getSymbolTable() { 
+  SymbolTable* getSymbolTable() const{ 
     return symbol_table;
   };
   Node* defineNode(const std::string& label, const std::string& description = "");
@@ -598,6 +613,10 @@ public:
 
   // vector of all nodes
   const std::vector<Node*>& getNodes() const {return nodes;}
+  
+  const MAP<std::string, Node*>& getNodeMap() const {return node_map;}
+  const MAP<std::string, bool>& getNodeDefMap() const {return node_def_map;}
+  const NodeIndex getLastIndex() const {return last_index; }
 
   std::string toString() const {
     std::ostringstream ostr;
@@ -724,6 +743,7 @@ public:
   }
 
   virtual Expression* clone() const = 0; 
+  virtual Expression* clone(Network& network) const = 0; 
 
   virtual Expression* cloneAndShrink(bool& shrinked) const {
     return clone();
@@ -754,6 +774,10 @@ public:
   NodeExpression(Node* node) : node(node) { }
 
   Expression* clone() const {return new NodeExpression(node);}
+  Expression* clone(Network& network) const {
+    Node* new_node = network.getOrMakeNode(node->getLabel());
+    return new NodeExpression(new_node);
+  }
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return (double)node->getNodeState(network_state);
@@ -806,6 +830,9 @@ public:
   MulExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new MulExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {
+    return new MulExpression(left->clone(network), right->clone(network));
+  }
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return left->eval(this_node, network_state) * right->eval(this_node, network_state);
@@ -826,6 +853,7 @@ public:
   DivExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new DivExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new DivExpression(left->clone(network), right->clone(network));}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return left->eval(this_node, network_state) / right->eval(this_node, network_state);
@@ -846,6 +874,7 @@ public:
   AddExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new AddExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new AddExpression(left->clone(network), right->clone(network));}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return left->eval(this_node, network_state) + right->eval(this_node, network_state);
@@ -866,6 +895,7 @@ public:
   SubExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new SubExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new SubExpression(left->clone(network), right->clone(network));}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return left->eval(this_node, network_state) - right->eval(this_node, network_state);
@@ -886,6 +916,7 @@ public:
   EqualExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new EqualExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new EqualExpression(left->clone(network), right->clone(network));}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return left->eval(this_node, network_state) == right->eval(this_node, network_state);
@@ -908,6 +939,7 @@ public:
   NotEqualExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new NotEqualExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new NotEqualExpression(left->clone(network), right->clone(network));}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return left->eval(this_node, network_state) != right->eval(this_node, network_state);
@@ -930,6 +962,7 @@ public:
   LetterExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new LetterExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new LetterExpression(left->clone(network), right->clone(network));}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return left->eval(this_node, network_state) < right->eval(this_node, network_state);
@@ -952,6 +985,7 @@ public:
   LetterOrEqualExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new LetterOrEqualExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new LetterOrEqualExpression(left->clone(network), right->clone(network));}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return left->eval(this_node, network_state) <= right->eval(this_node, network_state);
@@ -974,6 +1008,7 @@ public:
   GreaterExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new GreaterExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new GreaterExpression(left->clone(network), right->clone(network));}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return left->eval(this_node, network_state) > right->eval(this_node, network_state);
@@ -996,6 +1031,7 @@ public:
   GreaterOrEqualExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new GreaterOrEqualExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new GreaterOrEqualExpression(left->clone(network), right->clone(network));}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return left->eval(this_node, network_state) >= right->eval(this_node, network_state);
@@ -1022,6 +1058,7 @@ public:
   CondExpression(Expression* cond_expr, Expression* true_expr, Expression* false_expr) : cond_expr(cond_expr), true_expr(true_expr), false_expr(false_expr) { }
 
   Expression* clone() const {return new CondExpression(cond_expr->clone(), true_expr->clone(), false_expr->clone());}
+  Expression* clone(Network& network) const {return new CondExpression(cond_expr->clone(network), true_expr->clone(network), false_expr->clone(network));}
 
   Expression* cloneAndShrink(bool& shrinked) const;
   //  Expression* cloneAndShrink(bool& shrinked) const {return new CondExpression(cond_expr->cloneAndShrink(shrinked), true_expr->cloneAndShrink(shrinked), false_expr->cloneAndShrink(shrinked));}
@@ -1070,6 +1107,7 @@ public:
   ConstantExpression(double value) : value(value) { }
 
   Expression* clone() const {return new ConstantExpression(value);}
+  Expression* clone(Network& network) const {return new ConstantExpression(value);}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return value;
@@ -1104,6 +1142,7 @@ public:
   }
 
   Expression* clone() const {return new SymbolExpression(symbol_table, symbol);}
+  Expression* clone(Network& network) const {return new SymbolExpression(network.getSymbolTable(), symbol);}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     if (!value_set) {
@@ -1144,6 +1183,7 @@ public:
   AliasExpression(const std::string& identifier) : identifier(identifier), alias_expr(NULL) { }
 
   Expression* clone() const {return new AliasExpression(identifier);}
+  Expression* clone(Network& network) const {return new AliasExpression(identifier);}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     if (NULL == alias_expr) {
@@ -1176,6 +1216,7 @@ public:
   Expression* cloneAndShrink(bool& shrinked) const;
 
   Expression* clone() const {return new OrLogicalExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new OrLogicalExpression(left->clone(network), right->clone(network));}
 
   bool generationWillAddParenthesis() const {return true;}
 
@@ -1200,6 +1241,7 @@ public:
   AndLogicalExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new AndLogicalExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new AndLogicalExpression(left->clone(network), right->clone(network));}
   Expression* cloneAndShrink(bool& shrinked) const;
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
@@ -1225,6 +1267,7 @@ public:
   XorLogicalExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
 
   Expression* clone() const {return new XorLogicalExpression(left->clone(), right->clone());}
+  Expression* clone(Network& network) const {return new XorLogicalExpression(left->clone(network), right->clone(network));}
 
   Expression* cloneAndShrink(bool& shrinked) const;
 
@@ -1250,6 +1293,7 @@ public:
   NotLogicalExpression(Expression* expr) : expr(expr) { }
 
   Expression* clone() const {return new NotLogicalExpression(expr->clone());}
+  Expression* clone(Network& network) const {return new NotLogicalExpression(expr->clone(network));}
   Expression* cloneAndShrink(bool& shrinked) const;
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
@@ -1283,6 +1327,7 @@ public:
   ParenthesisExpression(Expression* expr) : expr(expr) { }
 
   Expression* clone() const {return new ParenthesisExpression(expr->clone());}
+  Expression* clone(Network& network) const {return new ParenthesisExpression(expr->clone(network));}
 
   Expression* cloneAndShrink(bool& shrinked) const {
     return new ParenthesisExpression(expr->cloneAndShrink(shrinked));
@@ -1395,6 +1440,7 @@ public:
  }
 
   Expression* clone() const {return new FuncCallExpression(funname, arg_list->clone());}
+  Expression* clone(Network& network) const {return new FuncCallExpression(funname, arg_list->clone());}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     if (is_const) {

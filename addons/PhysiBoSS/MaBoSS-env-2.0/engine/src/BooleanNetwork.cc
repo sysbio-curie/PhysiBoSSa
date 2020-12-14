@@ -689,6 +689,44 @@ void IStateGroup::reset(Network * network) {
   network->getIStateGroup()->clear();
 }
 
+Node::Node(const Node& node, Network& network) {
+  
+    logicalInputExpr = NULL;
+    rateUpExpr = NULL;
+    rateDownExpr = NULL;
+    
+    label = node.getLabel();
+    description = node.getDescription();
+    istate_set = !node.istateSetRandomly();
+    is_internal = node.isInternal();
+    is_reference = node.isReference();
+    referenceState = node.getReferenceState();
+    
+    attr_expr_map.clear();
+    
+    delete logicalInputExpr;
+    logicalInputExpr = node.getLogicalInputExpression()->clone(network);
+    delete rateUpExpr;
+    if (node.getRateUpExpression() != NULL){
+      rateUpExpr = node.getRateUpExpression()->clone(network);
+    } else {
+      rateUpExpr = NULL;
+    }
+    
+    delete rateDownExpr;
+    if (node.getRateDownExpression() != NULL){
+      rateDownExpr = node.getRateDownExpression()->clone(network);
+    } else {
+      rateDownExpr = NULL;
+    }
+      
+    index = node.getIndex();
+  #if !defined(USE_BITSET) && !defined(USE_BOOST_BITSET)
+    node_bit = node.getNodeBit();
+  #endif
+  
+  }
+
 Node::~Node()
 {
   delete logicalInputExpr;
@@ -705,17 +743,47 @@ Node::~Node()
 
 Network::Network(const Network& network)
 {
+  istate_group_list = NULL;
+  symbol_table = NULL;
   *this = network;
 }
 
 Network& Network::operator=(const Network& network)
 {
-  node_map = network.node_map;
+  delete symbol_table;
+  symbol_table = new SymbolTable();
+  
+  delete istate_group_list;
+  istate_group_list = new std::vector<IStateGroup*>();
+  
+  nodes.clear();
+  node_def_map.clear();
+  node_map.clear();
+  input_nodes.clear();
+  non_input_nodes.clear();
+  
+  for (auto node: network.getNodes()) {
+    node_def_map[node->getLabel()] = true;
+    Node* new_node = node->clone(*this);
+    nodes.push_back(new_node);
+    node_map[node->getLabel()] = new_node;
+    if (node->isInputNode()) {
+      input_nodes.push_back(new_node);
+    } else {
+      non_input_nodes.push_back(new_node);
+    }
+  }
+  
   last_index = network.last_index;
-  input_nodes = network.input_nodes;
-  non_input_nodes = network.non_input_nodes;
-  nodes = network.nodes;
-  symbol_table = network.symbol_table;
+  
+  cloneIStateGroup(network.getIStateGroup());
+
+  for (auto symbol_entry: network.getSymbolTable()->getSymbolsNames()) {
+    const Symbol* old_symbol = network.getSymbolTable()->getSymbol(symbol_entry);
+    const Symbol* new_symbol = symbol_table->getOrMakeSymbol(symbol_entry);
+    getSymbolTable()->setSymbolValue(new_symbol, network.getSymbolTable()->getSymbolValue(old_symbol));
+  }
+  
   return *this;
 }
 
