@@ -606,7 +606,7 @@ class Phenotype
 	Phenotype(); // done 
 	Phenotype(const Phenotype &p);
 	~Phenotype();
-	void operator=(const Phenotype &p );
+	Phenotype& operator=(const Phenotype &p );
 
 	void sync_to_functions( Cell_Functions& functions ); // done 
 	
