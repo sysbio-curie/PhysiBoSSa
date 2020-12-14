@@ -74,11 +74,37 @@ class RunConfig {
   void dump_perform(Network* network, std::ostream& os, bool is_template) const;
 
  public:
+  
   RunConfig();
+  RunConfig(const RunConfig& copy) {
+    randgen_factory = NULL;
+    *this = copy;
+  }
+  
+  void operator=(const RunConfig& copy) {
+    delete(randgen_factory);
+    randgen_factory = NULL;
+    time_tick = copy.getTimeTick();
+    max_time = copy.getMaxTime();
+    sample_count = copy.getSampleCount();
+    discrete_time = copy.isDiscreteTime();
+    use_physrandgen = copy.usePhysRandGen();
+    use_glibcrandgen = copy.useGlibCRandGen();
+    use_mtrandgen = copy.useMTRandGen();
+    display_traj = copy.displayTrajectories();
+    thread_count = copy.getThreadCount();
+    statdist_traj_count = copy.getStatDistTrajCount();
+    statdist_cluster_threshold = copy.getStatdistClusterThreshold();
+    statdist_similarity_cache_max_size = copy.getStatDistSimilarityCacheMaxSize(); 
+  }
+  
   ~RunConfig();
   
   int parse(Network* network, const char* file = NULL);
   int parseExpression(Network* network, const char* expr);
+  RunConfig* clone() {
+    return new RunConfig(*this);
+  }
   void setParameter(const std::string& param, double value);
 
   RandomGeneratorFactory* getRandomGeneratorFactory() const;
@@ -95,7 +121,9 @@ class RunConfig {
   unsigned int getStatDistTrajCount() const {return statdist_traj_count <= sample_count ? statdist_traj_count : sample_count;}
   double getStatdistClusterThreshold() const {return statdist_cluster_threshold;}
   unsigned int getStatDistSimilarityCacheMaxSize() const {return statdist_similarity_cache_max_size;}
-
+  bool usePhysRandGen() const { return use_physrandgen; }
+  bool useGlibCRandGen() const { return use_glibcrandgen; }
+  bool useMTRandGen() const { return use_mtrandgen; }
   void generateTemplate(Network* network, std::ostream& os) const;
   void dump(Network* network, std::ostream& os) const;
 };
