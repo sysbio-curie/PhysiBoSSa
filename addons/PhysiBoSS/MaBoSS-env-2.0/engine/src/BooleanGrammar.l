@@ -50,6 +50,7 @@
 */
 
 #include <math.h>
+#include "Utils.h"
 
 static char *yytokstr();
 static unsigned int input_lineno = 1;
@@ -81,11 +82,11 @@ exppart		[eE](\-|\+)?[0-9]+
   if (!strcasecmp(yytext, "NODE")) {
      return NODE;
   }
-  yylval.str = strdup(yytext);
+  yylval.str = maboss_strdup(yytext);
   return IDENTIFIER;
 }
 "$"[a-zA-Z_][a-zA-Z_0-9]* {
-  yylval.str = strdup(yytext);
+  yylval.str = maboss_strdup(yytext);
   return VARIABLE;
 }
 \" {

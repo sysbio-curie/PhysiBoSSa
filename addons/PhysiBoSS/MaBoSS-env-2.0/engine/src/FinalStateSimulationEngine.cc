@@ -112,8 +112,8 @@ NodeIndex FinalStateSimulationEngine::getTargetNode(RandomGenerator* random_gene
   MAP<NodeIndex, double>::const_iterator end = nodeTransitionRates.end();
   NodeIndex node_idx = INVALID_NODE_INDEX;
   while (begin != end && random_rate > 0.) {
-    node_idx = (*begin).first;
-    double rate = (*begin).second;
+    node_idx = begin->first;
+    double rate = begin->second;
     random_rate -= rate;
     ++begin;
   }
@@ -139,12 +139,18 @@ struct FinalStateArgWrapper {
 
 void* FinalStateSimulationEngine::threadWrapper(void *arg)
 {
+#ifdef USE_DYNAMIC_BITSET
+  MBDynBitset::init_pthread();
+#endif
   FinalStateArgWrapper* warg = (FinalStateArgWrapper*)arg;
   try {
     warg->mabest->runThread(warg->start_count_thread, warg->sample_count_thread, warg->randgen_factory, warg->seed, warg->final_state_map, warg->output_traj);
   } catch(const BNException& e) {
     std::cerr << e;
   }
+#ifdef USE_DYNAMIC_BITSET
+  MBDynBitset::end_pthread();
+#endif
   return NULL;
 }
 
@@ -223,16 +229,31 @@ void FinalStateSimulationEngine::runThread(unsigned int start_count_thread, unsi
     }
 
     NetworkState_Impl final_state = network_state.getState();
-    if (has_internal) {
 
-      final_state &= ~internal_state.getState();
+    if (has_internal) {
+      //final_state &= ~internal_state.getState();
+      // EV: 2020-11-24 to avoid use of operator&=()
+#ifdef USE_DYNAMIC_BITSET
+      final_state = final_state & ~internal_state.getState(1);
+#else
+      final_state = final_state & ~internal_state.getState();
+#endif
     }
 
+#ifdef USE_DYNAMIC_BITSET
+    NetworkState_Impl cp_final_state(final_state, 1);
+    if (final_state_map->find(cp_final_state) == final_state_map->end()) {
+      (*final_state_map)[cp_final_state] = 1;
+    } else {
+      (*final_state_map)[cp_final_state]++;
+    }  
+#else
     if (final_state_map->find(final_state) == final_state_map->end()) {
       (*final_state_map)[final_state] = 1;
     } else {
       (*final_state_map)[final_state]++;
     }  
+#endif
   }
   delete random_generator;
 }
@@ -275,11 +296,12 @@ STATE_MAP<NetworkState_Impl, unsigned int>* FinalStateSimulationEngine::mergeFin
     STATE_MAP<NetworkState_Impl, unsigned int>::const_iterator b = fp_map->begin();
     STATE_MAP<NetworkState_Impl, unsigned int>::const_iterator e = fp_map->end();
     while (b != e) {
-      NetworkState_Impl state = (*b).first;
+      //NetworkState_Impl state = b->first;
+      const NetworkState_Impl& state = b->first;
       if (final_states_map->find(state) == final_states_map->end()) {
-	(*final_states_map)[state] = (*b).second;
+	(*final_states_map)[state] = b->second;
       } else {
-	(*final_states_map)[state] += (*b).second;
+	(*final_states_map)[state] += b->second;
       }
       ++b;
     }
@@ -296,7 +318,11 @@ void FinalStateSimulationEngine::epilogue()
   STATE_MAP<NetworkState_Impl, unsigned int>::const_iterator e = merged_final_states_map->end();
 
   while (b != e) {
-    final_states[NetworkState((*b).first).getState()] = ((double) (*b).second)/sample_count;
+#ifdef USE_DYNAMIC_BITSET
+    final_states[NetworkState(b->first).getState(1)] = ((double) b->second)/sample_count;
+#else
+    final_states[NetworkState(b->first).getState()] = ((double) b->second)/sample_count;
+#endif
     ++b;
   }
   delete merged_final_states_map;
