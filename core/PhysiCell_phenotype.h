@@ -580,7 +580,7 @@ class Intracellular
 
 	virtual Intracellular* clone() = 0;
 	
-	virtual ~Intracellular() {};
+	virtual ~Intracellular() = 0;
 	
 };
 

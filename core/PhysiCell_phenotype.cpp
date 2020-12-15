@@ -1039,6 +1039,7 @@ Cell_Functions::Cell_Functions()
 	return; 
 }
 
+Intracellular::~Intracellular() = default;
 void Phenotype::sync_to_functions( Cell_Functions& functions )
 {
 	cycle.sync_to_cycle_model( functions.cycle_model );  
@@ -1064,8 +1065,9 @@ Phenotype::Phenotype(const Phenotype &p) {
 
 Phenotype::~Phenotype() 
 {
-	if (intracellular != NULL)
-		delete intracellular;
+	// std::cout << "Destroying phenotype" << std::endl;
+	delete intracellular;
+	// std::cout << "Done destroying phenotype" << std::endl;
 }
 
 Phenotype& Phenotype::operator=(const Phenotype &p ) { 
