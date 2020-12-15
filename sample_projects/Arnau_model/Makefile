@@ -26,14 +26,14 @@ ifneq ($(OS), Windows_NT)
 	LDL_FLAG = -ldl
 endif
 
-LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS $(LDL_FLAG)
-INC := -DADDON_PHYSIBOSS -I$(CUR_DIR)/$(MABOSS_DIR)/include -DMAXNODES=$(MABOSS_MAX_NODES)
+LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS_dn_std $(LDL_FLAG)
+INC := -DADDON_PHYSIBOSS -I$(CUR_DIR)/$(MABOSS_DIR)/include -DMAXNODES=64 -DUSE_DYNAMIC_BITSET -DUSE_DYNAMIC_BITSET_STD_ALLOC
 
 
 # If max nodes > 64, change lib path 
-ifeq ($(shell expr $(MABOSS_MAX_NODES) '>' 64), 1)
-LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS_$(MABOSS_MAX_NODES)n $(LDL_FLAG)
-endif
+# ifeq ($(shell expr $(MABOSS_MAX_NODES) '>' 64), 1)
+# LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS_$(MABOSS_MAX_NODES)n $(LDL_FLAG)
+# endif
 
 ARCH := native # best auto-tuning
 # ARCH := core2 # a reasonably safe default for most CPUs since 2007
@@ -165,7 +165,7 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 # user-defined PhysiCell modules
 
 MaBoSS:
-	cd $(MABOSS_DIR)/src && make MAXNODES=$(MABOSS_MAX_NODES) install_alib
+	cd $(MABOSS_DIR)/src && make install_alib
 
 maboss_network.o: ./addons/PhysiBoSSa/src/maboss_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSSa/src/maboss_network.cpp

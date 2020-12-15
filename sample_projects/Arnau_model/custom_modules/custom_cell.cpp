@@ -115,12 +115,12 @@ double Custom_cell::adhesion( Cell* other_cell )
 	double adh = 0;
 
 	if (PhysiCell::parameters.ints("choose_adhesion_function") == 0){
-		//bool my_cell_cell = phenotype.intracellular->get_boolean_node_value("Cell_cell");
-		//bool your_cell_cell = custom_other_cell->phenotype.intracellular->get_boolean_node_value("Cell_cell");
-		bool my_single = phenotype.intracellular->get_boolean_node_value("Single");
-		bool your_single = custom_other_cell->phenotype.intracellular->get_boolean_node_value("Single");
-		bool my_mig = phenotype.intracellular->get_boolean_node_value("Migration");
-		bool your_mig = custom_other_cell->phenotype.intracellular->get_boolean_node_value("Migration");
+		//bool my_cell_cell = phenotype.intracellular->get_boolean_variable_value("Cell_cell");
+		//bool your_cell_cell = custom_other_cell->phenotype.intracellular->get_boolean_variable_value("Cell_cell");
+		bool my_single = phenotype.intracellular->get_boolean_variable_value("Single");
+		bool your_single = custom_other_cell->phenotype.intracellular->get_boolean_variable_value("Single");
+		bool my_mig = phenotype.intracellular->get_boolean_variable_value("Migration");
+		bool your_mig = custom_other_cell->phenotype.intracellular->get_boolean_variable_value("Migration");
 		if (my_single || your_single )
 			return adh;
 		else if ( my_mig && your_mig || !my_mig && !your_mig){
@@ -149,7 +149,7 @@ double Custom_cell::adhesion( Cell* other_cell )
 		*/
 	}
 	else{
-		if(phenotype.intracellular->get_boolean_node_value("Single") || custom_other_cell->phenotype.intracellular->get_boolean_node_value("Single"))
+		if(phenotype.intracellular->get_boolean_variable_value("Single") || custom_other_cell->phenotype.intracellular->get_boolean_variable_value("Single"))
 			return adh;
 	
 		if ( this->type == other_cell->type )

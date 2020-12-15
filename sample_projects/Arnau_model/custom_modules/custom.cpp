@@ -204,7 +204,7 @@ void setup_tissue( void )
 		int TGFbeta_index = microenvironment.find_density_index("TGFbeta");
 		pC->phenotype.secretion.uptake_rates[TGFbeta_index] = PhysiCell::parameters.doubles("TGFbeta_degradation");
 		color_node(pC);
-		//std::cout << pC->phenotype.intracellular->get_boolean_node_value("Cell_growth");
+		//std::cout << pC->phenotype.intracellular->get_boolean_variable_value("Cell_growth");
 		//pC->phenotype.intracellular->print_current_nodes();
 		//std::cout << std::endl;
 	}
@@ -257,8 +257,8 @@ std::vector<std::string> phase_coloring_function( Cell* pCell )
 std::vector<std::string> node_coloring_function( Cell* pCell )
 {
 	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
-	//std::cout << pCell->phenotype.intracellular->get_boolean_node_value( parameters.strings("node_to_visualize"));
-	if ( !pCell->phenotype.intracellular->get_boolean_node_value( parameters.strings("node_to_visualize") ) ) //node off
+	//std::cout << pCell->phenotype.intracellular->get_boolean_variable_value( parameters.strings("node_to_visualize"));
+	if ( !pCell->phenotype.intracellular->get_boolean_variable_value( parameters.strings("node_to_visualize") ) ) //node off
 	{
 		output[0] = "rgb(0,0,255)"; //blue
 		output[2] = "rgb(0,0,125)";
@@ -305,7 +305,7 @@ void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, dou
 		//std::cout << std::endl;
 		pCell->phenotype.intracellular->update();
 		//std::cout << pCustomCell->cell_contact;
-		//std::cout << pCell->phenotype.intracellular->get_boolean_node_value("Cell_growth");
+		//std::cout << pCell->phenotype.intracellular->get_boolean_variable_value("Cell_growth");
 		//pCell->phenotype.intracellular->print_current_nodes();
 		//std::cout << std::endl;
 		from_nodes_to_cell(pCustomCell, phenotype, dt);
@@ -322,35 +322,35 @@ void set_input_nodes(Custom_cell* pCell)
 {	
 
 
-	if ( pCell->phenotype.intracellular->has_node( "Oxy" ) ){
-		pCell->phenotype.intracellular->set_boolean_node_value("Oxy", !pCell->necrotic_oxygen());
+	if ( pCell->phenotype.intracellular->has_variable( "Oxy" ) ){
+		pCell->phenotype.intracellular->set_boolean_variable_value("Oxy", !pCell->necrotic_oxygen());
 	}
 	
 	// 	nodes[ind] = ( !pCell->necrotic_oxygen() );
 
 	//enough_to_node( pCell, "TGFbR", "tgfb" );
 
-	if ( pCell->phenotype.intracellular->has_node( "Neighbours" ) ){
-		pCell->phenotype.intracellular->set_boolean_node_value("Neighbours", pCell->has_neighbor(0));	
+	if ( pCell->phenotype.intracellular->has_variable( "Neighbours" ) ){
+		pCell->phenotype.intracellular->set_boolean_variable_value("Neighbours", pCell->has_neighbor(0));	
 	}
 	
-	if ( pCell->phenotype.intracellular->has_node( "Nei2" ) ){
-		pCell->phenotype.intracellular->set_boolean_node_value("Nei2", pCell->has_neighbor(1));
+	if ( pCell->phenotype.intracellular->has_variable( "Nei2" ) ){
+		pCell->phenotype.intracellular->set_boolean_variable_value("Nei2", pCell->has_neighbor(1));
 	}
 	
 	// If has enough contact with ecm or not
-	if ( pCell->phenotype.intracellular->has_node( "ECM_sensing" ) )
-		pCell->phenotype.intracellular->set_boolean_node_value("ECM_sensing", touch_ECM(pCell));
+	if ( pCell->phenotype.intracellular->has_variable( "ECM_sensing" ) )
+		pCell->phenotype.intracellular->set_boolean_variable_value("ECM_sensing", touch_ECM(pCell));
 	
 	// If has enough contact with TGFbeta or not
-	if ( pCell->phenotype.intracellular->has_node( "TGFbeta" ) )
-		pCell->phenotype.intracellular->set_boolean_node_value("TGFbeta", touch_TGFbeta(pCell));
+	if ( pCell->phenotype.intracellular->has_variable( "TGFbeta" ) )
+		pCell->phenotype.intracellular->set_boolean_variable_value("TGFbeta", touch_TGFbeta(pCell));
 
 	// If nucleus is deformed, probability of damage
 	// Change to increase proba with deformation ? + put as parameter
 	/*
-	if ( pCell->phenotype.intracellular->has_node( "DNAdamage" ) )
-		pCell->phenotype.intracellular->set_boolean_node_value("DNAdamage", 
+	if ( pCell->phenotype.intracellular->has_variable( "DNAdamage" ) )
+		pCell->phenotype.intracellular->set_boolean_variable_value("DNAdamage", 
 			( pCell->nucleus_deform > 0.5 ) ? (2*PhysiCell::UniformRandom() < pCell->nucleus_deform) : 0
 		);
 	*/	
@@ -361,8 +361,8 @@ void set_input_nodes(Custom_cell* pCell)
 void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 {
 	
-	if ( pCell->phenotype.intracellular->has_node( "Apoptosis" ) 
-		&& pCell->phenotype.intracellular->get_boolean_node_value( "Apoptosis" ) 
+	if ( pCell->phenotype.intracellular->has_variable( "Apoptosis" ) 
+		&& pCell->phenotype.intracellular->get_boolean_variable_value( "Apoptosis" ) 
 	)
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
@@ -371,8 +371,8 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		return;
 	}
 	
-	if ( pCell->phenotype.intracellular->has_node( "Autophagy" ) 
-		&& pCell->phenotype.intracellular->get_boolean_node_value( "Autophagy" ) 
+	if ( pCell->phenotype.intracellular->has_variable( "Autophagy" ) 
+		&& pCell->phenotype.intracellular->get_boolean_variable_value( "Autophagy" ) 
 	)
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
@@ -381,8 +381,8 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 		return;
 	}
 
-	if ( pCell->phenotype.intracellular->has_node( "Hypoxia" ) 
-		&& pCell->phenotype.intracellular->get_boolean_node_value( "Hypoxia" ) 
+	if ( pCell->phenotype.intracellular->has_variable( "Hypoxia" ) 
+		&& pCell->phenotype.intracellular->get_boolean_variable_value( "Hypoxia" ) 
 	)
 	{
 		int apoptosis_model_index = phenotype.death.find_death_model_index( "Apoptosis" );
@@ -391,58 +391,58 @@ void from_nodes_to_cell(Custom_cell* pCell, Phenotype& phenotype, double dt)
 	}
 
 
-	if ( pCell->phenotype.intracellular->has_node( "Migration" )){
-		pCell->set_oxygen_motility(pCell->phenotype.intracellular->get_boolean_node_value("Migration"));
+	if ( pCell->phenotype.intracellular->has_variable( "Migration" )){
+		pCell->set_oxygen_motility(pCell->phenotype.intracellular->get_boolean_variable_value("Migration"));
 		
-		pCell->evolve_motility_coef( pCell->phenotype.intracellular->get_boolean_node_value( "Migration" ), dt );
+		pCell->evolve_motility_coef( pCell->phenotype.intracellular->get_boolean_variable_value( "Migration" ), dt );
 
 		/*		
-	if ( pCell->phenotype.intracellular->has_node( "Single" ) 
-		&& pCell->phenotype.intracellular->get_boolean_node_value( "Single" ) 
+	if ( pCell->phenotype.intracellular->has_variable( "Single" ) 
+		&& pCell->phenotype.intracellular->get_boolean_variable_value( "Single" ) 
 	)
 	{
 		pCell->padhesion = 0;
 	}
 	*/
 	}
-	 if ( pCell->phenotype.intracellular->has_node( "Cell_growth" ) && pCell->phenotype.intracellular->get_boolean_node_value("Cell_growth") ){
+	 if ( pCell->phenotype.intracellular->has_variable( "Cell_growth" ) && pCell->phenotype.intracellular->get_boolean_variable_value("Cell_growth") ){
 	 	//do_proliferation( pCell, phenotype, dt );
 	 }
 
-	/*if ( pCell->phenotype.intracellular->has_node( "Polarization" ) )
+	/*if ( pCell->phenotype.intracellular->has_variable( "Polarization" ) )
 		pCell->evolve_polarity_coef( 
-			pCell->phenotype.intracellular->get_boolean_node_value( "Polarization" ), dt 
+			pCell->phenotype.intracellular->get_boolean_variable_value( "Polarization" ), dt 
 		);
 	*/
 
-	if ( pCell->phenotype.intracellular->has_node( "Cell_cell" ) )
+	if ( pCell->phenotype.intracellular->has_variable( "Cell_cell" ) )
 		pCell->evolve_cellcell_coef( 
-			pCell->phenotype.intracellular->get_boolean_node_value( "Cell_cell" ), dt 
+			pCell->phenotype.intracellular->get_boolean_variable_value( "Cell_cell" ), dt 
 		);
 
-	if ( pCell->phenotype.intracellular->has_node( "Matrix_adhesion" ) )
+	if ( pCell->phenotype.intracellular->has_variable( "Matrix_adhesion" ) )
 		pCell->evolve_integrin_coef( 
-			pCell->phenotype.intracellular->get_boolean_node_value( "Matrix_adhesion" ), dt 
+			pCell->phenotype.intracellular->get_boolean_variable_value( "Matrix_adhesion" ), dt 
 		);
 
-	if ( pCell->phenotype.intracellular->has_node("Matrix_modif") )
-	 	pCell->set_mmp( pCell->phenotype.intracellular->get_boolean_node_value("Matrix_modif") );
+	if ( pCell->phenotype.intracellular->has_variable("Matrix_modif") )
+	 	pCell->set_mmp( pCell->phenotype.intracellular->get_boolean_variable_value("Matrix_modif") );
 
 /*
-	if ( pCell->phenotype.intracellular->has_node("EMTreg") )
+	if ( pCell->phenotype.intracellular->has_variable("EMTreg") )
 	{
-		pCell->set_mmp( pCell->phenotype.intracellular->get_boolean_node_value("EMTreg") );
+		pCell->set_mmp( pCell->phenotype.intracellular->get_boolean_variable_value("EMTreg") );
 	}
 */
 	pCell->freezing( 0 );
 
-	if ( pCell->phenotype.intracellular->has_node( "Quiescence" ) 
-		&& pCell->phenotype.intracellular->get_boolean_node_value( "Quiescence" )
+	if ( pCell->phenotype.intracellular->has_variable( "Quiescence" ) 
+		&& pCell->phenotype.intracellular->get_boolean_variable_value( "Quiescence" )
 	){
 		pCell->freezing(1);
 	}
-	if ( pCell->phenotype.intracellular->has_node( "Cell_freeze" ) ){
-		pCell->freezer(3 * pCell->phenotype.intracellular->get_boolean_node_value( "Cell_freeze" ));
+	if ( pCell->phenotype.intracellular->has_variable( "Cell_freeze" ) ){
+		pCell->freezer(3 * pCell->phenotype.intracellular->get_boolean_variable_value( "Cell_freeze" ));
 	}
 
 	//pCell->phenotype.intracellular->print_current_nodes();
@@ -550,17 +550,17 @@ bool touch_TGFbeta(Custom_cell* pCell){
 
 void enough_to_node( Custom_cell* pCell, std::string nody, std::string field )
 {
-	if ( pCell->phenotype.intracellular->has_node(nody) )
+	if ( pCell->phenotype.intracellular->has_variable(nody) )
 	{
 		int felt = pCell->feel_enough(field, *pCell);
 		if ( felt != -1 )
-			pCell->phenotype.intracellular->set_boolean_node_value(nody, felt);
+			pCell->phenotype.intracellular->set_boolean_variable_value(nody, felt);
 	}
 }
 
 void color_node(Custom_cell* pCell){
 	std::string node_name = parameters.strings("node_to_visualize");
-	pCell->custom_data["node"] = pCell->phenotype.intracellular->get_boolean_node_value(node_name);
+	pCell->custom_data["node"] = pCell->phenotype.intracellular->get_boolean_variable_value(node_name);
 }
 
 std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius, double sphere_radius)
@@ -595,7 +595,7 @@ std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius
 }
 
 bool wait_for_cell_growth(Cell* pCell, Phenotype& phenotype, double dt){
-	//std::cout << pCell->phenotype.intracellular->get_boolean_node_value("Cell_growth");
-	return !pCell->phenotype.intracellular->get_boolean_node_value("Cell_growth");
+	//std::cout << pCell->phenotype.intracellular->get_boolean_variable_value("Cell_growth");
+	return !pCell->phenotype.intracellular->get_boolean_variable_value("Cell_growth");
 
 }

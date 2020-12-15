@@ -140,7 +140,7 @@ int main( int argc, char* argv[] )
 	
 	save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 	
-	MaBoSSIntracellular::save_PhysiBoSS( PhysiCell_settings.folder, "initial" );
+	// MaBoSSIntracellular::save_PhysiBoSS( PhysiCell_settings.folder, "initial" );
 	// save a quick SVG cross section through z = 0, after setting its 
 	// length bar to 200 microns 
 
@@ -192,7 +192,7 @@ int main( int argc, char* argv[] )
 					
 					char index_str[16];
 					sprintf(index_str, "%08u", PhysiCell_globals.full_output_index);
-					MaBoSSIntracellular::save_PhysiBoSS( PhysiCell_settings.folder, std::string(index_str) );
+					// MaBoSSIntracellular::save_PhysiBoSS( PhysiCell_settings.folder, std::string(index_str) );
 
 				}
 				
