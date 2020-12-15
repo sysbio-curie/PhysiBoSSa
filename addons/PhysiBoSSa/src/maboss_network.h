@@ -26,8 +26,8 @@ class MaBoSSNetwork
 		RunConfig* config;
 
 		StochasticSimulationEngine* engine;
-		NetworkState state;
-		NetworkState output_mask;
+		NetworkState * state;
+		NetworkState * output_mask;
 		
 		/** \brief Time step between each MaBoSS simulation */
 		double update_time_step = 12.0;
@@ -56,6 +56,8 @@ class MaBoSSNetwork
 			network = NULL;
 			config = NULL;
 			engine = NULL;
+			state = NULL;
+			output_mask = NULL;
 			this->nodesByName.clear();
 		}
 		
@@ -67,6 +69,10 @@ class MaBoSSNetwork
 			this->network = NULL;
 			delete this->config;
 			this->config = NULL;
+			delete this->state;
+			this->state = NULL;
+			delete this->output_mask;
+			this->output_mask = NULL;
 		}
 		
 		/** 
@@ -136,8 +142,8 @@ class MaBoSSNetwork
 		 */
 		void print_nodes();
 
-		void set_state(NetworkState _state) { state = NetworkState(_state.getState()); }	
-		NetworkState get_maboss_state() { return state;}
+		void set_state(NetworkState _state) { state = new NetworkState(_state.getState()); }	
+		NetworkState get_maboss_state() { return *state;}
 };
 
 #endif

@@ -562,13 +562,19 @@ class Intracellular
 	virtual bool need_update() = 0;
 	
 	// This function checks if a node exists
-	virtual bool has_node(std::string name) = 0; 
+	virtual bool has_variable(std::string name) = 0; 
 	
-	// Access value for boolean model
-	virtual bool get_boolean_node_value(std::string name) = 0;
+	// Access value for boolean variable
+	virtual bool get_boolean_variable_value(std::string name) = 0;
 	
-	// Set value for boolean model
-	virtual void set_boolean_node_value(std::string name, bool value) = 0;
+	// Set value for boolean variable
+	virtual void set_boolean_variable_value(std::string name, bool value) = 0;
+	
+	// Access value for double variable
+	virtual double get_double_variable_value(std::string name) = 0;
+	
+	// Set value for read double variable
+	virtual void set_double_variable_value(std::string name, double value) = 0;
 	
 	// Get value for maboss model parameter
 	virtual double get_parameter_value(std::string name) = 0;
@@ -576,11 +582,10 @@ class Intracellular
 	// Set value for maboss model parameter
 	virtual void set_parameter_value(std::string name, double value) = 0;
 
-	virtual void print_current_nodes() = 0;
-	
-	virtual std::string get_state() = 0;
-	
 	virtual Intracellular* clone() = 0;
+	
+	virtual ~Intracellular() = 0;
+	
 };
 
 class Phenotype
@@ -600,14 +605,13 @@ class Phenotype
 	
 	Molecular molecular; 
 	
-	// We need it to be a pointer to allow polymorphism
-	// then this object could be a MaBoSSIntracellular, or a SBMLIntracellular
 	Intracellular* intracellular;
 	
 	Phenotype(); // done 
-	
-	void operator=(const Phenotype &p );
-	void operator=(Phenotype &p );
+	Phenotype(const Phenotype &p);
+	~Phenotype();
+	Phenotype& operator=(const Phenotype &p );
+
 	void sync_to_functions( Cell_Functions& functions ); // done 
 	
 	void sync_to_microenvironment( Microenvironment* pMicroenvironment ); 

@@ -1044,6 +1044,7 @@ Cell_Functions::Cell_Functions()
 	return; 
 }
 
+Intracellular::~Intracellular() = default;
 void Phenotype::sync_to_functions( Cell_Functions& functions )
 {
 	cycle.sync_to_cycle_model( functions.cycle_model );  
@@ -1062,7 +1063,19 @@ Phenotype::Phenotype()
 	return; 
 }
 
-void Phenotype::operator=(const Phenotype &p ) { 
+Phenotype::Phenotype(const Phenotype &p) {
+	intracellular = NULL;
+	*this = p;
+}
+
+Phenotype::~Phenotype() 
+{
+	// std::cout << "Destroying phenotype" << std::endl;
+	delete intracellular;
+	// std::cout << "Done destroying phenotype" << std::endl;
+}
+
+Phenotype& Phenotype::operator=(const Phenotype &p ) { 
 		
 	flagged_for_division = p.flagged_for_division;
 	flagged_for_removal = p.flagged_for_removal;
@@ -1077,27 +1090,14 @@ void Phenotype::operator=(const Phenotype &p ) {
 	
 	molecular = p.molecular;
 	
-	if (p.intracellular != NULL)
-		intracellular = p.intracellular->clone();
-}
-	
-void Phenotype::operator=(Phenotype &p ) { 
-	
-	flagged_for_division = p.flagged_for_division;
-	flagged_for_removal = p.flagged_for_removal;
-	
-	cycle = p.cycle;
-	death = p.death;
-	volume = p.volume;
-	geometry = p.geometry;
-	mechanics = p.mechanics;
-	motility = p.motility;
-	secretion = p.secretion;
-	
-	molecular = p.molecular;
+	delete intracellular;
 	
 	if (p.intracellular != NULL)
 		intracellular = p.intracellular->clone();
+	else
+		intracellular = NULL;
+	
+	return *this;
 }
 
 /*

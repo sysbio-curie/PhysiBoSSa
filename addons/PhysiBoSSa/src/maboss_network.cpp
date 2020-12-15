@@ -3,13 +3,9 @@
 /* Default constructor */
 void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile)
 {
-	if (this->network != NULL) {
-		delete this->network;
-	}
-	
-	if (this->config != NULL) {
-		delete this->config;
-	}
+	delete this->network;
+	delete this->config;
+	delete this->engine;
 	
 	// Initialize MaBoSS Objects for a model
 	this->network = new Network();
@@ -35,9 +31,11 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 			this->parametersByName[parameter] = this->network->getSymbolTable()->getSymbol(parameter);
 	}
 	
+	delete output_mask;
+	output_mask = new NetworkState;
 	for (auto node : network->getNodes())
       if (!node->isInternal()) 
-        output_mask.setNodeState(node, true);
+        output_mask->setNodeState(node, true);
 
 }
 
@@ -70,11 +68,12 @@ void MaBoSSNetwork::set_parameter_value(std::string name, double value)
 /* Reset a vector of bools to the init state of the network */
 void MaBoSSNetwork::restart_node_values()
 {
-	// NetworkState network_state;
-	this->network->initStates(state, engine->random_generator);
+	delete state;
+	state = new NetworkState;
+	this->network->initStates(*state, engine->random_generator);
 	
 	for (auto initial_value : initial_values) {
-		state.setNodeState(nodesByName[initial_value.first], PhysiCell::UniformRandom() < initial_value.second);
+		state->setNodeState(nodesByName[initial_value.first], PhysiCell::UniformRandom() < initial_value.second);
 	}
 	
 	this->set_time_to_update();
@@ -84,9 +83,8 @@ void MaBoSSNetwork::restart_node_values()
 void MaBoSSNetwork::run_simulation()
 {	
 	engine->setMaxTime(time_to_update/scaling);
-	state = engine->run(state, NULL);
+	*state = engine->run(*state, NULL);
 	this->set_time_to_update();
-
 }
 
 bool MaBoSSNetwork::has_node( std::string name ) {
@@ -94,15 +92,15 @@ bool MaBoSSNetwork::has_node( std::string name ) {
 }
 
 void MaBoSSNetwork::set_node_value(std::string name, bool value) {
-	state.setNodeState(nodesByName[name], value);
+	state->setNodeState(nodesByName[name], value);
 }
 
 bool MaBoSSNetwork::get_node_value(std::string name) {
-	return state.getNodeState(nodesByName[name]);
+	return state->getNodeState(nodesByName[name]);
 }
 
 std::string MaBoSSNetwork::get_state() {
-	return NetworkState(state.getState() & output_mask.getState()).getName(network);
+	return NetworkState(state->getState() & output_mask->getState()).getName(network);
 }
 
 /* Print current state of all the nodes of the network */
@@ -112,7 +110,7 @@ void MaBoSSNetwork::print_nodes()
 	std::vector<Node*> nodes = this->network->getNodes();
 	for ( auto node: nodes )
 	{
-		std::cout << node->getLabel() << "=" << state.getNodeState(node) << "; ";
+		std::cout << node->getLabel() << "=" << state->getNodeState(node) << "; ";
 		i++;
 	}
 	std::cout << std::endl;
