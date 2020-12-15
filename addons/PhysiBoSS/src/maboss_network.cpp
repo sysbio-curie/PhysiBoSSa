@@ -11,6 +11,9 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 		delete this->config;
 	}
 	
+	if (this->engine != NULL) {
+		delete this->engine;
+	}
 	// Initialize MaBoSS Objects for a model
 	this->network = new Network();
 	this->network->parse(networkFile.c_str());
