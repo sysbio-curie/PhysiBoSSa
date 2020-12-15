@@ -24,21 +24,13 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 	time_tick = copy->time_tick;
 	scaling = copy->scaling;
 	initial_values = copy->initial_values;
+	
 	mutations = copy->mutations;
 	parameters = copy->parameters;
 	
-	if (copy->maboss.has_init()) {
-		maboss.init_maboss(copy->bnd_filename, copy->cfg_filename);
-		maboss.mutate(mutations);
-		maboss.set_initial_values(initial_values);
-		maboss.set_parameters(parameters);
-		maboss.set_update_time_step(copy->time_step);
-		maboss.set_discrete_time(copy->discrete_time, copy->time_tick);
-		maboss.set_scaling(copy->scaling);
-		maboss.restart_node_values();
-		//maboss.set_state(copy->maboss.get_maboss_state());
-		//std::cout << get_state();
-	}	
+	maboss = copy->maboss;
+	maboss.restart_node_values();
+	//maboss.set_state(copy->maboss.get_maboss_state());
 }
 
 void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& node)

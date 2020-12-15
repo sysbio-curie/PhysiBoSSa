@@ -40,6 +40,7 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	MaBoSSIntracellular(MaBoSSIntracellular* copy);
 	
 	Intracellular* clone() {
+		std::cout << "Calling Intracellular clone" << std::endl;
 		return static_cast<Intracellular*>(new MaBoSSIntracellular(this));
 	}
 	Intracellular* getIntracellularModel() {

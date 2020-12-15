@@ -1,8 +1,52 @@
 #include "maboss_network.h"
+MaBoSSNetwork& MaBoSSNetwork::operator=(const MaBoSSNetwork& copy) {
+	std::cout << "Copying MaBoSSNetwork" << std::endl;
+	network = copy.network->clone();
+	config = copy.config->clone();
+	// std::cout << network->toString() << std::endl;
+	IStateGroup::checkAndComplete(this->network);
 
+	engine = new StochasticSimulationEngine(this->network, this->config, PhysiCell::UniformInt());
+
+	this->update_time_step = this->config->getMaxTime();
+	
+	// Building map of nodes for fast later access 
+	for (auto node : this->network->getNodes()) {
+		this->nodesByName[node->getLabel()] = node;
+	}
+	
+	// Building map of parameters for fast later access
+	for (auto parameter : this->network->getSymbolTable()->getSymbolsNames()) {
+		// std::cout << "Parameter : " << parameter << std::endl; 
+		if (parameter[0] == '$')
+			this->parametersByName[parameter] = this->network->getSymbolTable()->getSymbol(parameter);
+	}
+	
+	for (auto node : network->getNodes())
+      if (!node->isInternal()) 
+        output_mask.setNodeState(node, true);
+		
+	mutations = copy.get_mutations();
+	mutate(mutations);
+	initial_values = copy.get_initial_values();
+	set_initial_values(initial_values);
+	// parameters = copy.get_parameters();
+	update_time_step = copy.get_update_time_step();
+	engine->setTimeTick(copy.get_time_tick());
+	engine->setDiscreteTime(copy.get_discrete_time());
+	scaling = copy.get_scaling();
+	restart_node_values();
+		//maboss.set_state(copy->maboss.get_maboss_state());
+	parameters = copy.get_parameters();	
+	for (auto parameter: copy.get_parameters()) {
+		set_parameter_value(parameter.first, parameter.second);
+	}
+	return *this;		
+}
 /* Default constructor */
 void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile)
 {
+	std::cout << "Initializing network MaBoSSNetwork" << std::endl;
 	if (this->network != NULL) {
 		delete this->network;
 	}
@@ -38,7 +82,6 @@ void MaBoSSNetwork::init_maboss( std::string networkFile, std::string configFile
 	for (auto node : network->getNodes())
       if (!node->isInternal()) 
         output_mask.setNodeState(node, true);
-
 }
 
 void MaBoSSNetwork::mutate(std::map<std::string, double> mutations) 
@@ -50,6 +93,7 @@ void MaBoSSNetwork::mutate(std::map<std::string, double> mutations)
 
 void MaBoSSNetwork::set_parameters(std::map<std::string, double> parameters) 
 {	
+	this->parameters = parameters;
 	for (auto parameter: parameters) {
 		set_parameter_value(parameter.first, parameter.second);
 	}

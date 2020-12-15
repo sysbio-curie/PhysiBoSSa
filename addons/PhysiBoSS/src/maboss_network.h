@@ -43,11 +43,14 @@ class MaBoSSNetwork
 		/** \brief Mutations to apply to the network */
 		std::map< std::string, double > mutations;
 	
+		/** \brief Parameters modifications */
+		std::map< std::string, double > parameters;
+	
 		std::map< std::string, Node*> nodesByName;
 		std::map< std::string, const Symbol*> parametersByName;
 	
 		inline void set_time_to_update(){this->time_to_update = this->get_update_time_step();}
-
+		
 	
 	public:
 	
@@ -56,8 +59,18 @@ class MaBoSSNetwork
 			network = NULL;
 			config = NULL;
 			engine = NULL;
-			this->nodesByName.clear();
+			nodesByName.clear();
 		}
+		
+		MaBoSSNetwork(const MaBoSSNetwork& copy){
+			network = NULL;
+			config = NULL;
+			engine = NULL;
+			nodesByName.clear();
+			*this = copy;
+		}
+		
+		MaBoSSNetwork& operator=(const MaBoSSNetwork& copy);
 		
 		/** Desctructor */
 		~MaBoSSNetwork() {
@@ -77,11 +90,13 @@ class MaBoSSNetwork
 
 		bool has_init() const { return network != NULL && config != NULL; }
 		void mutate(std::map<std::string, double> mutations);
-
+		std::map< std::string, double > get_mutations() const { return mutations; }
 		void set_initial_values(std::map<std::string, double> initial_values)
 		{ this->initial_values = initial_values; }
+		std::map<std::string, double> get_initial_values() const { return initial_values; }
 
 		void set_parameters(std::map<std::string, double> parameters);
+		std::map<std::string, double> get_parameters() const { return parameters; }
 
 		double get_parameter_value(std::string name);
 		void set_parameter_value(std::string name, double value);
@@ -118,7 +133,7 @@ class MaBoSSNetwork
 		 * \param time_step Time step between each MaBoSS simulation
 		 */
 		inline void set_update_time_step(double time_step) { this->update_time_step = time_step;}
-		
+		double get_update_time_step() const { return this->update_time_step;} 
 		
 		/** \brief Get time to update*/
 		inline double get_time_to_update() {return this->time_to_update;}
@@ -127,8 +142,11 @@ class MaBoSSNetwork
 		inline void set_discrete_time(bool discrete_time, double time_tick) { 
 			this->engine->setDiscreteTime(discrete_time); this->engine->setTimeTick(time_tick); 
 		}
+		double get_time_tick() const { return this->engine->getTimeTick(); }
+		bool get_discrete_time()  const { return this->engine->getDiscreteTime(); }
 
 		inline void set_scaling(double scaling) { this->scaling = scaling; }
+		double get_scaling() const { return scaling; }
 		
 		/** 
 		 * \brief Print current state of all the nodes of the network 
