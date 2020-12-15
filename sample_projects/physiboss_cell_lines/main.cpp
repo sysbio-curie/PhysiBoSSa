@@ -258,5 +258,21 @@ int main( int argc, char* argv[] )
 	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
 	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
 
+	std::cout << "Deleting cell definitions" << std::endl;
+	for (auto cell_def: cell_definitions_by_index) {
+		if (cell_def != &cell_defaults)
+			delete cell_def;
+	}
+	std::cout << "Done" << std::endl;
+
+	std::cout << "Deleting cells" << std::endl;
+	for (auto cell: *all_cells) {
+		delete cell;	
+	}	
+	std::cout << "Done" << std::endl;
+	delete cell_container;	
+	// std::vector<Cell_Definition*> cell_definitions_by_index;
+
+
 	return 0; 
 }
