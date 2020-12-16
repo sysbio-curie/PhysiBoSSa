@@ -259,6 +259,8 @@ int main( int argc, char* argv[] )
 	
 	std::cout << std::endl << "Total simulation runtime: " << std::endl; 
 	BioFVM::display_stopwatch_value( std::cout , BioFVM::runtime_stopwatch_value() ); 
-
+	
+	std::cout << std::endl << "MaBoSS initialization duration : " << (MaBoSSIntracellular::DURATION_INITIALIZATION/1000000.0) << "s" << std::endl;
+	std::cout << "MaBoSS simulation duration : " << (MaBoSSIntracellular::DURATION_SIMULATION/1000000.0) << "s" << std::endl;
 	return 0; 
 }

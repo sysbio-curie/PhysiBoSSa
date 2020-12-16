@@ -1,5 +1,8 @@
 #include "maboss_intracellular.h"
 
+int64_t MaBoSSIntracellular::DURATION_SIMULATION = 0;
+int64_t MaBoSSIntracellular::DURATION_INITIALIZATION = 0;
+
 MaBoSSIntracellular::MaBoSSIntracellular() : Intracellular()
 {
 	type = "maboss";
@@ -10,12 +13,21 @@ MaBoSSIntracellular::MaBoSSIntracellular() : Intracellular()
 
 MaBoSSIntracellular::MaBoSSIntracellular(pugi::xml_node& node)
 {
+	auto t1 = std::chrono::high_resolution_clock::now();
+
 	type = "maboss";
 	initialize_intracellular_from_pugixml(node);
+	
+	auto t2 = std::chrono::high_resolution_clock::now();
+	auto t_duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+	#pragma omp critical 
+	{MaBoSSIntracellular::DURATION_INITIALIZATION += t_duration; }
 }
 
 MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy) 
 {
+	auto t1 = std::chrono::high_resolution_clock::now();
+
 	type = copy->type;
 	bnd_filename = copy->bnd_filename;
 	cfg_filename = copy->cfg_filename;
@@ -38,7 +50,12 @@ MaBoSSIntracellular::MaBoSSIntracellular(MaBoSSIntracellular* copy)
 		maboss.restart_node_values();
 		//maboss.set_state(copy->maboss.get_maboss_state());
 		//std::cout << get_state();
-	}	
+	}
+	
+	auto t2 = std::chrono::high_resolution_clock::now();
+	auto t_duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+	#pragma omp critical 
+	{MaBoSSIntracellular::DURATION_INITIALIZATION += t_duration; }	
 }
 
 void MaBoSSIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& node)
