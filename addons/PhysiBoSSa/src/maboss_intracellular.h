@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <chrono>
 #include "../../../core/PhysiCell.h"
 #include "../../../core/PhysiCell_phenotype.h"
 #include "../../../core/PhysiCell_cell.h"
@@ -14,9 +15,11 @@ static std::string PhysiBoSS_Version = "2.0.0";
 class MaBoSSIntracellular : public PhysiCell::Intracellular {
  private:
  public:
-
+	static int64_t DURATION_INITIALIZATION;
+	static int64_t DURATION_SIMULATION;
+ 
 	static long counter;
-	
+		
 	std::string bnd_filename;
 	std::string cfg_filename;
 	
@@ -53,8 +56,16 @@ class MaBoSSIntracellular : public PhysiCell::Intracellular {
 	}
 	
 	void update() {
+		auto t1 = std::chrono::high_resolution_clock::now();
 		this->maboss.run_simulation();
 		this->next_physiboss_run += this->maboss.get_time_to_update();
+		auto t2 = std::chrono::high_resolution_clock::now();
+		auto t_duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+		#pragma omp critical 
+		{MaBoSSIntracellular::DURATION_SIMULATION += t_duration; }
+		
+			
+		
 	}
 	
 	bool need_update() {
