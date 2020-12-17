@@ -191,7 +191,7 @@ arnau-model:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp -r ./sample_projects/Arnau_model/config/* ./config/
 	mkdir ./scripts/
-	cp ./sample_projects/Arnau_model/scripts/* ./scripts/
+	cp -r ./sample_projects/Arnau_model/scripts/* ./scripts/
 
 sorting: 	
 	cp -r ./sample_projects/sorting/custom_modules/* ./custom_modules/
