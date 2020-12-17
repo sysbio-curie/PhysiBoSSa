@@ -142,8 +142,8 @@ void setup_tissue( void )
 	// All start with A active and C inactive, B is random
 	// We print the value of C
 	
-	for (int i=0; i < 90; i+= 10)
-		for (int j=0; j < 90; j+= 10){
+	for (int i=0; i < 10; i+= 10)
+		for (int j=0; j < 10; j+= 10){
 			
 			// bottom left : default
 			// the formula for C is A&B. Meaning that C will only activate for half the cells
