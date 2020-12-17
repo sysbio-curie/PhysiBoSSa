@@ -1,4 +1,4 @@
-name: Tests Ubuntu
+name: Tests Classic
 
 on:
   push:
@@ -22,10 +22,17 @@ jobs:
         make
         
     - name: Run PhysiBoSS cell lines project
-      run: |
-        time ./Arnau_model
-        time ./Arnau_model
-        time ./Arnau_model
-        time ./Arnau_model
-        time ./Arnau_model
+      run: time ./Arnau_model
+      
+    - name: Run PhysiBoSS cell lines project
+      run: time ./Arnau_model
+      
+    - name: Run PhysiBoSS cell lines project
+      run: time ./Arnau_model
+      
+    - name: Run PhysiBoSS cell lines project
+      run: time ./Arnau_model
+      
+    - name: Run PhysiBoSS cell lines project
+      run: time ./Arnau_model
         

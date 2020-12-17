@@ -1,0 +1,38 @@
+name: Tests Bitset
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install dependencies
+      run: sudo apt-get install flex bison
+      
+    - name: Build PhysiBoSS cell lines project
+      run: |
+        make arnau-model
+        make clean
+        make MABOSS_MAX_NODES=70
+           
+    - name: Run PhysiBoSS cell lines project
+      run: time ./Arnau_model
+      
+    - name: Run PhysiBoSS cell lines project
+      run: time ./Arnau_model
+      
+    - name: Run PhysiBoSS cell lines project
+      run: time ./Arnau_model
+      
+    - name: Run PhysiBoSS cell lines project
+      run: time ./Arnau_model
+      
+    - name: Run PhysiBoSS cell lines project
+      run: time ./Arnau_model
+        
