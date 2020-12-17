@@ -86,6 +86,21 @@ Expression* Expression::cloneAndShrinkRecursive(Expression* expr)
   return NULL;
 }
 
+Expression* Expression::cloneAndShrinkRecursive(Expression* expr, Network& network)
+{
+  Expression* shrinked_expr = expr;
+  for (;;) {
+    bool shrinked = false;
+    Expression* shrinked_expr_new = shrinked_expr->cloneAndShrink(shrinked, network);
+    delete shrinked_expr;
+    shrinked_expr = shrinked_expr_new;
+    if (!shrinked) {
+      return shrinked_expr;
+    }
+  }
+  return NULL;
+}
+
 Expression* Node::rewriteLogicalExpression(Expression* ref_rateUpExpr, Expression* ref_rateDownExpr) const
 {
   return
@@ -185,6 +200,31 @@ Expression* CondExpression::cloneAndShrink(bool& shrinked) const
      );
 }
 
+Expression* CondExpression::cloneAndShrink(bool& shrinked, Network& network) const
+{
+  shrinked = true;
+ 
+  bool cond_value;
+  if (cond_expr->evalIfConstant(cond_value)) {
+    return cond_value ? true_expr->clone(network) : false_expr->clone(network);
+  }
+
+  return
+    new OrLogicalExpression
+    (
+     new AndLogicalExpression
+     (
+      cond_expr->clone(network),
+      true_expr->clone(network)
+      ),
+     new AndLogicalExpression
+     (
+      new NotLogicalExpression(cond_expr->clone(network)),
+      false_expr->clone(network)
+      )
+     );
+}
+
 void CondExpression::generateLogicalExpression(LogicalExprGenContext& genctx) const
 {
   throw BNException(LOGICAL_EXPR_MSG + "CondExpression INTERNAL ERROR");
@@ -250,6 +290,16 @@ Expression* NotLogicalExpression::cloneAndShrink(bool& shrinked) const
   return new NotLogicalExpression(expr->cloneAndShrink(shrinked));
 }
 
+Expression* NotLogicalExpression::cloneAndShrink(bool& shrinked, Network& network) const
+{
+  bool b_expr;
+  if (expr->evalIfConstant(b_expr)) {
+    shrinked = true;
+    return new ConstantExpression(b_expr);
+  }
+  return new NotLogicalExpression(expr->cloneAndShrink(shrinked, network));
+}
+
 void OrLogicalExpression::generateLogicalExpression(LogicalExprGenContext& genctx) const
 {
   LogicalExprGenContext::LevelManager levelManager(genctx);
@@ -302,6 +352,27 @@ Expression* OrLogicalExpression::cloneAndShrink(bool& shrinked) const
     return left->cloneAndShrink(shrinked);
   }
   return new OrLogicalExpression(left->cloneAndShrink(shrinked), right->cloneAndShrink(shrinked));
+}
+
+Expression* OrLogicalExpression::cloneAndShrink(bool& shrinked, Network& network) const
+{
+  bool b_left;
+  if (left->evalIfConstant(b_left)) {
+    shrinked = true;
+    if (b_left) {
+      return new ConstantExpression(1);
+    }
+    return right->cloneAndShrink(shrinked, network);
+  }
+  bool b_right;
+  if (right->evalIfConstant(b_right)) {
+    shrinked = true;
+    if (b_right) {
+      return new ConstantExpression(1);
+    }
+    return left->cloneAndShrink(shrinked, network);
+  }
+  return new OrLogicalExpression(left->cloneAndShrink(shrinked, network), right->cloneAndShrink(shrinked, network));
 }
 
 void AndLogicalExpression::generateLogicalExpression(LogicalExprGenContext& genctx) const
@@ -357,6 +428,26 @@ Expression* AndLogicalExpression::cloneAndShrink(bool& shrinked) const
   }
   return new AndLogicalExpression(left->cloneAndShrink(shrinked), right->cloneAndShrink(shrinked));
 }
+Expression* AndLogicalExpression::cloneAndShrink(bool& shrinked, Network& network) const
+{
+  bool b_left;
+  if (left->evalIfConstant(b_left)) {
+    shrinked = true;
+    if (!b_left) {
+      return new ConstantExpression(0);
+    }
+    return right->cloneAndShrink(shrinked, network);
+  }
+  bool b_right;
+  if (right->evalIfConstant(b_right)) {
+    shrinked = true;
+    if (!b_right) {
+      return new ConstantExpression(0);
+    }
+    return left->cloneAndShrink(shrinked, network);
+  }
+  return new AndLogicalExpression(left->cloneAndShrink(shrinked, network), right->cloneAndShrink(shrinked, network));
+}
 
 Expression* XorLogicalExpression::cloneAndShrink(bool& shrinked) const
 {
@@ -399,6 +490,49 @@ Expression* XorLogicalExpression::cloneAndShrink(bool& shrinked) const
   }
   return new XorLogicalExpression(left->cloneAndShrink(shrinked), right->cloneAndShrink(shrinked));
 }
+
+Expression* XorLogicalExpression::cloneAndShrink(bool& shrinked, Network& network) const
+{
+  if (rewrite_xor) {
+    shrinked = true;
+    return
+      new AndLogicalExpression
+      (
+       new OrLogicalExpression
+       (
+	left->clone(network),
+	right->clone(network)
+	),
+       new NotLogicalExpression
+       (
+	new AndLogicalExpression
+	(
+	left->clone(network),
+	right->clone(network)
+	 )
+	)
+       );
+  }
+
+  bool b_left;
+  if (left->evalIfConstant(b_left)) {
+    shrinked = true;
+    if (b_left) {
+      return new NotLogicalExpression(right->cloneAndShrink(shrinked, network));
+    }
+    return right->cloneAndShrink(shrinked, network);
+  }
+  bool b_right;
+  if (right->evalIfConstant(b_right)) {
+    shrinked = true;
+    if (b_right) {
+      return new NotLogicalExpression(left->cloneAndShrink(shrinked, network));
+    }
+    return left->cloneAndShrink(shrinked, network);
+  }
+  return new XorLogicalExpression(left->cloneAndShrink(shrinked, network), right->cloneAndShrink(shrinked, network));
+}
+
 
 void XorLogicalExpression::generateLogicalExpression(LogicalExprGenContext& genctx) const
 {

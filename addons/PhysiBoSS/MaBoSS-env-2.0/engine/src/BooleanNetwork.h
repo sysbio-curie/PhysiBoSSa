@@ -749,6 +749,9 @@ public:
     return clone();
   }
 
+  virtual Expression* cloneAndShrink(bool& shrinked, Network& network) const {
+    return clone(network);
+  }
   virtual void display(std::ostream& os) const = 0;
   virtual bool isConstantExpression() const {return false;}
   virtual bool isLogicalExpression() const {return false;}
@@ -760,6 +763,7 @@ public:
   bool evalIfConstant(bool& value) const;
 
   static Expression* cloneAndShrinkRecursive(Expression* expr);
+  static Expression* cloneAndShrinkRecursive(Expression* expr, Network& network);
 
   virtual const NotLogicalExpression* asNotLogicalExpression() const {return NULL;}
 
@@ -1061,6 +1065,7 @@ public:
   Expression* clone(Network& network) const {return new CondExpression(cond_expr->clone(network), true_expr->clone(network), false_expr->clone(network));}
 
   Expression* cloneAndShrink(bool& shrinked) const;
+  Expression* cloneAndShrink(bool& shrinked, Network& network) const;
   //  Expression* cloneAndShrink(bool& shrinked) const {return new CondExpression(cond_expr->cloneAndShrink(shrinked), true_expr->cloneAndShrink(shrinked), false_expr->cloneAndShrink(shrinked));}
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
@@ -1214,6 +1219,7 @@ class OrLogicalExpression : public BinaryExpression {
 public:
   OrLogicalExpression(Expression* left, Expression* right) : BinaryExpression(left, right) { }
   Expression* cloneAndShrink(bool& shrinked) const;
+  Expression* cloneAndShrink(bool& shrinked, Network& network) const;
 
   Expression* clone() const {return new OrLogicalExpression(left->clone(), right->clone());}
   Expression* clone(Network& network) const {return new OrLogicalExpression(left->clone(network), right->clone(network));}
@@ -1243,6 +1249,7 @@ public:
   Expression* clone() const {return new AndLogicalExpression(left->clone(), right->clone());}
   Expression* clone(Network& network) const {return new AndLogicalExpression(left->clone(network), right->clone(network));}
   Expression* cloneAndShrink(bool& shrinked) const;
+  Expression* cloneAndShrink(bool& shrinked, Network& network) const;
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return (double)((bool)left->eval(this_node, network_state) && (bool)right->eval(this_node, network_state));
@@ -1270,6 +1277,7 @@ public:
   Expression* clone(Network& network) const {return new XorLogicalExpression(left->clone(network), right->clone(network));}
 
   Expression* cloneAndShrink(bool& shrinked) const;
+  Expression* cloneAndShrink(bool& shrinked, Network& network) const;
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return (double)((bool)left->eval(this_node, network_state) ^ (bool)right->eval(this_node, network_state));
@@ -1295,6 +1303,7 @@ public:
   Expression* clone() const {return new NotLogicalExpression(expr->clone());}
   Expression* clone(Network& network) const {return new NotLogicalExpression(expr->clone(network));}
   Expression* cloneAndShrink(bool& shrinked) const;
+  Expression* cloneAndShrink(bool& shrinked, Network& network) const;
 
   double eval(const Node* this_node, const NetworkState& network_state) const {
     return (double)(!((bool)expr->eval(this_node, network_state)));
@@ -1331,6 +1340,9 @@ public:
 
   Expression* cloneAndShrink(bool& shrinked) const {
     return new ParenthesisExpression(expr->cloneAndShrink(shrinked));
+  }
+  Expression* cloneAndShrink(bool& shrinked, Network& network) const {
+    return new ParenthesisExpression(expr->cloneAndShrink(shrinked, network));
   }
 
   bool generationWillAddParenthesis() const {return true;}
