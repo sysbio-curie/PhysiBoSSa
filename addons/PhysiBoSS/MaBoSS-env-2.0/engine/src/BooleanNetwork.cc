@@ -341,8 +341,11 @@ double Node::getRateDown(const NetworkState& network_state) const
 
 void Node::mutate(double value) 
 {
+    delete logicalInputExpr;
     logicalInputExpr = new ConstantExpression(value);
+    delete rateUpExpr;
     rateUpExpr = NULL;
+    delete rateDownExpr;
     rateDownExpr = NULL;
 }
 
