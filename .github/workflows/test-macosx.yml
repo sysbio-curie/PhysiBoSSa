@@ -1,0 +1,26 @@
+name: Tests MacOSX
+
+on:
+  push:
+  pull_request:
+    
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run : brew install flex bison gcc@10
+
+    - name: Build Virus Macrophage project
+      run: |
+        make virus-macrophage-sample
+        make PHYSICELL_CPP=g++-10
+        
+    - name: Run Virus Macrophage cell lines project
+      run: |
+        ./virus-sample
+        
