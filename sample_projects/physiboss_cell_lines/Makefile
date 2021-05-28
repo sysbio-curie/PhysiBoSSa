@@ -26,13 +26,13 @@ ifneq ($(OS), Windows_NT)
 	LDL_FLAG = -ldl
 endif
 
-LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS $(LDL_FLAG)
+LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS-static $(LDL_FLAG)
 INC := -DADDON_PHYSIBOSS -I$(CUR_DIR)/$(MABOSS_DIR)/include -DMAXNODES=$(MABOSS_MAX_NODES)
 
 
 # If max nodes > 64, change lib path 
 ifeq ($(shell expr $(MABOSS_MAX_NODES) '>' 64), 1)
-LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS_$(MABOSS_MAX_NODES)n $(LDL_FLAG)
+LIB := -L$(CUR_DIR)/$(MABOSS_DIR)/lib -lMaBoSS_$(MABOSS_MAX_NODES)n-static $(LDL_FLAG)
 endif
 
 ARCH := native # best auto-tuning
@@ -164,8 +164,8 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 # user-defined PhysiCell modules
 
-MaBoSS:
-	cd $(MABOSS_DIR)/src && make MAXNODES=$(MABOSS_MAX_NODES) CXX=$(CC) install_alib
+MaBoSS: 
+	python3 beta/setup_libmaboss.py
 
 maboss_network.o: ./addons/PhysiBoSS/src/maboss_network.cpp
 	$(COMPILE_COMMAND) $(INC) -c ./addons/PhysiBoSS/src/maboss_network.cpp
@@ -190,7 +190,7 @@ reset:
 	rm -rf ./scripts
 
 MaBoSS-clean:
-	cd $(MABOSS_DIR)/src && make clean
+	rm -fr addons/PhysiBoSS/MaBoSS-env-2.0
 	
 clean: MaBoSS-clean
 	rm -f *.o
