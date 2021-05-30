@@ -13,8 +13,8 @@ make MAXNODES=512 install_alib
 make MAXNODES=1024 install_alib
 
 mkdir -p ${PREFIX}/lib
-mv ../pub/libMaBoSS* ${PREFIX}/lib
+mv ../lib/libMaBoSS* ${PREFIX}/lib
 
 mkdir -p ${PREFIX}/include
-mv *.h ${PREFIX}/include
+mv ../include/*.h ${PREFIX}/include
 
