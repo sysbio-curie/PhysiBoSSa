@@ -5,32 +5,28 @@ on:
   pull_request:
     
 jobs:
-  build:
-
+ 
+  conda_maboss:
+    name: Build Conda MaBoSS package
     runs-on: macos-latest
-
+  
     steps:
     - uses: actions/checkout@v2
+    - uses: s-weigand/setup-conda@v1
 
-    - name: Install dependencies
-      run : brew install flex bison gcc@10
+    - name: Installing conda-build      
+      run: conda install conda-build anaconda-client
 
-    - name: Build Virus Macrophage project
+    - name: Downgrading XCode to 11.7
       run: |
-        make virus-macrophage-sample
-        make PHYSICELL_CPP=g++-10
-        
-    - name: Run Virus Macrophage cell lines project
+        sudo xcode-select -s /Applications/Xcode_11.7.app/Contents/Developer
+        brew reinstall llvm    
+    
+    - name: Build MaBoSS Anaconda package
       run: |
-        ./virus-sample
-        
-    - name: Build PhysiBoSS cell lines project
-      run: |
-        make reset
-        make physiboss-cell-lines
-        make clean
-        make PHYSICELL_CPP=g++-10
-        
-    - name: Run PhysiBoSS cell lines project
-      run: |
-        ./PhysiBoSS_Cell_Lines
+        conda build libmaboss
+           
+    - name: Upload MaBoSS to Anaconda cloud
+      run: |   
+        anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload -u vincent-noel /usr/local/miniconda/conda-bld/osx-64/*.tar.bz2 --force;
+ 

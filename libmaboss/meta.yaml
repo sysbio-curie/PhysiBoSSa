@@ -1,0 +1,24 @@
+{% set name = "libMaBoSS" %}
+{% set version = "2.3.5" %}
+
+package:
+  name: '{{ name|lower }}'
+  version: '{{ version }}'
+
+source:
+  path: ../
+    
+build:
+  number: 0
+  binary_relocation: False
+
+requirements:
+  build:
+    - {{ compiler('cxx') }}
+    - flex
+    - bison
+    - make
+      
+about:
+  home:  https://maboss.curie.fr
+
